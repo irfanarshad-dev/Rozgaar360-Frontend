@@ -468,7 +468,7 @@ This project is part of a Final Year Project (FYP) for educational purposes.
 ## 👨💻 Team
 
 **Rozgaar360 Development Team**
-- GitHub: [@yourusername](https://github.com/irfanarshad-dev)
+- GitHub: irfanarshad-dev
 - Email: dev.irfan077@gmail.com
 
 ---
