@@ -1,0 +1,14 @@
+{
+  "dashboard": "Worker Dashboard",
+  "manageProfile": "Manage your profile and services",
+  "profilePhoto": "Profile Photo",
+  "editProfile": "Edit Profile",
+  "profileInformation": "Profile Information",
+  "name": "Name",
+  "phone": "Phone",
+  "city": "City",
+  "skill": "Skill",
+  "experience": "Experience",
+  "verificationStatus": "Verification Status",
+  "cnicVerification": "CNIC Verification"
+}
