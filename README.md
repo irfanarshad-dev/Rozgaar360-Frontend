@@ -446,112 +446,6 @@ GET  /api/notifications          # Get user notifications
 PUT  /api/notifications/:id/read # Mark as read
 ```
 
----
-
-## 🧪 Development
-
-### Available Scripts
-
-```bash
-# Development server with Turbopack (Fast Refresh)
-npm run dev
-
-# Production build
-npm run build
-
-# Start production server
-npm start
-
-# Run ESLint
-npm run lint
-```
-
-### Environment Setup
-
-**Development**:
-- API runs on `http://localhost:3001`
-- Frontend runs on `http://localhost:3000`
-- Stripe test mode enabled
-
-**Production**:
-- Update `NEXT_PUBLIC_API_BASE_URL` to production API
-- Use production Stripe keys
-- Enable proper CORS settings
-
----
-
-## 🚢 Deployment
-
-### Vercel (Recommended)
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-
-1. Push code to GitHub
-2. Import project in Vercel
-3. Add environment variables:
-   - `NEXT_PUBLIC_API_BASE_URL`
-   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-4. Deploy
-
-### Netlify
-
-```bash
-npm run build
-# Deploy .next folder
-```
-
-### Docker
-
-```dockerfile
-FROM node:18-alpine AS base
-
-# Install dependencies
-FROM base AS deps
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-
-# Build application
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-RUN npm run build
-
-# Production image
-FROM base AS runner
-WORKDIR /app
-ENV NODE_ENV production
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-
-EXPOSE 3000
-CMD ["node", "server.js"]
-```
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Commit your changes**
-   ```bash
-   git commit -m 'Add amazing feature'
-   ```
-4. **Push to the branch**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-5. **Open a Pull Request**
-
 ### Coding Standards
 
 - Use functional components with hooks
@@ -574,8 +468,8 @@ This project is part of a Final Year Project (FYP) for educational purposes.
 ## 👨💻 Team
 
 **Rozgaar360 Development Team**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: contact@rozgaar360.com
+- GitHub: [@yourusername](https://github.com/irfanarshad-dev)
+- Email: dev.irfan077@gmail.com
 
 ---
 
@@ -587,14 +481,6 @@ This project is part of a Final Year Project (FYP) for educational purposes.
 - Stripe for secure payment processing
 - Socket.io for real-time capabilities
 - All open-source contributors
-
----
-
-## 📞 Support
-
-For support:
-- Email: support@rozgaar360.com
-- Issues: [GitHub Issues](https://github.com/yourusername/rozgaar360-frontend/issues)
 
 ---
 
