@@ -1,13 +1,16 @@
 'use client';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '@/lib/axios';
 import { X } from 'lucide-react';
 
 export default function UploadCNIC({ userId, onUploadSuccess }) {
+  const { t } = useTranslation('worker');
   const [files, setFiles] = useState({ front: null, back: null });
   const [previews, setPreviews] = useState({ front: null, back: null });
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState('');
+  const [statusType, setStatusType] = useState('');
   const [errors, setErrors] = useState({ front: '', back: '' });
 
   const handleFileChange = (side, file) => {
@@ -15,14 +18,14 @@ export default function UploadCNIC({ userId, onUploadSuccess }) {
       // Validate file size (2MB limit)
       const maxSize = 2 * 1024 * 1024;
       if (file.size > maxSize) {
-        setErrors(prev => ({ ...prev, [side]: 'File size exceeds 2MB limit' }));
+        setErrors(prev => ({ ...prev, [side]: t('uploadCnic.fileTooLarge') }));
         return;
       }
 
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
       if (!allowedTypes.includes(file.type)) {
-        setErrors(prev => ({ ...prev, [side]: 'Only JPEG, JPG and PNG files are allowed' }));
+        setErrors(prev => ({ ...prev, [side]: t('uploadCnic.fileTypeInvalid') }));
         return;
       }
 
@@ -46,38 +49,42 @@ export default function UploadCNIC({ userId, onUploadSuccess }) {
 
   const handleUpload = async () => {
     if (!files.front || !files.back) {
-      alert('Please select both front and back images');
+      alert(t('uploadCnic.selectBothSides'));
       return;
     }
 
     // Validate file size (2MB limit)
     const maxSize = 2 * 1024 * 1024;
     if (files.front.size > maxSize || files.back.size > maxSize) {
-      setStatus('File size must be less than 2MB');
+      setStatus(t('uploadCnic.fileMustBeLessThan2mb'));
+      setStatusType('error');
       return;
     }
 
     // Validate file types
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
     if (!allowedTypes.includes(files.front.type) || !allowedTypes.includes(files.back.type)) {
-      setStatus('Only JPEG, JPG and PNG files are allowed');
+      setStatus(t('uploadCnic.fileTypeInvalid'));
+      setStatusType('error');
       return;
     }
 
     setUploading(true);
     setStatus('');
+    setStatusType('');
     const formData = new FormData();
     formData.append('cnicFront', files.front);
     formData.append('cnicBack', files.back);
 
     try {
-      const response = await api.post('/api/verification/upload', formData, {
+      await api.post('/api/verification/upload', formData, {
         headers: { 
           'Content-Type': 'multipart/form-data'
         },
         timeout: 60000 // 60 seconds for file upload
       });
-      setStatus('CNIC uploaded successfully! Verification pending.');
+      setStatus(t('uploadCnic.uploadSuccess'));
+      setStatusType('success');
       setFiles({ front: null, back: null });
       setPreviews({ front: null, back: null });
       
@@ -87,8 +94,9 @@ export default function UploadCNIC({ userId, onUploadSuccess }) {
       }
     } catch (error) {
       console.error('Upload error:', error);
-      const errorMsg = error.response?.data?.message || error.message || 'Upload failed. Please try again.';
+      const errorMsg = error.response?.data?.message || error.message || t('uploadCnic.uploadFailed');
       setStatus(errorMsg);
+      setStatusType('error');
     } finally {
       setUploading(false);
     }
@@ -96,11 +104,11 @@ export default function UploadCNIC({ userId, onUploadSuccess }) {
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg">
-      <h3 className="text-xl font-semibold mb-4">CNIC Verification {/* شناختی کارڈ کی تصدیق */}</h3>
+      <h3 className="text-xl font-semibold mb-4">{t('uploadCnic.title')}</h3>
       
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium mb-2">CNIC Front {/* شناختی کارڈ کا اگلا حصہ */}</label>
+          <label className="block text-sm font-medium mb-2">{t('uploadCnic.cnicFront')}</label>
           <input
             type="file"
             accept="image/*"
@@ -112,11 +120,11 @@ export default function UploadCNIC({ userId, onUploadSuccess }) {
           )}
           {previews.front && (
             <div className="relative mt-2">
-              <img src={previews.front} alt="CNIC Front" className="w-full h-32 object-cover rounded-lg" />
+              <img src={previews.front} alt={t('uploadCnic.cnicFront')} className="w-full h-32 object-cover rounded-lg" />
               <button
                 onClick={() => handleRemove('front')}
                 className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg transition-colors"
-                title="Remove image"
+                title={t('uploadCnic.removeImage')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -125,7 +133,7 @@ export default function UploadCNIC({ userId, onUploadSuccess }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">CNIC Back {/* شناختی کارڈ کا پچھلا حصہ */}</label>
+          <label className="block text-sm font-medium mb-2">{t('uploadCnic.cnicBack')}</label>
           <input
             type="file"
             accept="image/*"
@@ -137,11 +145,11 @@ export default function UploadCNIC({ userId, onUploadSuccess }) {
           )}
           {previews.back && (
             <div className="relative mt-2">
-              <img src={previews.back} alt="CNIC Back" className="w-full h-32 object-cover rounded-lg" />
+              <img src={previews.back} alt={t('uploadCnic.cnicBack')} className="w-full h-32 object-cover rounded-lg" />
               <button
                 onClick={() => handleRemove('back')}
                 className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg transition-colors"
-                title="Remove image"
+                title={t('uploadCnic.removeImage')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -155,11 +163,11 @@ export default function UploadCNIC({ userId, onUploadSuccess }) {
         disabled={uploading || !files.front || !files.back || errors.front || errors.back}
         className="mt-4 w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        {uploading ? 'Uploading...' : 'Upload CNIC'} {/* اپ لوڈ کیا جا رہا ہے */}
+        {uploading ? t('uploadCnic.uploading') : t('uploadCnic.uploadButton')}
       </button>
 
       {status && (
-        <p className={`mt-2 text-sm ${status.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+        <p className={`mt-2 text-sm ${statusType === 'success' ? 'text-green-600' : 'text-red-600'}`}>
           {status}
         </p>
       )}

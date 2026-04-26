@@ -1,30 +1,60 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
+@import "./rtl.css";
 
+/* ========== DESIGN TOKENS ========== */
 :root {
   --background: #ffffff;
   --foreground: #0f172a;
-  --primary: #2563eb;
-  --primary-light: #3b82f6;
-  --primary-dark: #1d4ed8;
+
+  /* Primary */
+  --primary-50:  #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-500: #3b82f6;
+  --primary:     #2563eb;
+  --primary-dark:#1d4ed8;
+
+  /* Accent */
   --accent: #06b6d4;
-  --surface: #f8fafc;
-  --border: #e2e8f0;
+
+  /* Surface */
+  --surface:   #f8fafc;
+  --surface-2: #f1f5f9;
+  --border:    #e2e8f0;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 2px 0 rgba(0,0,0,0.05);
+  --shadow-md:  0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
+  --shadow-lg:  0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+  --shadow-xl:  0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0,0,0,0.18);
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl:24px;
+
+  /* Spacing scale (8px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
+/* ========== RESETS ========== */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
 
@@ -59,12 +89,12 @@ body {
 @keyframes pulseRing {
   0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37,99,235,0.4); }
   70%  { transform: scale(1);    box-shadow: 0 0 0 14px rgba(37,99,235,0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0  rgba(37,99,235,0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(37,99,235,0); }
 }
 
 @keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
 }
 
 @keyframes spin-slow {
@@ -82,25 +112,48 @@ body {
   to   { opacity: 1; transform: translateX(0); }
 }
 
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-100px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
 @keyframes pulse-slow {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 }
 
-/* ========== UTILITIES ========== */
+@keyframes skeleton-wave {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
 
-.animate-fadeInUp   { animation: fadeInUp 0.7s ease both; }
-.animate-fadeInLeft  { animation: fadeInLeft 0.7s ease both; }
-.animate-fadeInRight { animation: fadeInRight 0.7s ease both; }
-.animate-floatY      { animation: floatY 4s ease-in-out infinite; }
-.animate-spin-slow   { animation: spin-slow 20s linear infinite; }
-.animate-blob        { animation: blob 8s ease-in-out infinite; }
-.animate-pulse-ring  { animation: pulseRing 2s cubic-bezier(0.455,0.03,0.515,0.955) infinite; }
-.animate-slideInRight { animation: slideInRight 0.4s ease both; }
-.animate-pulse-slow  { animation: pulse-slow 3s ease-in-out infinite; }
+/* ========== ANIMATION UTILITIES ========== */
 
-.animation-delay-2000 { animation-delay: 2s; }
-.animation-delay-4000 { animation-delay: 4s; }
+.animate-fadeInUp       { animation: fadeInUp 0.7s ease both; }
+.animate-fadeInLeft     { animation: fadeInLeft 0.7s ease both; }
+.animate-fadeInRight    { animation: fadeInRight 0.7s ease both; }
+.animate-floatY         { animation: floatY 4s ease-in-out infinite; }
+.animate-spin-slow      { animation: spin-slow 20s linear infinite; }
+.animate-blob           { animation: blob 8s ease-in-out infinite; }
+.animate-pulse-ring     { animation: pulseRing 2s cubic-bezier(0.455,0.03,0.515,0.955) infinite; }
+.animate-slideInRight   { animation: slideInRight 0.4s ease both; }
+.animate-slideInLeft    { animation: slideInLeft 0.4s ease both; }
+.animate-slideDown      { animation: slideDown 0.25s ease both; }
+.animate-scaleIn        { animation: scaleIn 0.2s ease both; }
+.animate-pulse-slow     { animation: pulse-slow 3s ease-in-out infinite; }
+
+.animation-delay-2000   { animation-delay: 2s; }
+.animation-delay-4000   { animation-delay: 4s; }
 
 .delay-100  { animation-delay: 0.1s; }
 .delay-200  { animation-delay: 0.2s; }
@@ -110,20 +163,43 @@ body {
 .delay-600  { animation-delay: 0.6s; }
 .delay-700  { animation-delay: 0.7s; }
 
-/* ========== CURSOR POINTER ========== */
-button,
-a,
-[role="button"],
-.cursor-pointer,
-select,
-input[type="checkbox"],
-input[type="radio"],
-input[type="submit"],
-input[type="button"],
-.service-card-hover,
-.stat-card {
-  cursor: pointer;
+/* ========== SKELETON LOADING ========== */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 25%,
+    #e2e8f0 50%,
+    #f1f5f9 75%
+  );
+  background-size: 400px 100%;
+  animation: skeleton-wave 1.4s ease-in-out infinite;
+  border-radius: var(--radius-md);
 }
+
+/* ========== CURSOR POINTER ========== */
+
+button, a, [role="button"], .cursor-pointer,
+select, input[type="checkbox"], input[type="radio"],
+input[type="submit"], input[type="button"],
+.service-card-hover, .stat-card { cursor: pointer; }
+
+/* ========== SCROLLBAR ========== */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+.scrollbar-thin::-webkit-scrollbar { width: 4px; }
+.scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 99px;
+}
+
+/* ========== GRADIENT TEXT ========== */
 
 .gradient-text {
   background: linear-gradient(135deg, #2563eb 0%, #06b6d4 50%, #8b5cf6 100%);
@@ -134,11 +210,15 @@ input[type="button"],
   animation: gradientPan 5s ease infinite;
 }
 
+/* ========== HERO GRADIENT ========== */
+
 .hero-gradient {
   background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 40%, #1e40af 70%, #0f172a 100%);
   background-size: 300% 300%;
   animation: gradientPan 10s ease infinite;
 }
+
+/* ========== GLASS ========== */
 
 .glass-card {
   background: rgba(255,255,255,0.05);
@@ -146,6 +226,14 @@ input[type="button"],
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255,255,255,0.12);
 }
+
+.glass-nav {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ========== SERVICE CARD ========== */
 
 .service-card-hover {
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -155,6 +243,8 @@ input[type="button"],
   transform: translateY(-8px) scale(1.03);
   box-shadow: 0 24px 48px -12px rgba(37, 99, 235, 0.2);
 }
+
+/* ========== BUTTONS ========== */
 
 .btn-primary {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
@@ -166,6 +256,9 @@ input[type="button"],
   transform: translateY(-2px);
   box-shadow: 0 16px 40px -8px rgba(37,99,235,0.7);
 }
+.btn-primary:active { transform: translateY(0); }
+
+/* ========== STAT CARD ========== */
 
 .stat-card {
   background: rgba(255,255,255,0.08);
@@ -179,8 +272,39 @@ input[type="button"],
   transform: translateY(-4px);
 }
 
+/* ========== SECTION DIVIDER ========== */
+
 .section-divider {
   background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
   height: 1px;
   width: 100%;
+}
+
+/* ========== FORM FOCUS RING ========== */
+
+.form-input {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+}
+
+/* ========== SIDEBAR ========== */
+
+.sidebar-link-active {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* ========== CARD HOVER ========== */
+
+.card-hover {
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px -6px rgba(0,0,0,0.1);
 }

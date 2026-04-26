@@ -1,6 +1,19 @@
+'use client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 export default function WorkerCard({ worker }) {
+  const router = useRouter();
+  const { t } = useTranslation(['common']);
+
+  const handleContact = () => {
+    const userStr = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+    const user = userStr ? JSON.parse(userStr) : {};
+    const route = user.role === 'worker' ? '/worker/chat' : '/customer/chat';
+    router.push(`${route}?workerId=${worker.id}`);
+  };
+
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
       <div className="flex items-start space-x-4">
@@ -21,7 +34,7 @@ export default function WorkerCard({ worker }) {
               {'☆'.repeat(5 - Math.floor(worker.rating))}
             </div>
             <span className="ml-2 text-sm text-gray-600">
-              {worker.rating} ({worker.reviewCount} reviews) {/* جائزے */}
+              {worker.rating} ({worker.reviewCount} {t('common:reviews')})
             </span>
           </div>
         </div>
@@ -32,10 +45,13 @@ export default function WorkerCard({ worker }) {
           href={`/profile/${worker.id}`}
           className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg text-center hover:bg-blue-700"
         >
-          View Profile {/* پروفائل دیکھیں */}
+          {t('common:viewProfile')}
         </Link>
-        <button className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700">
-          Contact {/* رابطہ */}
+        <button 
+          onClick={handleContact}
+          className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
+        >
+          {t('common:contact')}
         </button>
       </div>
     </div>

@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react';
 import { authService } from '@/lib/auth';
 import ChatWindow from '../../components/ChatWindow';
 import api from '@/lib/axios';
+import { useTranslation } from 'react-i18next';
 
 export default function ChatConversationPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useTranslation('common');
   const [conversation, setConversation] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,19 +26,19 @@ export default function ChatConversationPage() {
         setConversation({ _id: params.id });
       } catch (error) {
         console.error('Failed to access conversation:', error);
-        alert('You do not have access to this conversation');
+        alert(t('chatAccessDenied'));
         router.push('/customer/bookings');
       } finally {
         setLoading(false);
       }
     };
     init();
-  }, [params.id, router]);
+  }, [params.id, router, t]);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-xl">Loading chat...</div>
+        <div className="text-xl">{t('loadingChat')}</div>
       </div>
     );
   }
@@ -49,7 +51,7 @@ export default function ChatConversationPage() {
     <div className="h-screen bg-white overflow-hidden">
       <ChatWindow
         conversationId={params.id}
-        otherUserName="Chat"
+        otherUserName={t('messages')}
         onBack={() => router.back()}
       />
     </div>

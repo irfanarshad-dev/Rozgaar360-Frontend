@@ -1,7 +1,235 @@
 {
-  "dashboard": "گاہک ڈیش بورڈ",
-  "findHireWorkers": "ماہر کارکنان تلاش کریں اور ملازمت دیں",
+  "customerDashboard": "صارف ڈیش بورڈ",
   "findWorkers": "کارکن تلاش کریں",
-  "discoverWorkers": "اپنے قریب ماہر کارکنان دریافت کریں",
-  "findBestWorker": "اپنے قریب بہترین کارکن تلاش کریں"
+  "myBookings": "میری بکنگز",
+  "favorites": "پسندیدہ",
+  "recentlyViewed": "حال ہی میں دیکھا گیا",
+  "bookNow": "ابھی بک کریں",
+  "viewProfile": "پروفائل دیکھیں",
+  "sendMessage": "پیغام بھیجیں",
+  "writeReview": "جائزہ لکھیں",
+  "rateWorker": "کارکن کی درجہ بندی کریں",
+  "bookingConfirmed": "بکنگ کی تصدیق ہو گئی",
+  "bookingPending": "بکنگ زیر التواء",
+  "bookingCompleted": "بکنگ مکمل ہو گئی",
+  "bookingCancelled": "بکنگ منسوخ ہو گئی",
+  "cancelBooking": "بکنگ منسوخ کریں",
+  "reschedule": "دوبارہ شیڈول کریں",
+  "paymentMethod": "ادائیگی کا طریقہ",
+  "totalAmount": "کل رقم",
+  "serviceCharge": "سروس چارج",
+  "rateExperience": "اپنے تجربے کی درجہ بندی کریں",
+  "serviceBy": "سروس فراہم کرنے والے: {{name}}",
+  "leaveComment": "تبصرہ لکھیں",
+  "reviewCommentPlaceholder": "کارکن کے ساتھ اپنا تجربہ بیان کریں...",
+  "submittingReview": "جائزہ جمع کیا جا رہا ہے...",
+  "submitReview": "جائزہ جمع کریں",
+  "bookingNotFound": "بکنگ نہیں ملی",
+  "selectRatingPrompt": "براہ کرم درجہ بندی منتخب کریں",
+  "reviewSubmittedSuccess": "جائزہ کامیابی سے جمع ہو گیا!",
+  "reviewSubmitFailed": "جائزہ جمع کرنے میں ناکامی",
+  "bookService": "سروس بک کریں",
+  "bookingWith": "آپ {{name}} کے ساتھ {{service}} کے لیے سروس بک کر رہے ہیں",
+  "schedule": {
+    "title": "دستیابی شیڈول",
+    "unavailable": "غیر دستیاب",
+    "notProvided": "شیڈول فراہم نہیں کیا گیا",
+    "days": {
+      "monday": "پیر",
+      "tuesday": "منگل",
+      "wednesday": "بدھ",
+      "thursday": "جمعرات",
+      "friday": "جمعہ",
+      "saturday": "ہفتہ",
+      "sunday": "اتوار"
+    }
+  },
+  "selectDate": "تاریخ منتخب کریں",
+  "selectTime": "وقت منتخب کریں",
+  "serviceAddress": "سروس کا پتہ",
+  "addressPlaceholder": "123 مین اسٹریٹ، شہر، ملک",
+  "issueDescription": "مسئلے کی تفصیل",
+  "issueDescriptionPlaceholder": "بتائیں کیا کام کرنا ہے...",
+  "confirmingBooking": "بکنگ کی تصدیق ہو رہی ہے...",
+  "confirmBooking": "بکنگ کی تصدیق کریں",
+  "workerNotFound": "کارکن نہیں ملا",
+  "bookingCreatedSuccess": "بکنگ کامیابی سے بن گئی!",
+  "bookingCreateFailed": "بکنگ بنانے میں ناکامی",
+  "dashboard": {
+    "welcomeBack": "خوش آمدید{{name}}!",
+    "subtitle": "آج ہنر مند پیشہ ور افراد کو ہائر کرنے کے لیے تیار ہیں؟",
+    "stats": {
+      "discover": "دریافت",
+      "findBestPros": "بہترین پروفیشنلز تلاش کریں",
+      "bookings": "بکنگز",
+      "trackJobs": "کام ٹریک کریں",
+      "conversations": "گفتگو",
+      "chatWithWorkers": "کارکنوں سے چیٹ کریں"
+    },
+    "accountInfo": "اکاؤنٹ معلومات",
+    "editProfile": "پروفائل میں ترمیم",
+    "fullName": "پورا نام",
+    "phoneNumber": "فون نمبر",
+    "city": "شہر",
+    "address": "پتہ",
+    "noAddressProvided": "کوئی پتہ فراہم نہیں کیا گیا",
+    "noProfileData": "پروفائل ڈیٹا دستیاب نہیں ہے۔",
+    "quickFlow": "فوری اقدامات",
+    "browseWorkers": "کارکن دیکھیں",
+    "browseWorkersHint": "اپنے شہر کے ہنر مند پیشہ ور تلاش کریں",
+    "myBookingsAction": "میری بکنگز",
+    "myBookingsHint": "آنے والے اور پچھلے کام دیکھیں",
+    "messagesAction": "پیغامات",
+    "messagesHint": "اپنی گفتگو جاری رکھیں"
+  },
+  "bookings": {
+    "title": "میری بکنگز",
+    "loading": "آپ کی بکنگز لوڈ ہو رہی ہیں...",
+    "empty": "اس زمرے میں کوئی بکنگ نہیں ملی۔",
+    "fallbackWorker": "کارکن",
+    "tabs": {
+      "active": "فعال بکنگز",
+      "history": "بکنگ ہسٹری"
+    },
+    "labels": {
+      "date": "تاریخ",
+      "time": "وقت",
+      "payment": "ادائیگی",
+      "amount": "رقم"
+    },
+    "actions": {
+      "viewDetails": "تفصیلات دیکھیں",
+      "payNow": "ابھی ادائیگی کریں",
+      "chatWithWorker": "کارکن سے چیٹ کریں",
+      "leaveReview": "جائزہ دیں"
+    },
+    "payment": {
+      "none": "کوئی ادائیگی نہیں",
+      "stripeStatus": "اسٹرائپ - {{status}}",
+      "status": {
+        "pending": "زیر التواء",
+        "processing": "پروسیسنگ میں",
+        "completed": "مکمل",
+        "failed": "ناکام"
+      }
+    },
+    "status": {
+      "confirmed": "تصدیق شدہ",
+      "pending": "زیر التواء",
+      "in_progress": "جاری",
+      "completed": "مکمل",
+      "cancelled": "منسوخ"
+    }
+  },
+  "notifications": {
+    "title": "اطلاعات",
+    "loading": "اطلاعات لوڈ ہو رہی ہیں...",
+    "empty": "آپ کے پاس ابھی کوئی اطلاع نہیں ہے۔",
+    "markAsRead": "پڑھی ہوئی نشان زد کریں",
+    "items": {
+      "bookingConfirmed": {
+        "title": "بکنگ کی تصدیق",
+        "message": "پلمبنگ کے لیے جان کے ساتھ آپ کی بکنگ 12 مارچ صبح 10:00 بجے کے لیے تصدیق ہو گئی ہے۔"
+      },
+      "newMessage": {
+        "title": "نیا پیغام",
+        "message": "جان نے آپ کی سروس درخواست کے بارے میں نیا پیغام بھیجا ہے۔"
+      },
+      "serviceCompleted": {
+        "title": "سروس مکمل ہو گئی",
+        "message": "براہ کرم سارہ کی مکمل کی گئی الیکٹریکل سروس کے لیے جائزہ دیں۔"
+      }
+    }
+  },
+  "bookingDetails": {
+    "loading": "بکنگ کی تفصیلات لوڈ ہو رہی ہیں...",
+    "backToBookings": "بکنگز پر واپس جائیں",
+    "title": "بکنگ کی تفصیلات",
+    "bookingId": "بکنگ آئی ڈی: {{id}}",
+    "sections": {
+      "workerInfo": "کارکن کی معلومات",
+      "serviceDetails": "سروس کی تفصیلات",
+      "serviceLocation": "سروس کی جگہ",
+      "issueDescription": "مسئلے کی تفصیل",
+      "paymentInfo": "ادائیگی کی معلومات",
+      "timeline": "ٹائم لائن",
+      "quickActions": "فوری اقدامات"
+    },
+    "labels": {
+      "serviceType": "سروس کی قسم",
+      "date": "تاریخ",
+      "time": "وقت",
+      "status": "حالت",
+      "serviceCost": "سروس کی قیمت",
+      "platformFee": "پلیٹ فارم فیس (15%)",
+      "totalPaid": "کل ادا شدہ",
+      "totalAmount": "کل رقم",
+      "paymentMethod": "ادائیگی کا طریقہ",
+      "stripe": "اسٹرائپ",
+      "transactionId": "ٹرانزیکشن آئی ڈی"
+    },
+    "readyForStripe": "اسٹرائپ کے ذریعے ادائیگی کے لیے تیار",
+    "waitingForWorker": {
+      "title": "کارکن کا انتظار ہے",
+      "message": "کارکن کو قبول کر کے رقم مقرر کرنی ہے"
+    },
+    "timeline": {
+      "bookedOn": "بک کیا گیا",
+      "completedOn": "مکمل ہوا",
+      "cancelledOn": "منسوخ ہوا"
+    },
+    "actions": {
+      "payNowAmount": "ابھی ادائیگی کریں - ${{amount}}",
+      "chatWithWorker": "کارکن سے چیٹ کریں",
+      "leaveReview": "جائزہ دیں",
+      "cancelBooking": "بکنگ منسوخ کریں",
+      "cancelConfirm": "کیا آپ واقعی اس بکنگ کو منسوخ کرنا چاہتے ہیں؟"
+    },
+    "errors": {
+      "notFoundOrDenied": "بکنگ نہیں ملی یا رسائی نہیں ہے",
+      "cancelFailed": "بکنگ منسوخ کرنے میں ناکامی"
+    }
+  },
+  "paymentPage": {
+    "loading": "ادائیگی کی تفصیلات لوڈ ہو رہی ہیں...",
+    "title": "اپنی ادائیگی مکمل کریں",
+    "bookingId": "بکنگ آئی ڈی: {{id}}",
+    "backToBookings": "بکنگز پر واپس جائیں",
+    "sections": {
+      "summary": "بکنگ کا خلاصہ",
+      "breakdown": "ادائیگی کی تفصیل",
+      "security": "ادائیگی کی حفاظت",
+      "testMode": "ٹیسٹ موڈ"
+    },
+    "labels": {
+      "service": "سروس",
+      "worker": "کارکن",
+      "date": "تاریخ",
+      "currency": "کرنسی",
+      "serviceCost": "سروس کی قیمت",
+      "platformFee": "پلیٹ فارم فیس (15%)",
+      "total": "کل"
+    },
+    "security": {
+      "securePayment": "محفوظ ادائیگی",
+      "sslEncrypted": "SSL انکرپٹڈ",
+      "stripePowered": "اسٹرائپ سے تقویت یافتہ"
+    },
+    "testCards": {
+      "success": "کامیاب کارڈ: 4242 4242 4242 4242",
+      "failed": "مسترد کارڈ: 4000 0000 0000 0002",
+      "note": "کوئی بھی مستقبل کی تاریخ اور کوئی بھی 3 ہندسوں والا CVC استعمال کریں"
+    },
+    "actions": {
+      "redirecting": "اسٹرائپ پر منتقل کیا جا رہا ہے...",
+      "payNowAmount": "ابھی ${{amount}} ادا کریں",
+      "cancelPayment": "ادائیگی منسوخ کریں"
+    },
+    "poweredBy": "تقویت یافتہ بذریعہ",
+    "errors": {
+      "loadBookingFailed": "بکنگ کی تفصیلات لوڈ کرنے میں ناکامی",
+      "noCheckoutUrl": "چیک آؤٹ URL موصول نہیں ہوا",
+      "initFailed": "ادائیگی شروع کرنے میں ناکامی"
+    }
+  }
 }

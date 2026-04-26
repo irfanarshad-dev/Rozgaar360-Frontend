@@ -1,9 +1,21 @@
 {
-  "workerDashboard": "Worker Dashboard",
-  "customerDashboard": "Customer Dashboard",
-  "manageProfile": "Manage your profile and services",
-  "findHireWorkers": "Find and hire skilled workers",
-  "findWorkers": "Find Workers",
-  "discoverWorkers": "Discover skilled workers near you",
-  "findBestWorker": "Find Best Worker Near You"
+  "welcome": "Welcome",
+  "myBookings": "My Bookings",
+  "myProfile": "My Profile",
+  "notifications": "Notifications",
+  "messages": "Messages",
+  "settings": "Settings",
+  "activeBookings": "Active Bookings",
+  "completedBookings": "Completed Bookings",
+  "pendingBookings": "Pending Bookings",
+  "totalEarnings": "Total Earnings",
+  "rating": "Rating",
+  "reviews": "Reviews",
+  "viewAll": "View All",
+  "noBookings": "No bookings yet",
+  "startBooking": "Start booking workers to see them here",
+  "verificationStatus": "Verification Status",
+  "editProfile": "Edit Profile",
+  "uploadPhoto": "Upload Photo",
+  "saveChanges": "Save Changes"
 }

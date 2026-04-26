@@ -8,12 +8,17 @@ export const authService = {
 
   async login(data) {
     const response = await api.post('/api/auth/login', data);
+    
     if (response.data.token) {
-      const expiresAt = Date.now() + (24 * 60 * 60 * 1000);
+      const expiresAt = Date.now() + (7 * 24 * 60 * 60 * 1000);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('tokenExpiry', expiresAt.toString());
       localStorage.setItem('user', JSON.stringify(response.data.user));
       localStorage.setItem('userId', response.data.user._id);
+      
+      if (typeof document !== 'undefined') {
+        document.cookie = `token=${response.data.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+      }
     }
     return response.data;
   },
@@ -25,24 +30,36 @@ export const authService = {
 
   logout() {
     api.post('/api/auth/logout').catch(() => {});
-    localStorage.removeItem('token');
-    localStorage.removeItem('tokenExpiry');
-    localStorage.removeItem('user');
-    localStorage.removeItem('userId');
-    window.location.href = '/login';
+    const currentUser = this.getUser();
+    this.clearTokens();
+    if (typeof window !== 'undefined') {
+      window.location.href = currentUser?.role === 'admin' ? '/admin/login' : '/login';
+    }
   },
 
   clearTokens() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('tokenExpiry');
-    localStorage.removeItem('user');
-    localStorage.removeItem('userId');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('tokenExpiry');
+      localStorage.removeItem('user');
+      localStorage.removeItem('userId');
+      // Clear cookie
+      document.cookie = 'token=; path=/; max-age=0; SameSite=Lax';
+    }
   },
 
   getUser() {
     if (typeof window !== 'undefined') {
       const user = localStorage.getItem('user');
-      return user ? JSON.parse(user) : null;
+      if (!user) return null;
+
+      try {
+        return JSON.parse(user);
+      } catch {
+        // Corrupt user payload should not crash protected route checks.
+        this.clearTokens();
+        return null;
+      }
     }
     return null;
   },
@@ -63,12 +80,12 @@ export const authService = {
   },
 
   checkTokenExpiry() {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') return false;
     const expiry = localStorage.getItem('tokenExpiry');
     
     if (expiry && Date.now() > parseInt(expiry)) {
-      this.clearTokens();
-      window.location.href = '/login';
+      return true; // Token expired, let caller handle redirect
     }
+    return false;
   }
 };

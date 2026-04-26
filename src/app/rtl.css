@@ -1,0 +1,377 @@
+/**
+ * RTL (Right-to-Left) Styles for Urdu Language
+ * 
+ * This file contains CSS rules to ensure proper layout
+ * when the language is switched to Urdu (RTL).
+ * 
+ * These styles are automatically applied when dir="rtl" is set on <html>
+ */
+
+/* ============================================================================
+   RTL Direction Utilities
+   ============================================================================ */
+
+/* Flip margins and paddings for RTL */
+[dir="rtl"] .ml-auto {
+  margin-left: unset !important;
+  margin-right: auto !important;
+}
+
+[dir="rtl"] .mr-auto {
+  margin-right: unset !important;
+  margin-left: auto !important;
+}
+
+/* Flip text alignment */
+[dir="rtl"] .text-left {
+  text-align: right !important;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left !important;
+}
+
+/* Flip flex direction */
+[dir="rtl"] .flex-row-reverse {
+  flex-direction: row !important;
+}
+
+/* ============================================================================
+   Navigation & Menu RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] nav {
+  direction: rtl;
+}
+
+[dir="rtl"] .nav-links {
+  direction: rtl;
+}
+
+/* Mobile menu drawer should slide from left in RTL */
+[dir="rtl"] .mobile-drawer {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .mobile-drawer.open {
+  transform: translateX(0);
+}
+
+[dir="rtl"] .mobile-drawer:not(.open) {
+  transform: translateX(-100%);
+}
+
+/* ============================================================================
+   Form Elements RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] input,
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] input::placeholder,
+[dir="rtl"] textarea::placeholder {
+  text-align: right;
+}
+
+/* Icons in inputs should be on the right in RTL */
+[dir="rtl"] .input-icon-left {
+  left: auto;
+  right: 1rem;
+}
+
+[dir="rtl"] .input-icon-right {
+  right: auto;
+  left: 1rem;
+}
+
+/* Padding adjustments for inputs with icons */
+[dir="rtl"] .pl-10,
+[dir="rtl"] .pl-11,
+[dir="rtl"] .pl-12 {
+  padding-left: 1rem;
+  padding-right: 2.75rem;
+}
+
+/* ============================================================================
+   Card & Grid Layouts RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .card {
+  direction: rtl;
+}
+
+[dir="rtl"] .grid {
+  direction: rtl;
+}
+
+/* ============================================================================
+   Button & Icon RTL Fixes
+   ============================================================================ */
+
+/* Flip icons that indicate direction */
+[dir="rtl"] .icon-arrow-right {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .icon-arrow-left {
+  transform: scaleX(-1);
+}
+
+/* Button icons spacing */
+[dir="rtl"] button svg:first-child {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] button svg:last-child {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+/* ============================================================================
+   Modal & Dropdown RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .dropdown-menu {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .modal {
+  direction: rtl;
+}
+
+/* ============================================================================
+   Chat & Messages RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .chat-message {
+  direction: rtl;
+}
+
+[dir="rtl"] .chat-message.sent {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+[dir="rtl"] .chat-message.received {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+/* ============================================================================
+   Table RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] table {
+  direction: rtl;
+}
+
+[dir="rtl"] th,
+[dir="rtl"] td {
+  text-align: right;
+}
+
+/* ============================================================================
+   Notification & Toast RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .notification {
+  direction: rtl;
+}
+
+[dir="rtl"] .toast {
+  direction: rtl;
+}
+
+/* ============================================================================
+   Dashboard Sidebar RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .sidebar {
+  left: auto;
+  right: 0;
+}
+
+[dir="rtl"] .sidebar-item {
+  direction: rtl;
+}
+
+[dir="rtl"] .sidebar-icon {
+  margin-right: 0;
+  margin-left: 0.75rem;
+}
+
+/* ============================================================================
+   Breadcrumb RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .breadcrumb {
+  direction: rtl;
+}
+
+[dir="rtl"] .breadcrumb-separator {
+  transform: scaleX(-1);
+}
+
+/* ============================================================================
+   Badge & Tag RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .badge {
+  direction: rtl;
+}
+
+/* ============================================================================
+   Pagination RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .pagination {
+  direction: rtl;
+}
+
+/* ============================================================================
+   Tooltip RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .tooltip {
+  direction: rtl;
+}
+
+/* ============================================================================
+   Search & Filter RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .search-bar {
+  direction: rtl;
+}
+
+[dir="rtl"] .filter-dropdown {
+  left: auto;
+  right: 0;
+}
+
+/* ============================================================================
+   Worker Card RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .worker-card {
+  direction: rtl;
+}
+
+[dir="rtl"] .worker-card-header {
+  direction: rtl;
+}
+
+[dir="rtl"] .worker-card-body {
+  direction: rtl;
+}
+
+/* ============================================================================
+   Rating Stars RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .rating-stars {
+  direction: ltr; /* Keep stars left-to-right even in RTL */
+}
+
+/* ============================================================================
+   Number & Currency Display
+   ============================================================================ */
+
+/* Keep numbers LTR even in RTL context */
+[dir="rtl"] .number,
+[dir="rtl"] .currency,
+[dir="rtl"] .price {
+  direction: ltr;
+  display: inline-block;
+}
+
+/* ============================================================================
+   Animation Adjustments for RTL
+   ============================================================================ */
+
+[dir="rtl"] .slide-in-right {
+  animation-name: slideInLeft;
+}
+
+[dir="rtl"] .slide-in-left {
+  animation-name: slideInRight;
+}
+
+/* ============================================================================
+   Scrollbar RTL Fixes
+   ============================================================================ */
+
+[dir="rtl"] .scrollbar-custom {
+  direction: rtl;
+}
+
+/* ============================================================================
+   Language-Specific Font Adjustments
+   ============================================================================ */
+
+/* Improve Urdu text rendering without forcing a global font swap */
+.lang-ur {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================================
+   Utility Classes for Manual RTL Control
+   ============================================================================ */
+
+/* Force LTR for specific elements (like phone numbers, emails) */
+.force-ltr {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Force RTL for specific elements */
+.force-rtl {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* ============================================================================
+   Print Styles for RTL
+   ============================================================================ */
+
+@media print {
+  [dir="rtl"] {
+    direction: rtl;
+  }
+  
+  [dir="rtl"] body {
+    text-align: right;
+  }
+}
+
+/* ============================================================================
+   Responsive RTL Adjustments
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  [dir="rtl"] .mobile-menu {
+    left: 0;
+    right: auto;
+  }
+}
+
+/* ============================================================================
+   Accessibility Improvements for RTL
+   ============================================================================ */
+
+[dir="rtl"] :focus {
+  outline-offset: 2px;
+}
+
+[dir="rtl"] .sr-only {
+  direction: rtl;
+}

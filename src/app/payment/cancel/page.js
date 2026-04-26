@@ -22,8 +22,8 @@ function CancelContent() {
 
           <div className="p-8">
             <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
-              <p className="text-orange-800 text-sm">
-                Don't worry! Your booking is still pending. You can complete the payment anytime from your bookings dashboard.
+                <p className="text-orange-800 text-sm">
+                Don&apos;t worry! Your booking is still pending. You can complete the payment anytime from your bookings dashboard.
               </p>
             </div>
 

@@ -22,14 +22,16 @@ export default function AdminLogin() {
       authService.clearTokens();
       
       const response = await authService.login({ ...formData, role: ROLES.ADMIN });
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      document.cookie = `token=${response.token}; path=/; max-age=86400; SameSite=Lax`;
       
-      router.push('/admin/dashboard');
+      if (!response.token || response.user?.role !== 'admin') {
+        throw new Error('Not an admin account');
+      }
+
+      await new Promise(r => setTimeout(r, 100));
+      router.replace('/admin/dashboard');
     } catch (error) {
       console.error('Admin login failed:', error);
-      alert(error.response?.data?.message || 'Login failed. Please try again.');
+      alert(error.response?.data?.message || error.message || 'Login failed. Please try again.');
       setLoading(false);
     }
   };

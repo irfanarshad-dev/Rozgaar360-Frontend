@@ -15,40 +15,101 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('verifications');
   const [toast, setToast]       = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [fetchError, setFetchError] = useState('');
   const router = useRouter();
 
   // ── Auth guard ───────────────────────────────────────────────────────────────
   useEffect(() => {
-    const user = authService.getUser();
-    if (!user || user.role !== 'admin') {
-      router.replace('/admin/login');
-      return;
-    }
-    setAuthChecked(true);
+    const bootstrapAuth = async () => {
+      const hasValidToken = authService.isAuthenticated();
+      if (!hasValidToken) {
+        router.replace('/admin/login');
+        return;
+      }
+
+      const user = authService.getUser();
+      if (user?.role === 'admin') {
+        setAuthChecked(true);
+        return;
+      }
+
+      try {
+        const profileRes = await api.get('/api/users/me');
+        const profileUser = profileRes.data;
+
+        if (profileUser?.role !== 'admin') {
+          authService.clearTokens();
+          router.replace('/');
+          return;
+        }
+
+        localStorage.setItem('user', JSON.stringify(profileUser));
+        localStorage.setItem('userId', profileUser._id);
+        setAuthChecked(true);
+      } catch (err) {
+        if (err.response?.status === 401) {
+          authService.clearTokens();
+          router.replace('/admin/login');
+        } else {
+          setAuthChecked(true);
+        }
+      }
+    };
+
+    bootstrapAuth();
   }, [router]);
 
   // ── Fetch data (only after auth check passes) ────────────────────────────────
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setFetchError('');
     try {
-      const [profileRes, statsRes, pendingRes, workersRes, usersRes] = await Promise.all([
+      const [profileRes, statsRes, pendingRes, workersRes, usersRes] = await Promise.allSettled([
         api.get('/api/users/me'),
         api.get('/api/admin/dashboard'),
         api.get('/api/admin/verifications/pending'),
         api.get('/api/admin/workers'),
         api.get('/api/admin/users'),
       ]);
-      setProfile(profileRes.data);
-      setStats(statsRes.data);
-      console.log('[Frontend] Pending verifications data:', pendingRes.data);
-      setPending(pendingRes.data || []);
-      setAllWorkers(workersRes.data || []);
-      setAllUsers(usersRes.data || []);
+
+      const allFailed = [profileRes, statsRes, pendingRes, workersRes, usersRes].every(r => r.status === 'rejected');
+      const all401 = [profileRes, statsRes, pendingRes, workersRes, usersRes]
+        .filter(r => r.status === 'rejected')
+        .every(r => r.reason?.response?.status === 401);
+
+      if (allFailed && all401) {
+        setFetchError('⚠️ Authentication error. Please try logging in again.');
+        setStats({ totalUsers: 0, totalWorkers: 0, totalCustomers: 0, verifiedWorkers: 0, pendingVerifications: 0 });
+        setPending([]);
+        setAllWorkers([]);
+        setAllUsers([]);
+      } else {
+        if (profileRes.status === 'fulfilled') {
+          setProfile(profileRes.value.data);
+        }
+        if (statsRes.status === 'fulfilled') {
+          setStats(statsRes.value.data);
+        } else {
+          setStats({ totalUsers: 0, totalWorkers: 0, totalCustomers: 0, verifiedWorkers: 0, pendingVerifications: 0 });
+        }
+        if (pendingRes.status === 'fulfilled') {
+          setPending(pendingRes.value.data || []);
+        }
+        if (workersRes.status === 'fulfilled') {
+          setAllWorkers(workersRes.value.data || []);
+        }
+        if (usersRes.status === 'fulfilled') {
+          setAllUsers(usersRes.value.data || []);
+        }
+
+        const failed = [profileRes, statsRes, pendingRes, workersRes, usersRes].filter(r => r.status === 'rejected');
+        if (failed.length > 0) {
+          setFetchError('Some dashboard data could not be loaded. Please refresh.');
+        }
+      }
     } catch (err) {
       console.error('Admin data fetch failed:', err);
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        router.replace('/admin/login');
-      }
+      setFetchError('Unable to load dashboard data right now.');
     } finally {
       setLoading(false);
     }
@@ -159,6 +220,12 @@ export default function AdminDashboard() {
             {toast.type === 'success' ? '✓' : '⚠'}
             {toast.msg}
           </div>
+        </div>
+      )}
+
+      {fetchError && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium text-yellow-100 bg-yellow-600/90 border border-yellow-400/50 shadow-lg backdrop-blur-sm">
+          {fetchError}
         </div>
       )}
 
@@ -326,55 +393,95 @@ export default function AdminDashboard() {
                 <p className="text-gray-400">No workers registered yet.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-gray-400 border-b border-white/10">
-                      <th className="text-left py-3 px-4 font-semibold">Name</th>
-                      <th className="text-left py-3 px-4 font-semibold">Phone</th>
-                      <th className="text-left py-3 px-4 font-semibold">City</th>
-                      <th className="text-left py-3 px-4 font-semibold">Skill</th>
-                      <th className="text-left py-3 px-4 font-semibold">Rating</th>
-                      <th className="text-left py-3 px-4 font-semibold">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {allWorkers.map((w) => (
-                      <tr key={w._id} className="hover:bg-white/5 transition-colors">
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-violet-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                              {w.name?.charAt(0).toUpperCase()}
-                            </div>
-                            <span className="text-white font-medium truncate max-w-[120px]">{w.name}</span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-gray-300">{w.phone}</td>
-                        <td className="py-3 px-4 text-gray-300">{w.city}</td>
-                        <td className="py-3 px-4 text-gray-300">{w.profile?.skill || '—'}</td>
-                        <td className="py-3 px-4">
-                          <span className="text-amber-400 font-semibold">
-                            {w.profile?.rating > 0 ? `⭐ ${w.profile.rating.toFixed(1)}` : '—'}
+              <div className="w-full">
+                {/* Mobile Card View */}
+                <div className="md:hidden flex flex-col gap-4">
+                  {allWorkers.map((w) => (
+                    <div key={w._id} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-violet-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 shadow-md">
+                          {w.name?.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-white font-semibold truncate">{w.name}</h3>
+                          <p className="text-sm text-gray-400">{w.profile?.skill || 'No Skill'}</p>
+                        </div>
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+                          w.profile?.verified
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            : w.profile?.verificationStatus === 'rejected'
+                            ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                            : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                        }`}>
+                          {w.profile?.verified ? '✓ Verified' : w.profile?.verificationStatus || 'Pending'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-sm bg-black/20 p-2.5 rounded-lg border border-white/5">
+                        <div className="text-gray-300"><span className="text-gray-500 uppercase text-[10px] block mb-0.5 font-semibold">Phone</span>{w.phone}</div>
+                        <div className="text-gray-300"><span className="text-gray-500 uppercase text-[10px] block mb-0.5 font-semibold">City</span>{w.city}</div>
+                        <div className="col-span-2 text-gray-300 flex items-center justify-between border-t border-white/5 pt-2 mt-1">
+                          <span className="text-gray-500 uppercase text-[10px] font-semibold">Rating</span>
+                          <span className="text-amber-400 font-semibold text-xs">
+                            {w.profile?.rating > 0 ? `⭐ ${w.profile.rating.toFixed(1)}` : 'No rating'}
+                            {w.profile?.reviewCount > 0 && <span className="text-gray-500 ml-1">({w.profile.reviewCount})</span>}
                           </span>
-                          {w.profile?.reviewCount > 0 && (
-                            <span className="text-gray-500 text-xs ml-1">({w.profile.reviewCount})</span>
-                          )}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            w.profile?.verified
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                              : w.profile?.verificationStatus === 'rejected'
-                              ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                              : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                          }`}>
-                            {w.profile?.verified ? '✓ Verified' : w.profile?.verificationStatus || 'Pending'}
-                          </span>
-                        </td>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-gray-400 border-b border-white/10">
+                        <th className="text-left py-3 px-4 font-semibold">Name</th>
+                        <th className="text-left py-3 px-4 font-semibold">Phone</th>
+                        <th className="text-left py-3 px-4 font-semibold">City</th>
+                        <th className="text-left py-3 px-4 font-semibold">Skill</th>
+                        <th className="text-left py-3 px-4 font-semibold">Rating</th>
+                        <th className="text-left py-3 px-4 font-semibold">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {allWorkers.map((w) => (
+                        <tr key={w._id} className="hover:bg-white/5 transition-colors">
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-violet-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                                {w.name?.charAt(0).toUpperCase()}
+                              </div>
+                              <span className="text-white font-medium truncate max-w-[120px]">{w.name}</span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-gray-300">{w.phone}</td>
+                          <td className="py-3 px-4 text-gray-300">{w.city}</td>
+                          <td className="py-3 px-4 text-gray-300">{w.profile?.skill || '—'}</td>
+                          <td className="py-3 px-4">
+                            <span className="text-amber-400 font-semibold">
+                              {w.profile?.rating > 0 ? `⭐ ${w.profile.rating.toFixed(1)}` : '—'}
+                            </span>
+                            {w.profile?.reviewCount > 0 && (
+                              <span className="text-gray-500 text-xs ml-1">({w.profile.reviewCount})</span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                              w.profile?.verified
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                : w.profile?.verificationStatus === 'rejected'
+                                ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                                : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                            }`}>
+                              {w.profile?.verified ? '✓ Verified' : w.profile?.verificationStatus || 'Pending'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
@@ -394,74 +501,127 @@ export default function AdminDashboard() {
                 <p className="text-gray-400">No users registered yet.</p>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-gray-400 border-b border-white/10">
-                      <th className="text-left py-3 px-4 font-semibold">Name</th>
-                      <th className="text-left py-3 px-4 font-semibold">Phone</th>
-                      <th className="text-left py-3 px-4 font-semibold">Role</th>
-                      <th className="text-left py-3 px-4 font-semibold">City</th>
-                      <th className="text-left py-3 px-4 font-semibold">Details</th>
-                      <th className="text-left py-3 px-4 font-semibold">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {allUsers.map((u) => (
-                      <tr key={u._id} className="hover:bg-white/5 transition-colors">
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
-                              u.role === 'admin' ? 'bg-gradient-to-r from-blue-600 to-blue-500' :
-                              u.role === 'worker' ? 'bg-gradient-to-r from-blue-500 to-violet-500' :
-                              'bg-gradient-to-r from-green-500 to-teal-500'
-                            }`}>
-                              {u.name?.charAt(0).toUpperCase()}
-                            </div>
-                            <span className="text-white font-medium truncate max-w-[120px]">{u.name}</span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-gray-300">{u.phone}</td>
-                        <td className="py-3 px-4">
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            u.role === 'admin' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
-                            u.role === 'worker' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
-                            'bg-green-500/20 text-green-300 border border-green-500/30'
+              <div className="w-full">
+                {/* Mobile Card View */}
+                <div className="md:hidden flex flex-col gap-4">
+                  {allUsers.map((u) => (
+                    <div key={u._id} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 shadow-md ${
+                            u.role === 'admin' ? 'bg-gradient-to-r from-blue-600 to-blue-500' :
+                            u.role === 'worker' ? 'bg-gradient-to-r from-blue-500 to-violet-500' :
+                            'bg-gradient-to-r from-green-500 to-teal-500'
                           }`}>
-                            {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-gray-300">{u.city}</td>
-                        <td className="py-3 px-4 text-gray-300 text-xs">
-                          {u.role === 'worker' && u.profile && (
-                            <div className="flex flex-col gap-1">
-                              <span>🔧 {u.profile.skill}</span>
-                              {u.profile.experience && <span>⏱ {u.profile.experience} yrs</span>}
-                              {u.profile.rating > 0 && <span>⭐ {u.profile.rating.toFixed(1)}</span>}
-                            </div>
-                          )}
-                          {u.role === 'customer' && u.profile?.address && (
-                            <span>📍 {u.profile.address}</span>
-                          )}
-                          {u.role === 'admin' && <span className="text-blue-400">Admin User</span>}
-                        </td>
-                        <td className="py-3 px-4">
-                          {u.role !== 'admin' && (
-                            <button
-                              onClick={() => setDeleteConfirm(u)}
-                              className="bg-red-500/20 hover:bg-red-500/40 text-red-300 border border-red-500/30 px-3 py-1.5 rounded-lg font-semibold transition-all text-xs flex items-center gap-1.5"
-                            >
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                              Delete
-                            </button>
-                          )}
-                        </td>
+                            {u.name?.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <h3 className="text-white font-semibold truncate max-w-[140px]">{u.name}</h3>
+                            <span className={`inline-flex mt-1 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${
+                              u.role === 'admin' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                              u.role === 'worker' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                              'bg-green-500/20 text-green-400 border border-green-500/30'
+                            }`}>
+                              {u.role}
+                            </span>
+                          </div>
+                        </div>
+                        {u.role !== 'admin' && (
+                          <button onClick={() => setDeleteConfirm(u)} className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                          </button>
+                        )}
+                      </div>
+                      <div className="bg-black/20 p-3 rounded-lg border border-white/5 space-y-2 text-sm text-gray-300">
+                        <div className="flex justify-between">
+                          <span className="text-gray-500 uppercase text-[10px] font-semibold">Contact</span>
+                          <span>{u.phone}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-white/5 pt-2">
+                          <span className="text-gray-500 uppercase text-[10px] font-semibold">Location</span>
+                          <span>{u.city}</span>
+                        </div>
+                        {u.role === 'worker' && u.profile && (
+                          <div className="flex justify-between border-t border-white/5 pt-2">
+                            <span className="text-gray-500 uppercase text-[10px] font-semibold">Skill</span>
+                            <span>{u.profile.skill}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-gray-400 border-b border-white/10">
+                        <th className="text-left py-3 px-4 font-semibold">Name</th>
+                        <th className="text-left py-3 px-4 font-semibold">Phone</th>
+                        <th className="text-left py-3 px-4 font-semibold">Role</th>
+                        <th className="text-left py-3 px-4 font-semibold">City</th>
+                        <th className="text-left py-3 px-4 font-semibold">Details</th>
+                        <th className="text-left py-3 px-4 font-semibold">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {allUsers.map((u) => (
+                        <tr key={u._id} className="hover:bg-white/5 transition-colors">
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
+                                u.role === 'admin' ? 'bg-gradient-to-r from-blue-600 to-blue-500' :
+                                u.role === 'worker' ? 'bg-gradient-to-r from-blue-500 to-violet-500' :
+                                'bg-gradient-to-r from-green-500 to-teal-500'
+                              }`}>
+                                {u.name?.charAt(0).toUpperCase()}
+                              </div>
+                              <span className="text-white font-medium truncate max-w-[120px]">{u.name}</span>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-gray-300">{u.phone}</td>
+                          <td className="py-3 px-4">
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+                              u.role === 'admin' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                              u.role === 'worker' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                              'bg-green-500/20 text-green-300 border border-green-500/30'
+                            }`}>
+                              {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-gray-300">{u.city}</td>
+                          <td className="py-3 px-4 text-gray-300 text-xs">
+                            {u.role === 'worker' && u.profile && (
+                              <div className="flex flex-col gap-1">
+                                <span>🔧 {u.profile.skill}</span>
+                                {u.profile.experience && <span>⏱ {u.profile.experience} yrs</span>}
+                                {u.profile.rating > 0 && <span>⭐ {u.profile.rating.toFixed(1)}</span>}
+                              </div>
+                            )}
+                            {u.role === 'customer' && u.profile?.address && (
+                              <span>📍 {u.profile.address}</span>
+                            )}
+                            {u.role === 'admin' && <span className="text-blue-400">Admin User</span>}
+                          </td>
+                          <td className="py-3 px-4">
+                            {u.role !== 'admin' && (
+                              <button
+                                onClick={() => setDeleteConfirm(u)}
+                                className="bg-red-500/20 hover:bg-red-500/40 text-red-300 border border-red-500/30 px-3 py-1.5 rounded-lg font-semibold transition-all text-xs flex items-center gap-1.5"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Delete
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
@@ -488,16 +648,16 @@ export default function AdminDashboard() {
               <br />
               <span className="text-sm text-gray-400">Role: {deleteConfirm.role} • Phone: {deleteConfirm.phone}</span>
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-4 mt-8">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-xl font-semibold transition-colors"
+                className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-3 rounded-xl font-bold transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDeleteUser(deleteConfirm._id)}
-                className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-xl font-semibold transition-colors"
+                className="flex-1 bg-red-600 hover:bg-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.5)] px-4 py-3 rounded-xl font-bold transition-all hover:scale-[1.02]"
               >
                 Delete User
               </button>

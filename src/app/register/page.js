@@ -1,10 +1,13 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import RoleCard from '../components/RoleCard';
+import Link from 'next/link';
+import Image from 'next/image';
 import { authService } from '@/lib/auth';
 import { ROLES, SKILLS, CITIES } from '@/lib/constants';
 import { useTranslation } from 'react-i18next';
+import { Eye, EyeOff, ShieldCheck, Users, Wrench, ArrowLeft, Briefcase, User as UserIcon, MapPin, Loader2 } from 'lucide-react';
+import Button from '../components/ui/Button';
 
 export default function Register() {
   const [selectedRole, setSelectedRole] = useState('');
@@ -14,6 +17,8 @@ export default function Register() {
   const [passwordStrength, setPasswordStrength] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationStatus, setLocationStatus] = useState('');
   const router = useRouter();
   const { t } = useTranslation('auth');
 
@@ -30,22 +35,51 @@ export default function Register() {
     if (/[0-9]/.test(password)) score++;
     if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++;
 
-    if (score < 3) {
-      setPasswordStrength('weak');
-    } else if (score < 5) {
-      setPasswordStrength('good');
-    } else {
-      setPasswordStrength('strong');
-    }
+    if (score < 3) setPasswordStrength('weak');
+    else if (score < 5) setPasswordStrength('good');
+    else setPasswordStrength('strong');
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setError('');
     
     if (name === 'password') {
       checkPasswordStrength(value);
     }
+  };
+
+  const captureCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus('Location is not supported in this browser.');
+      return;
+    }
+
+    setLocationLoading(true);
+    setLocationStatus('');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = Number(position.coords.latitude.toFixed(6));
+        const lng = Number(position.coords.longitude.toFixed(6));
+
+        setFormData((prev) => ({
+          ...prev,
+          ...(selectedRole === ROLES.WORKER
+            ? { workerLatitude: lat, workerLongitude: lng }
+            : { customerLatitude: lat, customerLongitude: lng }),
+        }));
+
+        setLocationStatus('Current location saved successfully.');
+        setLocationLoading(false);
+      },
+      () => {
+        setLocationStatus('Could not access your location. Please allow location permission and try again.');
+        setLocationLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -69,221 +103,352 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-2xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">{t('createAccount')}</h1>
-          <p className="text-gray-600 mt-2">{t('joinRozgaar')}</p>
+    <div className="min-h-screen flex bg-surface">
+      {/* ── Left Split (Brand/Hero) ── */}
+      <div className="hidden lg:flex w-1/2 bg-slate-900 border-r border-white/10 relative overflow-hidden flex-col justify-between p-12 lg:p-20">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 z-0" />
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-3xl opacity-50 z-0 animate-blob" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-cyan-500/20 rounded-full blur-3xl opacity-50 z-0 animate-blob animation-delay-2000" />
+        
+        <div className="relative z-10">
+          <Link href="/" className="inline-flex items-center gap-3 group">
+            <Image
+              src="/assests/Logo/Rozgaar360-logo.png"
+              alt="Rozgaar360"
+              width={170}
+              height={48}
+              className="h-10 w-auto object-contain group-hover:scale-105 transition-transform"
+            />
+            <span className="text-2xl font-bold text-white tracking-tight">Rozgaar<span className="text-blue-400">360</span></span>
+          </Link>
+
+          <h1 className="text-4xl xl:text-5xl font-bold text-white mt-16 leading-tight">
+            Join the fastest<br />growing platform.
+          </h1>
+          <p className="text-blue-100/70 text-lg mt-6 max-w-md">
+            Whether you&apos;re looking to hire skilled professionals or offer your services, you&apos;re in the right place.
+          </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          {success && (
-            <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start">
-              <svg className="w-5 h-5 text-green-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-green-800 text-sm">Registration successful! Redirecting to login...</p>
+        <div className="relative z-10 grid gap-6 mt-16">
+          <div className="flex items-center gap-4 bg-white/5 backdrop-blur-sm border border-white/10 p-5 rounded-2xl">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <Briefcase className="w-6 h-6" />
             </div>
-          )}
-          {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
-              <svg className="w-5 h-5 text-red-600 mt-0.5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-red-800 text-sm">{error}</p>
+            <div>
+              <h3 className="text-white font-semibold">More Opportunities</h3>
+              <p className="text-white/60 text-sm mt-0.5">Find work that matches your skills</p>
             </div>
-          )}
-          {!selectedRole ? (
-            <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-center">{t('chooseRole')}</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <RoleCard
-                  role={ROLES.WORKER}
-                  title={t('worker')}
-                  description={t('offerSkills')}
-                  icon="🔧"
-                  onClick={() => setSelectedRole(ROLES.WORKER)}
-                />
-                <RoleCard
-                  role={ROLES.CUSTOMER}
-                  title={t('customer')}
-                  description={t('findWorkers')}
-                  icon="👤"
-                  onClick={() => setSelectedRole(ROLES.CUSTOMER)}
-                />
-              </div>
+          </div>
+          <div className="flex items-center gap-4 bg-white/5 backdrop-blur-sm border border-white/10 p-5 rounded-2xl">
+            <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+              <Users className="w-6 h-6" />
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-semibold">
-                  {selectedRole === ROLES.WORKER ? t('workerRegistration') : t('customerRegistration')}
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => setSelectedRole('')}
-                  className="text-blue-600 text-sm mt-2"
-                >
-                  {t('changeRole')}
-                </button>
-              </div>
+            <div>
+              <h3 className="text-white font-semibold">Quality Service</h3>
+              <p className="text-white/60 text-sm mt-0.5">Hire the best in your city</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-              <div className="space-y-4">
-                {/* Name */}
-                <input
-                  name="name"
-                  placeholder={t('fullName')}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-teal-100"
-                  required
-                />
+      {/* ── Right Split (Form) ── */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center px-6 py-12 sm:px-12 relative overflow-y-auto">
+        <div className="w-full max-w-md mx-auto animate-fadeInUp">
+          
+          <div className="text-center mb-10">
+            <Link href="/" className="lg:hidden inline-flex items-center gap-2 mb-8">
+              <Image
+                src="/assests/Logo/Rozgaar360-logo.png"
+                alt="Rozgaar360"
+                width={125}
+                height={36}
+                className="h-8 w-auto object-contain"
+              />
+              <span className="text-xl font-bold text-gray-900 tracking-tight">Rozgaar<span className="text-blue-600">360</span></span>
+            </Link>
+            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">{t('createAccount')}</h2>
+            <p className="text-gray-500 mt-2">{t('joinRozgaar')}</p>
+          </div>
 
-                {/* Dual Auth: Phone + Email */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <input
-                      name="phone"
-                      placeholder={t('phoneNumberPlaceholder')}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-teal-100"
-                      required
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Required for login</p>
-                  </div>
-                  <div>
-                    <input
-                      name="email"
-                      type="email"
-                      placeholder="Email (optional)"
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-teal-100"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">For password reset</p>
-                  </div>
+          <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8 sm:p-10 relative">
+            
+            {/* Status Messages */}
+            {success && (
+              <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-3 animate-scaleIn">
+                <ShieldCheck className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-emerald-800 font-semibold text-sm">Account Created!</h4>
+                  <p className="text-emerald-700/80 text-sm mt-0.5">Redirecting to login...</p>
                 </div>
+              </div>
+            )}
+            
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 animate-scaleIn">
+                <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <p className="text-red-800 text-sm font-medium leading-snug">{error}</p>
+              </div>
+            )}
 
-                {/* Password */}
-                <div className="relative">
-                  <input
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder={t('password')}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl outline-teal-100"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            {/* Step 1: Select Role */}
+            {!selectedRole ? (
+              <div className="space-y-6 animate-fadeInRight">
+                <p className="text-sm font-semibold text-gray-800 text-center uppercase tracking-wide">Tell us what you need</p>
+                <div className="grid gap-4">
+                  <button 
+                    onClick={() => setSelectedRole(ROLES.WORKER)}
+                    className="flex items-start gap-4 p-5 rounded-2xl border-2 border-gray-100 bg-white hover:border-blue-500 hover:bg-blue-50 transition-all group text-left"
                   >
-                    {showPassword ? (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
+                    <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                      <Wrench className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">I am a Worker</h3>
+                      <p className="text-sm text-gray-500 mt-1 leading-snug">I want to offer my services and get hired by customers.</p>
+                    </div>
+                  </button>
+
+                  <button 
+                    onClick={() => setSelectedRole(ROLES.CUSTOMER)}
+                    className="flex items-start gap-4 p-5 rounded-2xl border-2 border-gray-100 bg-white hover:border-emerald-500 hover:bg-emerald-50 transition-all group text-left"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                      <UserIcon className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">I am a Customer</h3>
+                      <p className="text-sm text-gray-500 mt-1 leading-snug">I want to hire skilled professionals for my needs.</p>
+                    </div>
                   </button>
                 </div>
-                {passwordStrength && (
-                  <div className="mt-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs text-gray-600">{t('passwordStrength')}</span>
-                      <span className={`text-xs font-medium ${
-                        passwordStrength === 'weak' ? 'text-red-500' :
-                        passwordStrength === 'good' ? 'text-yellow-500' :
-                        'text-green-500'
-                      }`}>
-                        {passwordStrength === 'weak' ? t('weak') :
-                         passwordStrength === 'good' ? t('good') : t('strong')}
-                      </span>
+              </div>
+            ) : (
+              /* Step 2: Form Details */
+              <div className="animate-fadeInLeft">
+                <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${selectedRole === ROLES.WORKER ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                      {selectedRole === ROLES.WORKER ? <Wrench className="w-4 h-4" /> : <UserIcon className="w-4 h-4" />}
                     </div>
-                    <div className="flex space-x-1 mt-1">
-                      <div className={`h-1 w-1/3 rounded ${
-                        passwordStrength === 'weak' ? 'bg-red-500' :
-                        passwordStrength === 'good' ? 'bg-yellow-500' :
-                        'bg-green-500'
-                      }`}></div>
-                      <div className={`h-1 w-1/3 rounded ${
-                        passwordStrength === 'good' ? 'bg-yellow-500' :
-                        passwordStrength === 'strong' ? 'bg-green-500' :
-                        'bg-gray-200'
-                      }`}></div>
-                      <div className={`h-1 w-1/3 rounded ${
-                        passwordStrength === 'strong' ? 'bg-green-500' : 'bg-gray-200'
-                      }`}></div>
+                    <h3 className="font-bold text-gray-900 capitalize">{selectedRole} Registration</h3>
+                  </div>
+                  <button 
+                    onClick={() => { setSelectedRole(''); setFormData({}); setError(''); }}
+                    className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Back
+                  </button>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Name */}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-gray-700">Full Name</label>
+                    <input
+                      name="name"
+                      placeholder="e.g. John Doe"
+                      value={formData.name || ''}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900"
+                      required
+                    />
+                  </div>
+
+                  {/* Contact Duo */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-semibold text-gray-700">Phone</label>
+                      <input
+                        name="phone"
+                        placeholder="03001234567"
+                        value={formData.phone || ''}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-semibold text-gray-700">Email <span className="text-gray-400 font-normal">(Opt)</span></label>
+                      <input
+                        name="email"
+                        type="email"
+                        placeholder="you@email.com"
+                        value={formData.email || ''}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900"
+                      />
                     </div>
                   </div>
-                )}
 
-                {/* City */}
-                <select
-                  name="city"
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-teal-100 cursor-pointer"
-                  required
-                >
-                  <option value="">{t('selectCity')}</option>
-                  {CITIES.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
+                  {/* Password */}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-gray-700">Password</label>
+                    <div className="relative">
+                      <input
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        value={formData.password || ''}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+                        tabIndex="-1"
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                    {/* Password Strength Indicator */}
+                    {passwordStrength && (
+                      <div className="pt-2 flex items-center gap-2">
+                        <div className="flex-1 flex gap-1 h-1.5">
+                          <div className={`h-full rounded-full w-1/3 transition-colors ${passwordStrength === 'weak' ? 'bg-red-400' : passwordStrength === 'good' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                          <div className={`h-full rounded-full w-1/3 transition-colors ${passwordStrength === 'weak' ? 'bg-gray-200' : passwordStrength === 'good' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                          <div className={`h-full rounded-full w-1/3 transition-colors ${passwordStrength === 'strong' ? 'bg-emerald-400' : 'bg-gray-200'}`} />
+                        </div>
+                        <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                          passwordStrength === 'weak' ? 'text-red-500' : passwordStrength === 'good' ? 'text-amber-500' : 'text-emerald-500'
+                        }`}>
+                          {passwordStrength}
+                        </span>
+                      </div>
+                    )}
+                  </div>
 
-                {/* Worker-specific fields */}
-                {selectedRole === ROLES.WORKER && (
-                  <>
+                  {/* Location */}
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-gray-700">City</label>
                     <select
-                      name="skill"
+                      name="city"
+                      value={formData.city || ''}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-teal-100"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900 cursor-pointer"
                       required
                     >
-                      <option value="">{t('selectSkill')}</option>
-                      {SKILLS.map(skill => (
-                        <option key={skill} value={skill}>{skill}</option>
-                      ))}
+                      <option value="" disabled>Select your city...</option>
+                      {CITIES.map(city => <option key={city} value={city}>{city}</option>)}
                     </select>
-                    <input
-                      name="experience"
-                      placeholder={t('yearsExperience')}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-teal-100"
-                    />
-                  </>
-                )}
+                  </div>
 
-                {/* Customer-specific fields */}
-                {selectedRole === ROLES.CUSTOMER && (
-                  <input
-                    name="address"
-                    placeholder={t('address')}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-teal-100"
-                  />
-                )}
+                  <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3.5">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-blue-800">Use precise map location</p>
+                        <p className="text-xs text-blue-700/80 mt-0.5">This improves nearest-worker matching accuracy.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={captureCurrentLocation}
+                        disabled={locationLoading}
+                        className="inline-flex items-center gap-1.5 bg-white hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold px-3 py-2 rounded-lg transition-colors disabled:opacity-70"
+                      >
+                        {locationLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
+                        {locationLoading ? 'Detecting...' : 'Use Current Location'}
+                      </button>
+                    </div>
+                    {locationStatus && (
+                      <p className="mt-2 text-xs text-blue-700 font-medium">{locationStatus}</p>
+                    )}
+                  </div>
+
+                  {/* Worker specifics */}
+                  {selectedRole === ROLES.WORKER && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-gray-700">Primary Skill</label>
+                        <select
+                          name="skill"
+                          value={formData.skill || ''}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900 cursor-pointer"
+                          required
+                        >
+                          <option value="" disabled>Select skill...</option>
+                          {SKILLS.map(skill => <option key={skill} value={skill}>{skill}</option>)}
+                        </select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-gray-700">Experience (Yrs)</label>
+                        <input
+                          name="experience"
+                          type="number"
+                          min="0"
+                          max="50"
+                          placeholder="e.g. 3"
+                          value={formData.experience || ''}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900"
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedRole === ROLES.WORKER && (
+                    <>
+                      <div className="space-y-1.5">
+                        <label className="text-sm font-semibold text-gray-700">Work Address (Optional)</label>
+                        <input
+                          name="workerAddress"
+                          placeholder="Street / Area"
+                          value={formData.workerAddress || ''}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900"
+                        />
+                      </div>
+
+                      <label className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 cursor-pointer">
+                        <span className="text-sm font-semibold text-gray-700">Currently Available for Jobs</span>
+                        <input
+                          type="checkbox"
+                          checked={formData.isAvailableNow !== false}
+                          onChange={(e) => {
+                            setFormData((prev) => ({ ...prev, isAvailableNow: e.target.checked }));
+                          }}
+                          className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                        />
+                      </label>
+                    </>
+                  )}
+
+                  {/* Customer specifics */}
+                  {selectedRole === ROLES.CUSTOMER && (
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-semibold text-gray-700">Full Address</label>
+                      <input
+                        name="address"
+                        placeholder="House / Street / Area"
+                        value={formData.address || ''}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900"
+                        required
+                      />
+                    </div>
+                  )}
+
+                  <div className="pt-4">
+                    <Button type="submit" fullWidth loading={loading} size="lg" className="font-bold shadow-lg">
+                      {loading ? 'Processing...' : 'Complete Registration'}
+                    </Button>
+                  </div>
+                </form>
               </div>
+            )}
+          </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
-              >
-                {loading ? t('creatingAccount') : t('createAccount')}
-              </button>
-
-              {/* Info Box */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
-                  <strong>📱 Phone:</strong> Required for login<br />
-                  <strong>📧 Email:</strong> Optional (for password reset via email)
-                </p>
-              </div>
-            </form>
-          )}
+          <p className="text-center mt-8 text-gray-600 font-medium">
+            Already have an account?{' '}
+            <Link href="/login" className="text-blue-600 hover:text-blue-700 font-bold hover:underline underline-offset-2">
+              Sign In Here
+            </Link>
+          </p>
         </div>
       </div>
     </div>

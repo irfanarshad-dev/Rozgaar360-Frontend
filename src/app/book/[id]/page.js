@@ -3,10 +3,12 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import { authService } from '@/lib/auth';
+import { useTranslation } from 'react-i18next';
 
 export default function BookService() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useTranslation(['customer', 'common']);
   const [worker, setWorker] = useState(null);
   const [loading, setLoading] = useState(true);
   
@@ -72,13 +74,13 @@ export default function BookService() {
       if (response.data && response.data._id) {
         router.push(`/customer/bookings/confirmation/${response.data._id}`);
       } else {
-        alert('Booking created successfully!');
+        alert(t('customer:bookingCreatedSuccess'));
         router.push('/customer/bookings');
       }
     } catch (error) {
       console.error('Failed to book service:', error);
       console.error('Error details:', error.response?.data);
-      alert(error.response?.data?.message || 'Failed to create booking');
+      alert(error.response?.data?.message || t('customer:bookingCreateFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -87,7 +89,7 @@ export default function BookService() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-xl">Loading...</div>
+        <div className="text-xl">{t('common:loading')}</div>
       </div>
     );
   }
@@ -95,21 +97,44 @@ export default function BookService() {
   if (!worker) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-xl">Worker not found</div>
+        <div className="text-xl">{t('customer:workerNotFound')}</div>
       </div>
     );
   }
 
+  const weeklySchedule = worker?.profile?.weeklySchedule || worker?.weeklySchedule || [];
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-3xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Book Service</h1>
-        <p className="text-gray-600 mb-8">You are booking a service with <span className="font-semibold">{worker.name}</span> for <span className="font-semibold text-blue-600">{worker.profile?.skill || worker.skill || 'Service'}</span></p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('customer:bookService')}</h1>
+        <p className="text-gray-600 mb-8">{t('customer:bookingWith', { name: worker.name, service: worker.profile?.skill || worker.skill || t('customer:bookService') })}</p>
+
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-3">{t('customer:schedule.title')}</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {weeklySchedule.map((slot) => (
+              <div key={slot.day} className={`text-center p-3 border rounded-xl flex flex-col justify-center ${slot.enabled ? 'bg-gray-50' : 'bg-gray-50 opacity-60'}`}>
+                <p className="font-semibold text-gray-800 text-xs sm:text-sm">{t(`customer:schedule.days.${slot.day.toLowerCase()}`)}</p>
+                {slot.enabled ? (
+                  <p className="text-[11px] text-emerald-600 mt-1">{slot.start} - {slot.end}</p>
+                ) : (
+                  <p className="text-[11px] text-red-500 mt-1">{t('customer:schedule.unavailable')}</p>
+                )}
+              </div>
+            ))}
+            {weeklySchedule.length === 0 && (
+              <div className="text-center p-3 border rounded-xl bg-gray-50 flex flex-col justify-center col-span-2 sm:col-span-3">
+                <p className="text-sm text-gray-500">{t('customer:schedule.notProvided')}</p>
+              </div>
+            )}
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('customer:selectDate')}</label>
               <input 
                 type="date"
                 name="date"
@@ -120,7 +145,7 @@ export default function BookService() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Select Time</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('customer:selectTime')}</label>
               <input 
                 type="time"
                 name="time"
@@ -133,26 +158,26 @@ export default function BookService() {
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Service Address</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('customer:serviceAddress')}</label>
             <input 
               type="text"
               name="address"
               value={formData.address}
               onChange={handleChange}
-              placeholder="123 Main St, City, Country"
+              placeholder={t('customer:addressPlaceholder')}
               required
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
 
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Issue Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('customer:issueDescription')}</label>
             <textarea 
               name="description"
               value={formData.description}
               onChange={handleChange}
               rows={4}
-              placeholder="Describe what needs to be done..."
+              placeholder={t('customer:issueDescriptionPlaceholder')}
               required
               className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
             ></textarea>
@@ -163,7 +188,7 @@ export default function BookService() {
             disabled={submitting}
             className="w-full bg-blue-600 text-white font-semibold py-4 rounded-xl hover:bg-blue-700 transition shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {submitting ? 'Confirming Booking...' : 'Confirm Booking'}
+            {submitting ? t('customer:confirmingBooking') : t('customer:confirmBooking')}
           </button>
         </form>
       </div>

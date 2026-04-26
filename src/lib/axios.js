@@ -35,17 +35,18 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error(`API ${error.response?.status || 'Network'} Error:`, error.response?.data?.message || error.message);
-    
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('tokenExpiry');
-      localStorage.removeItem('userId');
-      // Redirect admin routes to admin login, others to regular login
-      const isAdminPath = window.location.pathname.startsWith('/admin');
-      window.location.href = isAdminPath ? '/admin/login' : '/login';
+    const status = error.response?.status;
+    const message = error.response?.data?.message || error.message;
+    const url = error.config?.url || 'unknown-endpoint';
+
+    // 401/403 are expected during auth checks on protected screens.
+    // Avoid noisy Console Error spam for these cases.
+    if (status !== 401 && status !== 403) {
+      console.error(`API ${status || 'Network'} Error (${url}):`, message);
     }
+
+    // Do not force global redirects here. Route-level guards decide how to handle 401
+    // to avoid redirect loops when only part of a page's requests fail.
     return Promise.reject(error);
   }
 );

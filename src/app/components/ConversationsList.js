@@ -1,118 +1,211 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { chatAPI } from '@/lib/chatAPI';
+import { Search, MessageSquare, Clock } from 'lucide-react';
 
-export default function ConversationsList({ onSelectConversation }) {
+function timeAgo(dateStr, language, t) {
+  if (!dateStr) return '';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return t('justNow');
+  if (mins < 60) return t('minutesAgo', { count: mins });
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return t('hoursAgo', { count: hrs });
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return t('daysAgo', { count: days });
+  return new Date(dateStr).toLocaleDateString(language === 'ur' ? 'ur-PK' : 'en-US', { month: 'short', day: 'numeric' });
+}
+
+function Avatar({ name, size = 'md' }) {
+  const colors = [
+    'from-blue-500 to-blue-600',
+    'from-violet-500 to-purple-600',
+    'from-emerald-500 to-teal-600',
+    'from-rose-500 to-pink-600',
+    'from-amber-500 to-orange-600',
+    'from-cyan-500 to-sky-600',
+  ];
+  const idx = name ? name.charCodeAt(0) % colors.length : 0;
+  const sizeClass = size === 'lg' ? 'w-14 h-14 text-lg' : 'w-11 h-11 text-sm';
+  return (
+    <div className={`${sizeClass} bg-gradient-to-br ${colors[idx]} rounded-2xl flex items-center justify-center text-white font-bold flex-shrink-0 shadow-md`}>
+      {name?.charAt(0)?.toUpperCase() || '?'}
+    </div>
+  );
+}
+
+export default function ConversationsList({ onSelectConversation, selectedId }) {
+  const { t, i18n } = useTranslation('common');
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [unreadCounts, setUnreadCounts] = useState({});
+  const [search, setSearch] = useState('');
 
-  useEffect(() => {
-    loadConversations();
-    const interval = setInterval(loadConversations, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  const loadConversations = useCallback(async () => {
+    // Don't make API calls if not authenticated
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
-  const loadConversations = async () => {
     try {
-      const response = await chatAPI.getConversations();
-      setConversations(response.data);
-    } catch (error) {
-      console.error('Failed to load conversations:', error);
+      const res = await chatAPI.getConversations();
+      const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+
+      const convs = (res.data || []).map((conv) => {
+        const workerIdStr =
+          typeof conv.workerId === 'object' && conv.workerId?._id
+            ? String(conv.workerId._id)
+            : String(conv.workerId || '');
+        const customerIdStr =
+          typeof conv.customerId === 'object' && conv.customerId?._id
+            ? String(conv.customerId._id)
+            : String(conv.customerId || '');
+
+        const workerName =
+          typeof conv.workerId === 'object' ? conv.workerId?.name || t('workerLabel') : t('workerLabel');
+        const customerName =
+          typeof conv.customerId === 'object' ? conv.customerId?.name || t('customerLabel') : t('customerLabel');
+
+        const isWorker = workerIdStr === String(currentUserId);
+        const otherParticipantName = isWorker ? customerName : workerName;
+        const otherParticipantId = isWorker ? customerIdStr : workerIdStr;
+
+        return {
+          ...conv,
+          _id: String(conv._id),
+          otherParticipantName,
+          otherParticipantId,
+        };
+      });
+
+      setConversations(convs);
+    } catch (err) {
+      // Silently fail for network errors — don't crash the UI
+      if (err.response?.status !== 401 && err.response?.status !== 403) {
+        console.warn('[ConversationsList] Could not load conversations:', err.message);
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
 
-  const filtered = conversations.filter(conv =>
-    conv.jobId.toString().includes(searchTerm)
+  useEffect(() => {
+    loadConversations();
+    
+    // Real-time refresh
+    const handleUpdate = () => loadConversations();
+    window.addEventListener('chat:conversation-updated', handleUpdate);
+    
+    const interval = setInterval(loadConversations, 30000); // Poll less frequently now that we have sockets
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('chat:conversation-updated', handleUpdate);
+    };
+  }, [loadConversations]);
+
+  const filtered = conversations.filter((c) =>
+    c.otherParticipantName?.toLowerCase().includes(search.toLowerCase())
   );
 
-  const getStatusIcon = (status) => {
-    if (status === 'seen') {
-      return (
-        <svg className="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" style={{ transform: 'translateX(8px)' }} />
-        </svg>
-      );
-    } else if (status === 'delivered') {
-      return (
-        <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" style={{ transform: 'translateX(8px)' }} />
-        </svg>
-      );
-    } else {
-      return (
-        <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-        </svg>
-      );
-    }
-  };
+  if (loading) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="p-4">
+          <div className="h-10 skeleton rounded-xl mb-4" />
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="flex items-center gap-3 mb-4">
+              <div className="w-11 h-11 skeleton rounded-2xl flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 skeleton rounded w-3/4" />
+                <div className="h-3 skeleton rounded w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
 
   return (
     <div className="flex flex-col h-full">
-      {/* Search Bar */}
-      <div className="p-3 border-b border-gray-200">
+      {/* Search */}
+      <div className="p-3 pb-2">
         <div className="relative">
-          <svg className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           <input
             type="text"
-            placeholder="Search Chats"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            placeholder={t('searchConversations')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all"
           />
         </div>
       </div>
 
-      {/* Conversations List */}
-      <div className="flex-1 overflow-y-auto">
-        {loading ? (
-          <div className="p-4 text-center text-gray-500 text-sm">Loading...</div>
-        ) : filtered.length === 0 ? (
-          <div className="p-4 text-center text-gray-500 text-sm">No chats</div>
+      {/* List */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin">
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-48 px-6 text-center">
+            <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-3">
+              <MessageSquare className="w-7 h-7 text-gray-300" />
+            </div>
+            <p className="text-sm font-medium text-gray-500">{t('noConversationsYet')}</p>
+            <p className="text-xs text-gray-400 mt-1">{t('startChatFromProfile')}</p>
+          </div>
         ) : (
-          filtered.map((conv) => (
-            <div
-              key={conv._id}
-              onClick={() => onSelectConversation(conv)}
-              className="px-3 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition active:bg-gray-100 flex items-center gap-3"
-            >
-              {/* Avatar */}
-              <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                {conv.jobId.toString().slice(0, 1).toUpperCase()}
-              </div>
+          filtered.map((conv) => {
+            const isActive = conv._id === selectedId;
+            const unreadCount = conv.unreadCount && currentUserId ? conv.unreadCount[currentUserId] || 0 : 0;
 
-              {/* Chat Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex justify-between items-baseline gap-2">
-                  <p className="font-medium text-gray-900 text-sm">Job #{conv.jobId}</p>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    {conv.lastMessage && getStatusIcon(conv.lastMessageStatus)}
+            return (
+              <button
+                key={conv._id}
+                onClick={() => {
+                  if (unreadCount > 0) {
+                    // Locally reset for instant feedback
+                    setConversations(prev => prev.map(c => c._id === conv._id ? { ...c, unreadCount: { ...c.unreadCount, [currentUserId]: 0 } } : c));
+                  }
+                  onSelectConversation(conv);
+                }}
+                className={`w-full text-left px-4 py-3.5 flex items-center gap-3 transition-all duration-150 border-b border-gray-50 hover:bg-blue-50/60 group ${
+                  isActive ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'border-l-4 border-l-transparent'
+                }`}
+              >
+                <div className="relative">
+                   <Avatar name={conv.otherParticipantName} />
+                   <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full" />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline justify-between mb-0.5">
+                    <p className={`text-sm font-semibold truncate ${isActive ? 'text-blue-700' : 'text-gray-900'}`}>
+                      {conv.otherParticipantName || t('user')}
+                    </p>
                     {conv.lastMessageTime && (
-                      <p className="text-gray-500 text-xs">
-                        {new Date(conv.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
+                      <span className="text-[11px] text-gray-400 flex-shrink-0 ml-2 flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {timeAgo(conv.lastMessageTime, i18n.language, t)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className={`text-xs truncate flex-1 ${conv.lastMessage ? 'text-gray-500' : 'text-gray-400 italic'}`}>
+                      {conv.lastMessage || t('noMessagesYet')}
+                    </p>
+                    {unreadCount > 0 && !isActive && (
+                      <span className="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] flex items-center justify-center shadow-sm animate-scaleIn">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
                     )}
                   </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-gray-600 text-sm truncate">{conv.lastMessage || 'No messages yet'}</p>
-                  {unreadCounts[conv._id] > 0 && (
-                    <span className="bg-green-500 text-white text-xs rounded-full px-2 py-0.5 ml-2 flex-shrink-0 font-semibold">
-                      {unreadCounts[conv._id]}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))
+              </button>
+            );
+          })
         )}
       </div>
     </div>

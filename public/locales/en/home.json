@@ -1,0 +1,267 @@
+{
+  "banner": {
+    "welcomeBack": "Welcome back, {{name}}!",
+    "goToDashboard": "Go to your dashboard →"
+  },
+  "ad": {
+    "badge": "Sponsored",
+    "title": "See How Rozgaar360 Works",
+    "subtitle": "Quick overview of booking trusted local workers",
+    "cta": "Explore Workers"
+  },
+  "hero": {
+    "line1": "Find Skilled",
+    "line2": "Local Workers",
+    "line3": "Near You",
+    "description": "Connect with thousands of verified, background-checked professionals for any home service instantly and at fair prices.",
+    "searchPlaceholder": "e.g. Plumber, Electrician...",
+    "viewMap": "View Map",
+    "findButton": "Find",
+    "allSkills": "All Skills →",
+    "badge": "Pakistan's #1 Skilled Workers Platform"
+  },
+  "ai": {
+    "badge": "New AI Feature",
+    "titlePrefix": "Can't find the right",
+    "titleHighlight": "Skill?",
+    "description": "Tell our AI assistant what you need, and it will match you with the best professional for the job even if you don't know the exact category."
+  },
+  "aiBox": {
+    "title": "AI Worker Assistant",
+    "subtitle": "Describe your problem in plain Urdu or English",
+    "placeholder": "e.g. 'There is a water leakage in my kitchen wall and it's damaging the paint'",
+    "nearMe": "Find workers near me",
+    "resultsTitle": "AI Recommendations",
+    "viewProfile": "View Profile",
+    "reviewCount": "{{count}} Reviews",
+    "match": "Match",
+    "disclaimer": "AI matches are based on skill relevance, experience, and proximity.",
+    "noRelatedWorkers": "No workers found related to your query. Please change your preference.",
+    "unavailable": "AI feature is currently unavailable. Please try again later.",
+    "locationDenied": "Location access denied or unavailable. Searching broadly instead."
+  },
+  "worker": {
+    "hero": {
+      "line1": "Grow Your",
+      "line2": "Business",
+      "line3": "Connect with Customers",
+      "description": "Manage your bookings, update availability, and build your reputation with verified reviews.",
+      "dashboardButton": "View Dashboard",
+      "bookingsButton": "My Bookings"
+    },
+    "ai": {
+      "badge": "AI Powered",
+      "titlePrefix": "Find",
+      "titleHighlight": "Perfect Jobs",
+      "titleSuffix": "For You",
+      "description": "AI matches you with jobs based on your skills, location, and experience"
+    },
+    "performance": {
+      "badge": "YOUR PERFORMANCE",
+      "titlePrefix": "Track Your",
+      "titleHighlight": "Success",
+      "description": "Monitor your business metrics and grow your reputation",
+      "stats": {
+        "totalJobs": "Total Jobs",
+        "pending": "Pending",
+        "completed": "Completed",
+        "rating": "Rating"
+      }
+    },
+    "bookings": {
+      "titlePrefix": "Your",
+      "titleHighlight": "Bookings",
+      "subtitle": "Manage your job requests and bookings",
+      "loading": "Loading bookings...",
+      "emptyTitle": "No bookings yet",
+      "emptySubtitle": "You'll see job requests from customers here",
+      "viewAll": "View All Bookings",
+      "previewBadge": "Live Booking",
+      "previewTitle": "Next booking preview",
+      "previewSubtitle": "Real booking data from your account",
+      "previewView": "Open booking",
+      "labels": {
+        "service": "Service",
+        "customer": "Customer",
+        "when": "When",
+        "location": "Location",
+        "budget": "Budget"
+      }
+    },
+    "quickFlow": {
+      "title": "Quick Flow",
+      "subtitle": "Jump straight to your daily actions",
+      "actions": "Actions",
+      "jobRequestsTitle": "Job Requests",
+      "jobRequestsDescription": "Manage incoming bookings and job updates from one place.",
+      "messagesTitle": "Messages",
+      "messagesDescription": "Reply to clients and keep conversations moving."
+    },
+    "schedule": {
+      "title": "Availability Schedule",
+      "subtitle": "Set working hours for each day",
+      "availableNow": "Available Now",
+      "notAvailable": "Not Available",
+      "applySameTime": "Apply same time to all days",
+      "serviceRadius": "Service Radius",
+      "radiusHint": "How far you are willing to travel",
+      "responseRate": "Response rate",
+      "responseHint": "Used for ranking and trust",
+      "save": "Save schedule",
+      "saving": "Saving...",
+      "updated": "Schedule updated successfully",
+      "failed": "Failed to update schedule"
+    },
+    "tips": {
+      "badge": "SUCCESS TIPS",
+      "titlePrefix": "Maximize Your",
+      "titleHighlight": "Earnings",
+      "description": "Follow these tips to get more bookings",
+      "step1": {
+        "title": "Complete Verification",
+        "description": "Upload CNIC to gain customer trust"
+      },
+      "step2": {
+        "title": "Stay Available",
+        "description": "Update your schedule regularly"
+      },
+      "step3": {
+        "title": "Deliver Quality",
+        "description": "Great service leads to 5-star reviews"
+      }
+    },
+    "cta": {
+      "badge": "GROW YOUR BUSINESS",
+      "titleLine1": "Start Getting",
+      "titleLine2": "More Bookings",
+      "description": "Complete your profile, stay available, and deliver quality service to grow your reputation.",
+      "dashboard": "Go to Dashboard",
+      "bookings": "View Bookings"
+    }
+  },
+  "map": {
+    "title": "Find Workers Near You"
+  },
+  "services": {
+    "badge": "Browse by Skill",
+    "titlePrefix": "Popular",
+    "titleHighlight": "Services",
+    "description": "All workers are real, registered professionals from your city. Click a skill to see available workers.",
+    "showingWorkers": "Showing workers ↓",
+    "browseWorkers": "Browse workers"
+  },
+  "howItWorks": {
+    "badge": "The Process",
+    "titlePrefix": "How It",
+    "titleHighlight": "Works",
+    "subtitle": "Three simple steps to get any job done professionally.",
+    "step1": {
+      "title": "Search",
+      "description": "Browse real verified professionals filtered by skill and city."
+    },
+    "step2": {
+      "title": "Book",
+      "description": "Select your preferred worker and connect via chat instantly."
+    },
+    "step3": {
+      "title": "Get Service",
+      "description": "Your pro arrives, gets the job done, and you rate them."
+    },
+    "browseNow": "Browse available workers now"
+  },
+  "featured": {
+    "title": "Top Rated Professionals",
+    "subtitle": "Highest rated workers across all skills",
+    "filteredTitle": "{{skill}} Workers",
+    "filteredSubtitle": "Professionals available for {{skill}} in {{city}}",
+    "allCities": "all cities",
+    "clearFilter": "Clear filter",
+    "seeAllWorkers": "See All Workers",
+    "viewProfile": "View Profile",
+    "experienceOne": "{{count}} yr experience",
+    "experienceOther": "{{count}} yrs experience",
+    "verified": "Verified",
+    "new": "New"
+  },
+  "about": {
+    "badge": "Why Rozgaar360",
+    "titlePrefix": "Built for",
+    "titleHighlight": "Pakistan",
+    "description": "We're on a mission to make skilled labor accessible, fair, and safe for every household in Pakistan. Every worker on our platform is identity-verified and rated by real customers.",
+    "features": {
+      "cnic": {
+        "title": "CNIC Verified Workers",
+        "description": "Every professional submits their CNIC verified by our admin team before being listed."
+      },
+      "reviews": {
+        "title": "Real Customer Reviews",
+        "description": "Ratings and reviews come from real customers who booked through the platform."
+      },
+      "connect": {
+        "title": "Connect Instantly",
+        "description": "Chat directly with workers through our built-in real-time messaging system."
+      },
+      "profile": {
+        "title": "Transparent Profiles",
+        "description": "See skill, experience, city, and all reviews upfront with no hidden surprises."
+      }
+    }
+  },
+  "stats": {
+    "badge": "Platform Highlights",
+    "skillsAvailable": "Skills Available",
+    "citiesCovered": "Cities Covered",
+    "avgRating": "Avg. Rating",
+    "cnicVerified": "CNIC Verified",
+    "liveWorkersTitle": "Workers are live on the platform",
+    "liveWorkersSubtitle": "Browse and connect with them right now"
+  },
+  "cta": {
+    "badge": "Join Pakistan's fastest growing labor platform",
+    "titleLine1": "Ready to Get",
+    "titleLine2": "Any Job Done?",
+    "description": "Whether you need a skilled worker or want to offer your services, Rozgaar360 connects both sides instantly.",
+    "findWorkerNow": "Find a Worker Now",
+    "registerWorker": "Register as a Worker"
+  },
+  "messages": {
+    "loadingWorkers": "Loading workers from database...",
+    "workersLoadError": "Could not load workers. Please try again.",
+    "retry": "Retry",
+    "noSkillWorkersTitle": "No {{skill}} found",
+    "noWorkersTitle": "No workers found",
+    "noSkillWorkersDescription": "We couldn't find any {{skill}} workers matching your criteria.",
+    "noWorkersDescription": "No workers are registered yet. Be the first to join!"
+  },
+  "skills": {
+    "plumber": "Plumber",
+    "electrician": "Electrician",
+    "carpenter": "Carpenter",
+    "tailor": "Tailor",
+    "painter": "Painter",
+    "cleaner": "Cleaner",
+    "mechanic": "Mechanic",
+    "cook": "Cook",
+    "driver": "Driver",
+    "acRepair": "AC Repair"
+  },
+  "footer": {
+    "brandDescription": "Pakistan's trusted platform for finding skilled local workers quickly and safely.",
+    "ourSkills": "Our Skills",
+    "company": "Company",
+    "contact": "Contact",
+    "email": "rozgaar360@gmail.com",
+    "phone": "+92-300-1234567",
+    "coveragePrefix": "Coverage:",
+    "coverageSuffix": "& more",
+    "copyright": "© {{year}} Rozgaar360. All rights reserved.",
+    "madeWith": "Made with",
+    "inPakistan": "in Pakistan",
+    "links": {
+      "aboutUs": "About Us",
+      "registerWorker": "Register as Worker",
+      "findWorkers": "Find Workers",
+      "login": "Login"
+    }
+  }
+}

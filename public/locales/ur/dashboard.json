@@ -1,9 +1,21 @@
 {
-  "workerDashboard": "کارکن ڈیش بورڈ",
-  "customerDashboard": "گاہک ڈیش بورڈ",
-  "manageProfile": "اپنی پروفائل اور خدمات کا انتظام کریں",
-  "findHireWorkers": "ماہر کارکنان تلاش کریں اور ملازمت دیں",
-  "findWorkers": "کارکن تلاش کریں",
-  "discoverWorkers": "اپنے قریب ماہر کارکنان دریافت کریں",
-  "findBestWorker": "اپنے قریب بہترین کارکن تلاش کریں"
+  "welcome": "خوش آمدید",
+  "myBookings": "میری بکنگز",
+  "myProfile": "میری پروفائل",
+  "notifications": "اطلاعات",
+  "messages": "پیغامات",
+  "settings": "ترتیبات",
+  "activeBookings": "فعال بکنگز",
+  "completedBookings": "مکمل بکنگز",
+  "pendingBookings": "زیر التواء بکنگز",
+  "totalEarnings": "کل آمدنی",
+  "rating": "درجہ بندی",
+  "reviews": "جائزے",
+  "viewAll": "سب دیکھیں",
+  "noBookings": "ابھی تک کوئی بکنگ نہیں",
+  "startBooking": "کارکنوں کی بکنگ شروع کریں تاکہ انہیں یہاں دیکھ سکیں",
+  "verificationStatus": "تصدیق کی حیثیت",
+  "editProfile": "پروفائل میں ترمیم کریں",
+  "uploadPhoto": "تصویر اپ لوڈ کریں",
+  "saveChanges": "تبدیلیاں محفوظ کریں"
 }

@@ -41,24 +41,19 @@ function RecenterMap({ center }) {
   return null;
 }
 
-export default function WorkerMap({ workers, onWorkerClick }) {
-  const [userLocation, setUserLocation] = useState(null);
+export default function WorkerMap({ workers, onWorkerClick, userLocation, onRequestLocation }) {
   const [mapCenter, setMapCenter] = useState([30.3753, 69.3451]); // Pakistan center
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const location = [position.coords.latitude, position.coords.longitude];
-          setUserLocation(location);
-          setMapCenter(location);
-        },
-        (error) => {
-          console.log('Location access denied:', error);
-        }
-      );
+    if (userLocation?.lat && userLocation?.lng) {
+      setMapCenter([userLocation.lat, userLocation.lng]);
+      return;
     }
-  }, []);
+
+    if (onRequestLocation) {
+      onRequestLocation();
+    }
+  }, [userLocation, onRequestLocation]);
 
   return (
     <div className="relative w-full h-[500px] rounded-xl overflow-hidden shadow-lg border border-gray-200">
@@ -72,10 +67,10 @@ export default function WorkerMap({ workers, onWorkerClick }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <RecenterMap center={userLocation} />
+        <RecenterMap center={userLocation?.lat && userLocation?.lng ? [userLocation.lat, userLocation.lng] : null} />
         
-        {userLocation && (
-          <Marker position={userLocation} icon={userIcon}>
+        {userLocation?.lat && userLocation?.lng && (
+          <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
             <Popup>
               <div className="text-center">
                 <strong>Your Location</strong>
@@ -108,7 +103,7 @@ export default function WorkerMap({ workers, onWorkerClick }) {
         })}
       </MapContainer>
 
-      {userLocation && (
+      {userLocation?.lat && userLocation?.lng && (
         <div className="absolute top-4 right-4 bg-white px-4 py-2 rounded-lg shadow-md z-[1000]">
           <p className="text-sm text-gray-600">📍 Your location detected</p>
         </div>

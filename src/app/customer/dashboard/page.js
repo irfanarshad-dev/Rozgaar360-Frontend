@@ -1,28 +1,32 @@
-"use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { authService } from "@/lib/auth";
-import DashboardLayout from "@/app/components/ui/DashboardLayout";
-import Card, { CardBody } from "@/app/components/ui/Card";
+'use client';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { authService } from '@/lib/auth';
+import DashboardLayout from '@/app/components/ui/DashboardLayout';
+import Card, { CardBody } from '@/app/components/ui/Card';
+import { SkeletonStatCard } from '@/app/components/ui/SkeletonCard';
+import EditProfile from '../../components/EditProfile';
+import { useTranslation } from 'react-i18next';
+import { UserCircle, Search, Calendar, MessageCircle, MapPin, Phone, Briefcase, Mail } from 'lucide-react';
 
 export default function CustomerDashboard() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
+  const { t } = useTranslation(['customer', 'common']);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
-
       if (!authService.isAuthenticated()) {
-        router.push("/login");
+        router.push('/login');
         return;
       }
 
       const user = authService.getUser();
-      if (!user || user.role !== "customer") {
-        router.push("/");
+      if (!user || user.role !== 'customer') {
+        router.push('/');
         return;
       }
 
@@ -30,7 +34,7 @@ export default function CustomerDashboard() {
         const data = await authService.getProfile();
         setProfile(data);
       } catch (error) {
-        console.error("Profile fetch failed:", error.message);
+        console.error('Profile fetch failed:', error);
       } finally {
         setLoading(false);
       }
@@ -38,202 +42,213 @@ export default function CustomerDashboard() {
     fetchProfile();
   }, [router]);
 
+  const handleProfileUpdate = (updatedProfile) => {
+    setProfile(updatedProfile);
+    setIsEditing(false);
+  };
+
   if (loading) {
     return (
       <DashboardLayout role="customer">
-        <div className="flex items-center justify-center h-96">
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-            <p className="text-gray-600 font-medium">Loading dashboard...</p>
-          </div>
+        <div className="mb-8">
+          <div className="h-8 w-64 rounded-lg skeleton mb-2" />
+          <div className="h-4 w-48 rounded-lg skeleton" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+        </div>
+        <div className="h-[300px] rounded-2xl skeleton mb-8" />
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="h-[120px] rounded-2xl skeleton" />
+          <div className="h-[120px] rounded-2xl skeleton" />
+          <div className="h-[120px] rounded-2xl skeleton" />
         </div>
       </DashboardLayout>
     );
   }
 
+  const firstName = profile?.name ? profile.name.split(' ')[0] : '';
+
   return (
     <DashboardLayout role="customer">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back{profile?.name ? `, ${profile.name}` : ''}!
-        </h1>
-        <p className="text-gray-600 mt-1">Here&apos;s what&apos;s happening with your services today</p>
-      </div>
+      <div className="max-w-6xl mx-auto pb-12 px-4">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div>
+            <h1 className="text-3xl md:text-[34px] font-black text-gray-900 tracking-tight">
+              {t('customer:dashboard.welcomeBack', { name: firstName ? `, ${firstName}` : '' })}
+            </h1>
+            <p className="text-sm md:text-[15px] text-gray-500 mt-1.5 max-w-2xl">{t('customer:dashboard.subtitle')}</p>
+          </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="overflow-hidden">
-          <CardBody className="relative">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Active Bookings</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
-                <p className="text-xs text-gray-500 mt-1">View all bookings</p>
-              </div>
-              <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center">
-                <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
+          <Link href="/customer/recommendations" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/20 flex items-center gap-2 transition-all hover:-translate-y-0.5 w-full md:w-auto justify-center text-sm">
+            <Search className="w-5 h-5" /> {t('customer:findWorkers')}
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-7">
+          <div className="lg:col-span-8 flex flex-col gap-7">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              <Card hover className="group flex flex-col justify-center">
+                <CardBody className="relative overflow-hidden p-5 sm:p-6">
+                  <div className="absolute -right-4 -top-4 w-16 h-16 bg-blue-50 rounded-full group-hover:scale-150 transition-transform duration-500 z-0" />
+                  <div className="relative z-10 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">{t('customer:dashboard.stats.discover')}</p>
+                      <p className="text-base sm:text-[18px] font-black text-gray-900 leading-tight mt-1.5 group-hover:text-blue-600 transition-colors">{t('customer:dashboard.stats.findBestPros')}</p>
+                    </div>
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 shadow-inner group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                      <Search className="w-5 h-5" />
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+
+              <Card hover className="group flex flex-col justify-center">
+                <CardBody className="relative overflow-hidden p-5 sm:p-6">
+                  <div className="absolute -right-4 -top-4 w-16 h-16 bg-emerald-50 rounded-full group-hover:scale-150 transition-transform duration-500 z-0" />
+                  <div className="relative z-10 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">{t('customer:dashboard.stats.bookings')}</p>
+                      <p className="text-base sm:text-[18px] font-black text-gray-900 leading-tight mt-1.5 group-hover:text-emerald-600 transition-colors">{t('customer:dashboard.stats.trackJobs')}</p>
+                    </div>
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300">
+                      <Calendar className="w-5 h-5" />
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+
+              <Card hover className="group flex flex-col justify-center">
+                <CardBody className="relative overflow-hidden p-5 sm:p-6">
+                  <div className="absolute -right-4 -top-4 w-16 h-16 bg-violet-50 rounded-full group-hover:scale-150 transition-transform duration-500 z-0" />
+                  <div className="relative z-10 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wide">{t('customer:dashboard.stats.conversations')}</p>
+                      <p className="text-base sm:text-[18px] font-black text-gray-900 leading-tight mt-1.5 group-hover:text-violet-600 transition-colors">{t('customer:dashboard.stats.chatWithWorkers')}</p>
+                    </div>
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 bg-violet-100 rounded-xl flex items-center justify-center text-violet-600 shadow-inner group-hover:bg-violet-600 group-hover:text-white transition-all duration-300">
+                      <MessageCircle className="w-5 h-5" />
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
             </div>
-          </CardBody>
-        </Card>
 
-        <Card className="overflow-hidden">
-          <CardBody className="relative">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Completed Jobs</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
-                <p className="text-xs text-gray-500 mt-1">Total completed</p>
-              </div>
-              <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center">
-                <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+            <div className="flex-1">
+              {isEditing ? (
+                <EditProfile
+                  profile={profile}
+                  onProfileUpdate={handleProfileUpdate}
+                  onCancel={() => setIsEditing(false)}
+                />
+              ) : (
+                <Card className="h-full flex flex-col">
+                  <CardBody className="p-6 sm:p-7 flex-1 flex flex-col">
+                    <div className="flex justify-between items-center mb-5 pb-4 border-b border-gray-100">
+                      <h2 className="text-xl md:text-[22px] font-bold text-gray-900 flex items-center gap-2">
+                        <UserCircle className="w-5 h-5 text-blue-600" /> {t('customer:dashboard.accountInfo')}
+                      </h2>
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="px-4 py-2 bg-blue-50 text-blue-600 text-sm font-bold rounded-lg hover:bg-blue-100 transition-colors"
+                      >
+                        {t('customer:dashboard.editProfile')}
+                      </button>
+                    </div>
+
+                    {profile ? (
+                      <div className="grid sm:grid-cols-2 gap-y-6 gap-x-8 flex-1">
+                        <div className="flex gap-2.5">
+                          <UserCircle className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-0.5">{t('customer:dashboard.fullName')}</p>
+                            <p className="text-base font-bold text-gray-900">{profile.name}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2.5">
+                          <Phone className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-0.5">{t('customer:dashboard.phoneNumber')}</p>
+                            <p className="text-base font-bold text-gray-900">{profile.phone}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2.5">
+                          <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-0.5">{t('customer:dashboard.city')}</p>
+                            <p className="text-base font-bold text-gray-900">{profile.city || '-'}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2.5">
+                          <Mail className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest mb-0.5">{t('customer:dashboard.address')}</p>
+                            <p className="text-base font-bold text-gray-900">{profile.address || t('customer:dashboard.noAddressProvided')}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-xs text-center m-auto">{t('customer:dashboard.noProfileData')}</p>
+                    )}
+                  </CardBody>
+                </Card>
+              )}
             </div>
-          </CardBody>
-        </Card>
+          </div>
 
-        <Card className="overflow-hidden">
-          <CardBody className="relative">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Messages</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">0</p>
-                <p className="text-xs text-gray-500 mt-1">Unread messages</p>
-              </div>
-              <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center">
-                <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+          <div className="lg:col-span-4 flex flex-col gap-7">
+            <Card className="flex flex-col flex-1 shrink-0">
+              <CardBody className="p-6 sm:p-7 h-full flex flex-col justify-center">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Briefcase className="w-4 h-4 text-gray-400" /> {t('customer:dashboard.quickFlow')}
+                </h2>
+                <div className="flex flex-col gap-5">
+                  <button onClick={() => router.push('/customer/recommendations')} className="text-left group relative outline-none w-full">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl opacity-90 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative p-5 flex items-center gap-4">
+                      <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                        <Search className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-white text-sm">{t('customer:dashboard.browseWorkers')}</h3>
+                        <p className="text-blue-100 text-[10px] tracking-wide mt-0.5 line-clamp-1">{t('customer:dashboard.browseWorkersHint')}</p>
+                      </div>
+                    </div>
+                  </button>
 
-      {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-3 gap-6 mb-8">
-        {/* Profile Card */}
-        <Card className="lg:col-span-2">
-          <CardBody>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
-              <Link href="/profile" className="text-sm font-medium text-blue-600 hover:text-blue-700">
-                Edit Profile
-              </Link>
-            </div>
-            {profile && (
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                    Full Name
-                  </label>
-                  <p className="text-base font-medium text-gray-900">{profile.name}</p>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                    Phone Number
-                  </label>
-                  <p className="text-base font-medium text-gray-900">{profile.phone}</p>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                    City
-                  </label>
-                  <p className="text-base font-medium text-gray-900">{profile.city}</p>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                    Account Type
-                  </label>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-                    Customer
-                  </span>
-                </div>
-              </div>
-            )}
-          </CardBody>
-        </Card>
+                  <button onClick={() => router.push('/customer/bookings')} className="text-left group relative outline-none w-full">
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl opacity-90 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative p-5 flex items-center gap-4">
+                      <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                        <Calendar className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-white text-sm">{t('customer:dashboard.myBookingsAction')}</h3>
+                        <p className="text-emerald-100 text-[10px] tracking-wide mt-0.5 line-clamp-1">{t('customer:dashboard.myBookingsHint')}</p>
+                      </div>
+                    </div>
+                  </button>
 
-        {/* Quick Action Card */}
-        <Card className="bg-gradient-to-br from-blue-600 to-blue-700 border-0 text-white">
-          <CardBody>
-            <div className="flex flex-col h-full">
-              <div className="mb-4">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Find Workers</h3>
-                <p className="text-blue-100 text-sm">Discover skilled professionals near you</p>
-              </div>
-              <Link
-                href="/recommendations"
-                className="mt-auto bg-white text-blue-600 py-3 px-4 rounded-xl font-semibold hover:bg-blue-50 transition-colors text-center text-sm"
-              >
-                Browse Workers
-              </Link>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-
-      {/* Quick Links */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          <Link href="/customer/bookings" className="group">
-            <Card hover>
-              <CardBody className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-sm">My Bookings</h3>
-                  <p className="text-gray-500 text-xs mt-0.5">View all bookings</p>
+                  <button onClick={() => router.push('/customer/chat')} className="text-left group relative outline-none w-full">
+                    <div className="absolute inset-0 bg-gradient-to-r from-violet-500 to-fuchsia-600 rounded-xl opacity-90 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative p-5 flex items-center gap-4">
+                      <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition-transform duration-300 shadow-inner">
+                        <MessageCircle className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-white text-sm">{t('customer:dashboard.messagesAction')}</h3>
+                        <p className="text-violet-100 text-[10px] tracking-wide mt-0.5 line-clamp-1">{t('customer:dashboard.messagesHint')}</p>
+                      </div>
+                    </div>
+                  </button>
                 </div>
               </CardBody>
             </Card>
-          </Link>
-
-          <Link href="/customer/notifications" className="group">
-            <Card hover>
-              <CardBody className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-sm">Notifications</h3>
-                  <p className="text-gray-500 text-xs mt-0.5">Check updates</p>
-                </div>
-              </CardBody>
-            </Card>
-          </Link>
-
-          <Link href="/chat" className="group">
-            <Card hover>
-              <CardBody className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-sm">Messages</h3>
-                  <p className="text-gray-500 text-xs mt-0.5">Chat with workers</p>
-                </div>
-              </CardBody>
-            </Card>
-          </Link>
+          </div>
         </div>
       </div>
     </DashboardLayout>

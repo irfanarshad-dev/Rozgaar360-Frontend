@@ -1,235 +1,311 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { authService } from '@/lib/auth';
+import { useLanguage } from '@/lib/i18nProvider';
 import NotificationBell from '../NotificationBell';
+import ProfilePhotoUpload from '../ProfilePhotoUpload';
+import {
+  Home, Search, Calendar, Bell, MessageCircle, Briefcase,
+  LogOut, Menu, X, ChevronRight, Settings, Camera, User as UserIcon, Globe
+} from 'lucide-react';
+import { Info } from 'lucide-react';
 
-export default function DashboardLayout({ children, role = 'customer' }) {
+const CUSTOMER_LINKS = [
+  { href: '/customer/dashboard',      labelKey: 'common:dashboard',     fallback: 'Dashboard', icon: Home },
+  { href: '/customer/recommendations', labelKey: 'common:findWorkers',   fallback: 'Find Workers', icon: Search },
+  { href: '/customer/bookings',       labelKey: 'common:myBookings',    fallback: 'My Bookings', icon: Calendar },
+  { href: '/customer/notifications',  labelKey: 'common:notifications', fallback: 'Notifications', icon: Bell },
+  { href: '/customer/chat',           labelKey: 'common:messages',      fallback: 'Messages', icon: MessageCircle },
+];
+
+const WORKER_LINKS = [
+  { href: '/worker/dashboard',  labelKey: 'common:dashboard', icon: Home, fallback: 'Dashboard' },
+  { href: '/worker/bookings',   labelKey: 'worker:jobRequests', icon: Briefcase, fallback: 'Job Requests' },
+  { href: '/worker/chat',       labelKey: 'common:messages', icon: MessageCircle, fallback: 'Messages' },
+];
+
+const HOME_LINKS = [
+  { href: '/', labelKey: 'common:home', fallback: 'Home', icon: Home },
+  { href: '/#services', labelKey: 'common:services', fallback: 'Services', icon: Briefcase },
+  { href: '/#how-it-works', labelKey: 'common:howItWorks', fallback: 'How it works', icon: Search },
+  { href: '/#about', labelKey: 'common:about', fallback: 'About', icon: Info },
+];
+
+function SidebarContent({ links, pathname, onLogout, onClose, t }) {
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between h-16 px-5 border-b border-gray-100 flex-shrink-0">
+        <Link href="/" className="flex items-center gap-2.5" onClick={onClose}>
+          <Image
+            src="/assests/Logo/Rozgaar360-logo.png"
+            alt="Rozgaar360"
+            width={110}
+            height={32}
+            className="h-8 w-auto object-contain"
+          />
+          <span className="text-base font-bold text-gray-900">Rozgaar<span className="text-blue-600">360</span></span>
+        </Link>
+        {onClose && (
+          <button onClick={onClose} className="p-2 rounded-xl hover:bg-gray-100 lg:hidden" aria-label={t('common:closeMenu')}>
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        )}
+      </div>
+
+      <nav className="flex-1 px-3 py-5 space-y-0.5 overflow-y-auto scrollbar-thin">
+        {links.map(({ href, labelKey, fallback, icon: Icon }) => {
+          const isActive = pathname === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={onClose}
+              className={`group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 ${
+                isActive
+                  ? 'bg-blue-50 text-blue-700 shadow-sm shadow-blue-500/10'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+              }`} />
+              <span className="truncate">{t(labelKey, { defaultValue: fallback })}</span>
+              {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto text-blue-400" />}
+            </Link>
+          );
+        })}
+
+        <div className="px-4 pt-4 pb-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">{t('common:navigation', { defaultValue: 'Navigation' })}</p>
+        </div>
+
+        {HOME_LINKS.map(({ href, labelKey, fallback, icon: Icon }) => {
+          const isActive = href === '/' ? pathname === '/' : pathname?.startsWith(href.replace(/#.*$/, ''));
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={onClose}
+              className={`group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 ${
+                isActive
+                  ? 'bg-blue-50 text-blue-700 shadow-sm shadow-blue-500/10'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Icon className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'
+              }`} />
+              <span className="truncate">{t(labelKey, { defaultValue: fallback })}</span>
+              {isActive && <ChevronRight className="w-3.5 h-3.5 ml-auto text-blue-400" />}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="p-3 border-t border-gray-100 flex-shrink-0">
+        <button
+          onClick={onLogout}
+          className="flex items-center gap-3 w-full px-4 py-2.5 text-sm font-medium text-gray-500 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>{t('common:logoutSystem')}</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+  role = 'customer',
+  contentClassName = 'p-4 lg:p-8',
+  showFooter = true,
+  isFixedHeight = false,
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { t, i18n } = useTranslation(['common', 'worker']);
+  const { language, changeLanguage, isChangingLanguage } = useLanguage();
+  const isRTL = isMounted && i18n.language === 'ur';
 
-  const customerLinks = [
-    { href: '/customer/dashboard', label: 'Dashboard', icon: HomeIcon },
-    { href: '/recommendations', label: 'Find Workers', icon: SearchIcon },
-    { href: '/customer/bookings', label: 'My Bookings', icon: CalendarIcon },
-    { href: '/customer/notifications', label: 'Notifications', icon: BellIcon },
-    { href: '/chat', label: 'Messages', icon: ChatIcon }
-  ];
+  const pageTitle = (() => {
+    if (!pathname) return t('common:dashboard');
+    if (pathname.startsWith('/worker/dashboard') || pathname.startsWith('/customer/dashboard')) return t('common:dashboard');
+    if (pathname.startsWith('/worker/bookings') || pathname.startsWith('/customer/bookings')) return t('common:myBookings');
+    if (pathname.startsWith('/customer/notifications')) return t('common:notifications');
+    if (pathname.startsWith('/recommendations') || pathname.startsWith('/customer/recommendations')) return t('common:findWorkers');
+    if (pathname.startsWith('/customer/chat') || pathname.startsWith('/worker/chat')) return t('common:messages');
+    return t('common:dashboard');
+  })();
 
-  const workerLinks = [
-    { href: '/worker/dashboard', label: 'Dashboard', icon: HomeIcon },
-    { href: '/worker/bookings', label: 'Job Requests', icon: BriefcaseIcon },
-    { href: '/chat', label: 'Messages', icon: ChatIcon }
-  ];
+  const links = role === 'customer' ? CUSTOMER_LINKS : WORKER_LINKS;
 
-  const links = role === 'customer' ? customerLinks : workerLinks;
+  useEffect(() => {
+    const u = authService.getUser();
+    setUser(u);
+  }, []);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => { setSidebarOpen(false); }, [pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = (sidebarOpen || showPhotoModal) ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [sidebarOpen, showPhotoModal]);
 
   const handleLogout = () => {
     authService.logout();
     router.push('/login');
   };
 
+  const handlePhotoUpdate = (newUrl) => {
+    setUser(prev => ({ ...prev, profilePicture: newUrl }));
+    const u = authService.getUser();
+    authService.saveUser({ ...u, profilePicture: newUrl });
+  };
+
+  if (!isMounted) {
+    return <div className="min-h-screen bg-gray-50" suppressHydrationWarning />;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sidebar - Desktop */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
-          {/* Logo */}
-          <div className="flex items-center h-16 px-6 border-b border-gray-200">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="bg-blue-600 rounded-lg p-1.5">
-                <svg viewBox="0 0 100 100" className="w-6 h-6" fill="white">
-                  <path d="M 20 15 h 16 v 75 h -16 z" />
-                  <path d="M 28 23 h 35 a 22 22 0 0 1 0 44 h -8" stroke="white" strokeWidth="16" fill="none" />
-                </svg>
-              </div>
-              <span className="text-lg font-bold text-gray-800">Rozgaar360</span>
-            </Link>
-          </div>
+    <div className={`${isFixedHeight ? 'h-screen overflow-hidden' : 'min-h-screen'} bg-gray-50 flex`}>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
-            {links.map((link) => {
-              const Icon = link.icon;
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                    isActive 
-                      ? 'bg-blue-50 text-blue-600' 
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span>{link.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          {/* User Section */}
-          <div className="p-4 border-t border-gray-200">
-            <button 
-              onClick={handleLogout}
-              className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors"
-            >
-              <LogoutIcon className="w-5 h-5" />
-              <span>Logout</span>
-            </button>
-          </div>
+      <aside className={`hidden lg:flex lg:w-64 lg:flex-col fixed inset-y-0 z-30 ${isRTL ? 'right-0' : 'left-0'}`}>
+        <div className={`flex flex-col flex-grow bg-white shadow-sm ${isRTL ? 'border-l border-gray-100' : 'border-r border-gray-100'}`}>
+          <SidebarContent
+            links={links}
+            pathname={pathname}
+            onLogout={handleLogout}
+            onClose={null}
+            t={t}
+          />
         </div>
       </aside>
 
-      {/* Mobile sidebar */}
       {sidebarOpen && (
-        <>
-          <div className="fixed inset-0 bg-gray-900/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
-          <aside className="fixed inset-y-0 left-0 w-64 bg-white z-50 lg:hidden">
-            <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-                <span className="text-lg font-bold text-gray-800">Rozgaar360</span>
-                <button onClick={() => setSidebarOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg">
-                  <CloseIcon className="w-5 h-5" />
-                </button>
-              </div>
-              <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
-                {links.map((link) => {
-                  const Icon = link.icon;
-                  const isActive = pathname === link.href;
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                        isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span>{link.label}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
-              <div className="p-4 border-t border-gray-200">
-                <button 
-                  onClick={handleLogout}
-                  className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 rounded-xl"
-                >
-                  <LogoutIcon className="w-5 h-5" />
-                  <span>Logout</span>
-                </button>
-              </div>
-            </div>
-          </aside>
-        </>
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
+      <aside className={`fixed inset-y-0 w-72 bg-white z-50 shadow-2xl lg:hidden transition-transform duration-300 ${isRTL ? 'right-0' : 'left-0'} ${sidebarOpen ? 'translate-x-0' : isRTL ? 'translate-x-full' : '-translate-x-full'}`}>
+        <SidebarContent
+          links={links}
+          pathname={pathname}
+          onLogout={handleLogout}
+          onClose={() => setSidebarOpen(false)}
+          t={t}
+        />
+      </aside>
 
-      {/* Main Content */}
-      <div className="lg:pl-64">
-        {/* Top Bar */}
-        <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+      <div className={`flex-1 flex flex-col ${isFixedHeight ? 'h-screen' : 'min-h-screen'} ${isRTL ? 'lg:mr-64' : 'lg:ml-64'}`}>
+        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm pl-4 pr-6 sm:pr-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+             <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100" aria-label={t('common:openMenu')}>
+               <Menu className="w-5 h-5" />
+             </button>
+             <div>
+               <h1 className="text-sm font-black text-gray-900 leading-tight">{pageTitle}</h1>
+               <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                  <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">{t('common:roleAccount', { role: t(`common:role.${role}`) })}</span>
+               </div>
+             </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <NotificationBell />
+
             <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              type="button"
+              onClick={() => changeLanguage(language === 'en' ? 'ur' : 'en')}
+              disabled={isChangingLanguage}
+              className="flex items-center gap-2 px-3 py-2 rounded-2xl border border-gray-100 text-sm font-semibold text-gray-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-100 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              title={t('common:toggleLanguage')}
+              aria-label={t('common:toggleLanguage')}
             >
-              <MenuIcon className="w-6 h-6 text-gray-600" />
+              <Globe className="w-4 h-4" />
+              <span className="hidden sm:inline">{language === 'en' ? 'اردو' : 'EN'}</span>
             </button>
             
-            <div className="flex-1 lg:flex-none" />
-
-            <div className="flex items-center gap-4">
-              <NotificationBell />
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-                {role === 'customer' ? 'C' : 'W'}
+            <button 
+              onClick={() => setShowPhotoModal(true)}
+              className="flex items-center gap-3 p-1 pr-3 rounded-2xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100 group"
+            >
+              <div className="relative">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md ring-2 ring-white group-hover:ring-blue-100 transition-all overflow-hidden">
+                  {user?.profilePicture ? (
+                    <img src={user.profilePicture} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    user?.name?.charAt(0).toUpperCase() || '?'
+                  )}
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 group-hover:scale-110 transition-transform">
+                  <Camera className="w-2.5 h-2.5 text-blue-600" />
+                </div>
               </div>
-            </div>
+              <div className="hidden sm:block text-left">
+                <p className="text-xs font-black text-gray-900 truncate max-w-[100px]">{user?.name || t('common:user')}</p>
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{t('common:editPhoto')}</p>
+              </div>
+            </button>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="p-4 sm:p-6 lg:p-8">
+        <main className={`flex-1 min-h-0 ${contentClassName}`}>
           {children}
         </main>
+
+        {showFooter && (
+          <footer className="p-6 border-t border-gray-100 text-center">
+              <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">{t('common:copyrightLine', { year: new Date().getFullYear() })}</p>
+          </footer>
+        )}
       </div>
+
+      {showPhotoModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setShowPhotoModal(false)} />
+          <div className="relative bg-white rounded-[2rem] shadow-2xl p-8 w-full max-w-sm animate-scaleIn border border-gray-100">
+            <button 
+              onClick={() => setShowPhotoModal(false)}
+              className="absolute top-4 right-4 p-2 rounded-xl hover:bg-gray-100 text-gray-400 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <UserIcon className="w-8 h-8 text-blue-600" />
+              </div>
+              <h2 className="text-xl font-black text-gray-900 tracking-tight">{t('common:profileIdentity')}</h2>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">{t('common:uploadBestPhoto')}</p>
+            </div>
+
+            <ProfilePhotoUpload 
+              userId={user?._id}
+              currentPhoto={user?.profilePicture}
+              onPhotoUpdate={handlePhotoUpdate}
+            />
+
+            <button 
+              onClick={() => setShowPhotoModal(false)}
+              className="w-full mt-6 py-4 bg-gray-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200"
+            >
+              {t('common:closeWindow')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
-  );
-}
-
-// Icons
-function HomeIcon({ className }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-    </svg>
-  );
-}
-
-function SearchIcon({ className }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-  );
-}
-
-function CalendarIcon({ className }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-    </svg>
-  );
-}
-
-function BellIcon({ className }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-    </svg>
-  );
-}
-
-function ChatIcon({ className }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-    </svg>
-  );
-}
-
-function BriefcaseIcon({ className }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-    </svg>
-  );
-}
-
-function MenuIcon({ className }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  );
-}
-
-function LogoutIcon({ className }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-    </svg>
-  );
-}
-
-function CloseIcon({ className }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-    </svg>
   );
 }

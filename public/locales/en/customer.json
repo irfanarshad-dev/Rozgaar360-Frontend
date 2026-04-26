@@ -1,7 +1,235 @@
 {
-  "dashboard": "Customer Dashboard",
-  "findHireWorkers": "Find and hire skilled workers",
+  "customerDashboard": "Customer Dashboard",
   "findWorkers": "Find Workers",
-  "discoverWorkers": "Discover skilled workers near you",
-  "findBestWorker": "Find Best Worker Near You"
+  "myBookings": "My Bookings",
+  "favorites": "Favorites",
+  "recentlyViewed": "Recently Viewed",
+  "bookNow": "Book Now",
+  "viewProfile": "View Profile",
+  "sendMessage": "Send Message",
+  "writeReview": "Write a Review",
+  "rateWorker": "Rate Worker",
+  "bookingConfirmed": "Booking Confirmed",
+  "bookingPending": "Booking Pending",
+  "bookingCompleted": "Booking Completed",
+  "bookingCancelled": "Booking Cancelled",
+  "cancelBooking": "Cancel Booking",
+  "reschedule": "Reschedule",
+  "paymentMethod": "Payment Method",
+  "totalAmount": "Total Amount",
+  "serviceCharge": "Service Charge",
+  "rateExperience": "Rate Your Experience",
+  "serviceBy": "Service by {{name}}",
+  "leaveComment": "Leave a Comment",
+  "reviewCommentPlaceholder": "Describe your experience with the worker...",
+  "submittingReview": "Submitting Review...",
+  "submitReview": "Submit Review",
+  "bookingNotFound": "Booking not found",
+  "selectRatingPrompt": "Please select a rating",
+  "reviewSubmittedSuccess": "Review submitted successfully!",
+  "reviewSubmitFailed": "Failed to submit review",
+  "bookService": "Book Service",
+  "bookingWith": "You are booking a service with {{name}} for {{service}}",
+  "schedule": {
+    "title": "Availability Schedule",
+    "unavailable": "Unavailable",
+    "notProvided": "Schedule not provided",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
+  },
+  "selectDate": "Select Date",
+  "selectTime": "Select Time",
+  "serviceAddress": "Service Address",
+  "addressPlaceholder": "123 Main St, City, Country",
+  "issueDescription": "Issue Description",
+  "issueDescriptionPlaceholder": "Describe what needs to be done...",
+  "confirmingBooking": "Confirming Booking...",
+  "confirmBooking": "Confirm Booking",
+  "workerNotFound": "Worker not found",
+  "bookingCreatedSuccess": "Booking created successfully!",
+  "bookingCreateFailed": "Failed to create booking",
+  "dashboard": {
+    "welcomeBack": "Hi{{name}}!",
+    "subtitle": "Ready to hire skilled professionals today?",
+    "stats": {
+      "discover": "Discover",
+      "findBestPros": "Find Best Pros",
+      "bookings": "Bookings",
+      "trackJobs": "Track Jobs",
+      "conversations": "Conversations",
+      "chatWithWorkers": "Chat with Workers"
+    },
+    "accountInfo": "Account Information",
+    "editProfile": "Edit Profile",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "city": "City",
+    "address": "Address",
+    "noAddressProvided": "No address provided",
+    "noProfileData": "No profile data available.",
+    "quickFlow": "Quick Flow",
+    "browseWorkers": "Browse Workers",
+    "browseWorkersHint": "Find skilled professionals in your city",
+    "myBookingsAction": "My Bookings",
+    "myBookingsHint": "Check upcoming and past jobs",
+    "messagesAction": "Messages",
+    "messagesHint": "Continue your conversations"
+  },
+  "bookings": {
+    "title": "My Bookings",
+    "loading": "Loading your bookings...",
+    "empty": "No bookings found in this category.",
+    "fallbackWorker": "Worker",
+    "tabs": {
+      "active": "Active Bookings",
+      "history": "Booking History"
+    },
+    "labels": {
+      "date": "Date",
+      "time": "Time",
+      "payment": "Payment",
+      "amount": "Amount"
+    },
+    "actions": {
+      "viewDetails": "View Details",
+      "payNow": "Pay Now",
+      "chatWithWorker": "Chat with Worker",
+      "leaveReview": "Leave Review"
+    },
+    "payment": {
+      "none": "No Payment",
+      "stripeStatus": "Stripe - {{status}}",
+      "status": {
+        "pending": "Pending",
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed"
+      }
+    },
+    "status": {
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "loading": "Loading notifications...",
+    "empty": "You have no notifications yet.",
+    "markAsRead": "Mark as read",
+    "items": {
+      "bookingConfirmed": {
+        "title": "Booking Confirmed",
+        "message": "Your booking with John for Plumbing has been confirmed for Mar 12, 10:00 AM."
+      },
+      "newMessage": {
+        "title": "New Message",
+        "message": "John sent you a new message regarding your service request."
+      },
+      "serviceCompleted": {
+        "title": "Service Completed",
+        "message": "Please leave a review for Electrical works completed by Sarah."
+      }
+    }
+  },
+  "bookingDetails": {
+    "loading": "Loading booking details...",
+    "backToBookings": "Back to Bookings",
+    "title": "Booking Details",
+    "bookingId": "Booking ID: {{id}}",
+    "sections": {
+      "workerInfo": "Worker Information",
+      "serviceDetails": "Service Details",
+      "serviceLocation": "Service Location",
+      "issueDescription": "Issue Description",
+      "paymentInfo": "Payment Information",
+      "timeline": "Timeline",
+      "quickActions": "Quick Actions"
+    },
+    "labels": {
+      "serviceType": "Service Type",
+      "date": "Date",
+      "time": "Time",
+      "status": "Status",
+      "serviceCost": "Service Cost",
+      "platformFee": "Platform Fee (15%)",
+      "totalPaid": "Total Paid",
+      "totalAmount": "Total Amount",
+      "paymentMethod": "Payment Method",
+      "stripe": "Stripe",
+      "transactionId": "Transaction ID"
+    },
+    "readyForStripe": "Ready for payment via Stripe",
+    "waitingForWorker": {
+      "title": "Waiting for Worker",
+      "message": "Worker needs to accept and set the amount"
+    },
+    "timeline": {
+      "bookedOn": "Booked on",
+      "completedOn": "Completed on",
+      "cancelledOn": "Cancelled on"
+    },
+    "actions": {
+      "payNowAmount": "Pay Now - ${{amount}}",
+      "chatWithWorker": "Chat with Worker",
+      "leaveReview": "Leave Review",
+      "cancelBooking": "Cancel Booking",
+      "cancelConfirm": "Are you sure you want to cancel this booking?"
+    },
+    "errors": {
+      "notFoundOrDenied": "Booking not found or access denied",
+      "cancelFailed": "Failed to cancel booking"
+    }
+  },
+  "paymentPage": {
+    "loading": "Loading payment details...",
+    "title": "Complete Your Payment",
+    "bookingId": "Booking ID: {{id}}",
+    "backToBookings": "Back to Bookings",
+    "sections": {
+      "summary": "Booking Summary",
+      "breakdown": "Payment Breakdown",
+      "security": "Payment Security",
+      "testMode": "Test Mode"
+    },
+    "labels": {
+      "service": "Service",
+      "worker": "Worker",
+      "date": "Date",
+      "currency": "Currency",
+      "serviceCost": "Service Cost",
+      "platformFee": "Platform Fee (15%)",
+      "total": "Total"
+    },
+    "security": {
+      "securePayment": "Secure Payment",
+      "sslEncrypted": "SSL Encrypted",
+      "stripePowered": "Stripe Powered"
+    },
+    "testCards": {
+      "success": "Success card: 4242 4242 4242 4242",
+      "failed": "Declined card: 4000 0000 0000 0002",
+      "note": "Use any future expiry date and any 3-digit CVC"
+    },
+    "actions": {
+      "redirecting": "Redirecting to Stripe...",
+      "payNowAmount": "Pay ${{amount}} Now",
+      "cancelPayment": "Cancel Payment"
+    },
+    "poweredBy": "Powered by",
+    "errors": {
+      "loadBookingFailed": "Failed to load booking details",
+      "noCheckoutUrl": "No checkout URL received",
+      "initFailed": "Payment initialization failed"
+    }
+  }
 }

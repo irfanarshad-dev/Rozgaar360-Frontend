@@ -1,23 +1,30 @@
 'use client';
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { authService } from '@/lib/auth';
 
 export default function AdminLayout({ children }) {
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
-    const user = authService.getUser();
-    
-    if (!user) {
-      router.push('/admin/login');
+    // Only protect dashboard routes, not login/register
+    if (pathname === '/admin/login' || pathname === '/admin/register') {
       return;
     }
 
-    if (user.role !== 'admin') {
-      router.push('/');
+    const user = authService.getUser();
+    const hasValidToken = authService.isAuthenticated();
+
+    if (!hasValidToken) {
+      router.replace('/admin/login');
+      return;
     }
-  }, [router]);
+
+    if (user && user.role !== 'admin') {
+      router.replace('/');
+    }
+  }, [pathname, router]);
 
   return <>{children}</>;
 }
