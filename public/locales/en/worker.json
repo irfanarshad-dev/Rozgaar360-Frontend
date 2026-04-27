@@ -19,6 +19,7 @@
   "payment": "Payment",
   "contactCustomer": "Contact Customer",
   "jobRequests": "Job Requests",
+  "myBookings": "My Bookings",
   "manageBookings": "Manage and track your service bookings",
   "requests": "Requests",
   "active": "Active",
@@ -40,10 +41,12 @@
   "markInProgress": "Mark as In Progress",
   "markFinished": "Mark Finished",
   "statusPending": "Pending",
+  "statusActive": "Active",
   "statusConfirmed": "Confirmed",
   "statusInProgress": "In Progress",
   "statusCompleted": "Completed",
   "statusCancelled": "Cancelled",
+  "paymentPending": "Pending",
   "updateBookingFailed": "Failed to update booking status",
   "dashboard": {
     "welcomeBack": "Welcome back{{name}}!",
@@ -91,7 +94,17 @@
     "quickFlow": "Quick Flow",
     "jobRequests": "Job Requests",
     "manageIncomingBookings": "Manage incoming bookings",
-    "clientCommunications": "Client communications"
+    "clientCommunications": "Client communications",
+    "quickActions": {
+      "jobRequestsTitle": "New work is waiting",
+      "jobRequestsSubtitle": "Review new job requests and manage your active bookings from one place.",
+      "messagesTitle": "Stay connected with customers",
+      "messagesSubtitle": "Keep conversations moving and respond faster to new customers."
+    },
+    "verificationCta": {
+      "title": "Complete your worker verification",
+      "subtitle": "Upload your CNIC so customers and admins can trust your profile and unlock more bookings."
+    }
   },
   "uploadCnic": {
     "title": "CNIC Verification",

@@ -50,10 +50,18 @@ export default function AIJobRecommendationBox({ workerSkills = [], workerLocati
     setError(null);
 
     try {
-      const [profileResponse, bookingsResponse] = await Promise.all([
+      const [profileResponse, pendingBookingsResponse] = await Promise.all([
         authService.getProfile(),
         jobsService.getWorkerJobs('pending'),
       ]);
+
+      // Pending jobs are preferred, but if there are none we still rank all jobs
+      // so workers are not blocked by an empty pending queue.
+      let bookings = Array.isArray(pendingBookingsResponse) ? pendingBookingsResponse : [];
+      if (bookings.length === 0) {
+        const allBookingsResponse = await jobsService.getWorkerJobs();
+        bookings = Array.isArray(allBookingsResponse) ? allBookingsResponse : [];
+      }
 
       const workerProfile = {
         skills: Array.isArray(workerSkills) && workerSkills.length > 0
@@ -65,15 +73,28 @@ export default function AIJobRecommendationBox({ workerSkills = [], workerLocati
         availability: profileResponse?.profile?.isAvailableNow ? 'available now' : 'not available now',
       };
 
-      const bookings = Array.isArray(bookingsResponse) ? bookingsResponse : [];
       const jobsPayload = normalizeJobs(bookings);
+
+      if (jobsPayload.length === 0) {
+        setRankedJobs([]);
+        setJobPool([]);
+        setError('No jobs available right now. Please check again later.');
+        return;
+      }
+
       setJobPool(jobsPayload);
 
-      const response = await api.post('/api/recommendations/jobs/ai', {
-        workerProfile,
-        jobs: jobsPayload,
-        preference: query.trim(),
-      });
+      const response = await api.post(
+        '/api/recommendations/jobs/ai',
+        {
+          workerProfile,
+          jobs: jobsPayload,
+          preference: query.trim(),
+        },
+        {
+          timeout: 45000,
+        },
+      );
 
       const ranked = Array.isArray(response.data) ? response.data : [];
       setRankedJobs(ranked.slice(0, 10));
@@ -83,7 +104,11 @@ export default function AIJobRecommendationBox({ workerSkills = [], workerLocati
       }
     } catch (err) {
       console.error('AI job search failed:', err);
-      setError('Failed to search jobs. Please try again.');
+      if (err?.code === 'ECONNABORTED' || err?.message?.toLowerCase?.().includes('timeout')) {
+        setError('AI is taking too long right now. Please try again in a moment.');
+      } else {
+        setError('Failed to search jobs. Please try again.');
+      }
       setRankedJobs([]);
       setJobPool([]);
     } finally {

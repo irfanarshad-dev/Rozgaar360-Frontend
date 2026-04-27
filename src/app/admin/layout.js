@@ -8,21 +8,21 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Only protect dashboard routes, not login/register
+    // Keep auth pages accessible.
     if (pathname === '/admin/login' || pathname === '/admin/register') {
       return;
     }
 
-    const user = authService.getUser();
     const hasValidToken = authService.isAuthenticated();
+    const user = authService.getUser();
 
     if (!hasValidToken) {
-      router.replace('/admin/login');
+      router.replace('/login');
       return;
     }
 
     if (user && user.role !== 'admin') {
-      router.replace('/');
+      router.replace('/login');
     }
   }, [pathname, router]);
 

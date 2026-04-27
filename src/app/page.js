@@ -109,60 +109,69 @@ function Counter({ end, suffix = '' }) {
 }
 
 // Worker card using real backend data
-function WorkerCard({ worker, t, getSkillLabel }) {
+function WorkerCard({ worker, t, getSkillLabel, onViewProfile }) {
   const router = useRouter();
-  const meta = SKILL_META[worker.skill] || DEFAULT_META;
-  const Icon = meta.icon;
   const translatedSkill = getSkillLabel(worker.skill);
   const avatarSrc = worker.profilePicture && worker.profilePicture !== '/user.png'
     ? worker.profilePicture
     : null;
+  const initials = (worker.name || 'W')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('');
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(37,99,235,0.15)] hover:-translate-y-1.5 transition-all duration-300 p-5 flex flex-col relative overflow-hidden group">
-      {/* Subtle hover gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-cyan-500/0 group-hover:from-blue-500/5 group-hover:to-cyan-500/5 transition-all duration-500 opacity-0 group-hover:opacity-100 pointer-events-none" />
+    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-blue-200 transition-all">
+      <div className="h-2 rounded-t-xl bg-blue-600" />
 
-      {/* Avatar */}
-      <div className="w-full aspect-[4/3] rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 mb-4 overflow-hidden flex items-center justify-center relative">
+      <div className="flex flex-col items-center mt-3">
         {avatarSrc ? (
-          <Image src={avatarSrc} alt={worker.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+          <Image
+            src={avatarSrc}
+            alt={worker.name}
+            width={48}
+            height={48}
+            className="h-12 w-12 rounded-full object-cover"
+          />
         ) : (
-          <div className={`w-full h-full bg-gradient-to-br ${meta.color} flex flex-col items-center justify-center gap-2 group-hover:scale-105 transition-transform duration-500`}>
-            <Icon className="w-12 h-12 text-white/80" strokeWidth={1.5} />
-            <span className="text-white/70 text-xs font-medium">{translatedSkill}</span>
+          <div className="h-12 w-12 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center text-lg font-medium">
+            {initials || 'W'}
           </div>
         )}
-      </div>
-
-      <div className="flex items-center gap-2 mb-1">
-        <h3 className="font-bold text-[17px] text-gray-900 truncate group-hover:text-blue-700 transition-colors">{worker.name}</h3>
         {worker.verified && (
-          <div className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3" />
-          </div>
+          <span className="mt-2 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
+            {t('home:featured.verified', { defaultValue: 'Verified' })}
+          </span>
         )}
       </div>
-      <p className="text-gray-500 text-[13px] mb-2 font-medium">{translatedSkill} • {worker.city}</p>
 
-      <div className="flex items-center gap-1.5 mb-4">
+      <h3 className="mt-3 text-base font-medium text-gray-900 truncate text-center">{worker.name}</h3>
+      <p className="text-sm text-gray-400 text-center">{translatedSkill} • {worker.city}</p>
+
+      <div className="mt-2 flex items-center justify-center gap-1.5">
         <Stars rating={worker.rating} />
-        <span className="text-[12px] text-gray-500 font-medium">
-          {worker.rating > 0 ? worker.rating.toFixed(1) : t('home:featured.new')} ({worker.reviewCount})
-        </span>
+        <span className="text-xs text-gray-400">({worker.reviewCount || 0} {t('home:featured.reviews', { defaultValue: 'reviews' })})</span>
       </div>
 
       {worker.experience != null && (
-        <p className="text-[12px] text-gray-400 mb-4">
+        <span className="mt-2 inline-block text-xs text-gray-500 bg-gray-50 rounded-md px-2 py-1">
           {worker.experience === 1
             ? t('home:featured.experienceOne', { count: worker.experience })
             : t('home:featured.experienceOther', { count: worker.experience })}
-        </p>
+        </span>
       )}
 
       <button
-        onClick={() => router.push(`/profile/${worker.id}`)}
-        className="mt-auto w-full bg-blue-600 hover:bg-blue-700 text-white text-[13px] font-bold py-2.5 rounded-xl transition-colors"
+        onClick={() => {
+          if (onViewProfile) {
+            onViewProfile(worker.id);
+            return;
+          }
+          router.push(`/profile/${worker.id}`);
+        }}
+        className="mt-3 w-full border border-gray-200 text-gray-700 text-sm py-2 rounded-lg hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all"
       >
         {t('home:featured.viewProfile')}
       </button>
@@ -198,13 +207,26 @@ export default function Home() {
   // Skill-filtered search workers
   const [searchWorkers,  setSearchWorkers]  = useState([]);
   const [searchLoading,  setSearchLoading]  = useState(false);
+  const [showRegisterPrompt, setShowRegisterPrompt] = useState(false);
 
   // Auth banner
   const [user, setUser] = useState(null);
   useEffect(() => { setUser(authService.getUser()); }, []);
   const isWorker = user?.role === 'worker';
   const isCustomer = user?.role === 'customer';
+  const hasRegisteredRole = isWorker || isCustomer;
   const isRTL = language === 'ur';
+
+  const ensureRegistered = useCallback(() => {
+    if (hasRegisteredRole) return true;
+    setShowRegisterPrompt(true);
+    return false;
+  }, [hasRegisteredRole]);
+
+  const handleViewProfile = useCallback((workerId) => {
+    if (!ensureRegistered()) return;
+    router.push(`/profile/${workerId}`);
+  }, [ensureRegistered, router]);
 
   const getSkillLabel = useCallback((skillName) => {
     const key = SKILL_TRANSLATION_KEYS[skillName];
@@ -293,6 +315,7 @@ export default function Home() {
   // ── Handle search ──────────────────────────────────────────────────────────
   const handleSearch = async (e) => {
     e?.preventDefault();
+    if (!ensureRegistered()) return;
     const searchSkill = skill || query;
     if (!searchSkill && !city) {
       router.push('/recommendations');
@@ -302,6 +325,7 @@ export default function Home() {
   };
 
   const handleSkillFilter = async (s) => {
+    if (!ensureRegistered()) return;
     setSkill(s);
     setSearchLoading(true);
     try {
@@ -327,7 +351,7 @@ export default function Home() {
     <div className="min-h-screen bg-white overflow-x-hidden">
 
       {/* ──── LOGGED-IN BANNER ──── */}
-      {user && (
+      {user && hasRegisteredRole && (
         <div className={`text-white text-center py-2.5 px-4 text-sm font-medium ${
           isWorker ? 'bg-emerald-600' : 'bg-blue-600'
         }`}>
@@ -339,6 +363,12 @@ export default function Home() {
             className="font-bold hover:opacity-90">
             Go to your dashboard
           </Link>
+        </div>
+      )}
+
+      {user && !hasRegisteredRole && (
+        <div className="bg-amber-500 text-white text-center py-2.5 px-4 text-sm font-medium">
+          Complete registration as Worker or Customer to use home actions.
         </div>
       )}
 
@@ -400,7 +430,12 @@ export default function Home() {
                 </div>
 
                 {/* City picker - Map Button */}
-                <button type="button" onClick={(e) => { e.preventDefault(); setShowMap(true); requestSharedLocation(); }}
+                <button type="button" onClick={(e) => {
+                  e.preventDefault();
+                  if (!ensureRegistered()) return;
+                  setShowMap(true);
+                  requestSharedLocation();
+                }}
                   className="flex items-center justify-center gap-2 px-4 py-4 text-gray-600 text-[14px] border-b sm:border-b-0 sm:border-r border-gray-100 hover:bg-gray-50 transition-colors">
                   <MapPin className="w-4 h-4 text-blue-500" />
                   {t('home:hero.viewMap')}
@@ -423,9 +458,16 @@ export default function Home() {
                     {getSkillLabel(s)}
                   </button>
                 ))}
-                <Link href="/recommendations" className="bg-white/10 hover:bg-white/20 border border-gray-100 text-white/85 text-sm px-4 py-2 rounded-full transition-all">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!ensureRegistered()) return;
+                    router.push('/recommendations');
+                  }}
+                  className="bg-white/10 hover:bg-white/20 border border-gray-100 text-white/85 text-sm px-4 py-2 rounded-full transition-all"
+                >
                   {t('home:hero.allSkills')}
-                </Link>
+                </button>
               </div>
             </form>
             )}
@@ -468,10 +510,20 @@ export default function Home() {
             </p>
           </div>
           
-          <AIRecommendationBox
-            sharedLocation={sharedLocation}
-            requestSharedLocation={requestSharedLocation}
-          />
+          {hasRegisteredRole ? (
+            <AIRecommendationBox
+              sharedLocation={sharedLocation}
+              requestSharedLocation={requestSharedLocation}
+            />
+          ) : (
+            <div className="max-w-3xl mx-auto bg-white border border-blue-100 rounded-2xl p-6 text-center shadow-sm">
+              <p className="text-gray-700 font-semibold mb-2">Register first to use AI Worker Assistant.</p>
+              <p className="text-sm text-gray-500 mb-4">Create your account as Worker or Customer to continue.</p>
+              <Link href="/register" className="btn-primary text-white font-semibold px-6 py-2.5 rounded-xl inline-flex items-center gap-2">
+                Register Now
+              </Link>
+            </div>
+          )}
         </div>
       </section>
       )}
@@ -517,7 +569,10 @@ export default function Home() {
                 workers={displayWorkers}
                 userLocation={sharedLocation}
                 onRequestLocation={requestSharedLocation}
-                onWorkerClick={(id) => { setShowMap(false); router.push(`/profile/${id}`); }}
+                onWorkerClick={(id) => {
+                  setShowMap(false);
+                  handleViewProfile(id);
+                }}
               />
             </div>
           </div>
@@ -620,17 +675,29 @@ export default function Home() {
       {!isWorker ? (
       <section className="pb-20 sm:pb-24 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-8 sm:mb-10">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
             <div>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
+              <h2 className="text-2xl font-medium text-gray-900">
                 {skill ? t('home:featured.filteredTitle', { skill: getSkillLabel(skill) }) : t('home:featured.title')}
               </h2>
-              <p className="text-gray-500 mt-1 text-[15px]">
+              <p className="text-sm text-gray-400 mt-1">
                 {skill
                   ? t('home:featured.filteredSubtitle', { skill: getSkillLabel(skill), city: city || t('home:featured.allCities') })
                   : t('home:featured.subtitle')}
               </p>
             </div>
+            {!skill && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (!ensureRegistered()) return;
+                  router.push('/recommendations');
+                }}
+                className="text-sm text-blue-600 hover:underline"
+              >
+                {t('home:featured.seeAllWorkers')} →
+              </button>
+            )}
             {skill && (
               <button onClick={() => { setSkill(''); setSearchWorkers([]); }}
                 className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 border border-gray-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition-all">
@@ -672,17 +739,16 @@ export default function Home() {
           )}
 
           {!displayLoading && displayWorkers.length > 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {displayWorkers.map(w => <WorkerCard key={w.id} worker={w} t={t} getSkillLabel={getSkillLabel} />)}
-            </div>
-          )}
-
-          {!displayLoading && (
-            <div className="text-center mt-10">
-              <Link href={`/recommendations${skill ? `?skill=${encodeURIComponent(skill)}` : ''}`}
-                className="inline-flex items-center gap-2 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold px-8 py-3 rounded-full transition-all duration-300">
-                {t('home:featured.seeAllWorkers')} <ArrowRight className="w-4 h-4" />
-              </Link>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {displayWorkers.map(w => (
+                <WorkerCard
+                  key={w.id}
+                  worker={w}
+                  t={t}
+                  getSkillLabel={getSkillLabel}
+                  onViewProfile={handleViewProfile}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -727,6 +793,27 @@ export default function Home() {
         </section>
         )}
       </>
+      )}
+
+      {showRegisterPrompt && (
+        <div className="fixed inset-0 z-[10000] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-gray-100 text-center">
+            <h3 className="text-xl font-black text-gray-900 mb-2">Register First</h3>
+            <p className="text-gray-600 text-sm mb-6">Please register as Worker or Customer before using home page actions.</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link href="/register" className="btn-primary text-white font-semibold px-5 py-2.5 rounded-xl" onClick={() => setShowRegisterPrompt(false)}>
+                Go to Register
+              </Link>
+              <button
+                type="button"
+                onClick={() => setShowRegisterPrompt(false)}
+                className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* ──────────── HOW IT WORKS (Customer) / TIPS (Worker) ──────────── */}
@@ -898,8 +985,8 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {isWorker ? (
               <>
-                <Link href="/worker/dashboard" className="btn-primary text-white font-bold px-10 py-4 rounded-full text-[16px] inline-flex items-center gap-2">
-                  <Briefcase className="w-5 h-5" /> Go to Dashboard
+                <Link href="/recommendations" className="btn-primary text-white font-bold px-10 py-4 rounded-full text-[16px] inline-flex items-center gap-2">
+                  {t('home:cta.findWorkerNow')} <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link href="/worker/bookings" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-10 py-4 rounded-full text-[16px] transition-all">
                   <CalendarDays className="w-5 h-5" /> View Bookings
@@ -907,9 +994,16 @@ export default function Home() {
               </>
             ) : (
               <>
-                <Link href="/recommendations" className="btn-primary text-white font-bold px-10 py-4 rounded-full text-[16px] inline-flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!ensureRegistered()) return;
+                    router.push('/recommendations');
+                  }}
+                  className="btn-primary text-white font-bold px-10 py-4 rounded-full text-[16px] inline-flex items-center gap-2"
+                >
                   {t('home:cta.findWorkerNow')} <ArrowRight className="w-5 h-5" />
-                </Link>
+                </button>
                 <Link href="/register" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-10 py-4 rounded-full text-[16px] transition-all">
                   {t('home:cta.registerWorker')}
                 </Link>

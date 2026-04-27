@@ -53,7 +53,7 @@ function CancelContent() {
               {bookingId && (
                 <Link
                   href={`/payment?bookingId=${bookingId}`}
-                  className="block w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 rounded-xl text-center transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 rounded-xl text-center transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                 >
                   <CreditCard className="w-5 h-5" />
                   Try Again
@@ -62,7 +62,7 @@ function CancelContent() {
               
               <Link
                 href="/customer/bookings"
-                className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl text-center transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl text-center transition-colors flex items-center justify-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Bookings

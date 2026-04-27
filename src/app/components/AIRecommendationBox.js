@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import { Sparkles, Loader2, ArrowRight, User, Star, CheckCircle2, MessageSquare, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/axios';
@@ -130,10 +131,12 @@ export default function AIRecommendationBox({ sharedLocation, requestSharedLocat
                   className="w-full min-w-0 bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 md:p-6 shadow-sm border border-slate-200 md:hover:border-blue-200 md:hover:shadow-md transition-all flex flex-col md:flex-row gap-3 sm:gap-4 md:gap-6"
                 >
                   <div className="w-16 sm:w-20 h-16 sm:h-20 rounded-[16px] sm:rounded-[24px] overflow-hidden flex-shrink-0 bg-gray-100 relative">
-                    <img 
-                      src={worker.profilePicture || '/user.png'} 
-                      alt={worker.name} 
-                      className="w-full h-full object-cover"
+                    <Image
+                      src={worker.profilePicture || '/user.png'}
+                      alt={worker.name}
+                      fill
+                      className="object-cover"
+                      sizes="80px"
                     />
                   </div>
 

@@ -244,7 +244,13 @@ export default function DashboardLayout({
               <div className="relative">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md ring-2 ring-white group-hover:ring-blue-100 transition-all overflow-hidden">
                   {user?.profilePicture ? (
-                    <img src={user.profilePicture} alt="Avatar" className="w-full h-full object-cover" />
+                    <Image
+                      src={user.profilePicture}
+                      alt={user?.name || 'Avatar'}
+                      width={36}
+                      height={36}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     user?.name?.charAt(0).toUpperCase() || '?'
                   )}

@@ -19,6 +19,7 @@
   "payment": "ادائیگی",
   "contactCustomer": "صارف سے رابطہ کریں",
   "jobRequests": "کام کی درخواستیں",
+  "myBookings": "میری بکنگز",
   "manageBookings": "اپنی سروس بکنگز کا انتظام اور نگرانی کریں",
   "requests": "درخواستیں",
   "active": "فعال",
@@ -40,10 +41,12 @@
   "markInProgress": "کام جاری کے طور پر نشان زد کریں",
   "markFinished": "کام مکمل نشان زد کریں",
   "statusPending": "زیر التواء",
+  "statusActive": "فعال",
   "statusConfirmed": "تصدیق شدہ",
   "statusInProgress": "جاری",
   "statusCompleted": "مکمل",
   "statusCancelled": "منسوخ",
+  "paymentPending": "زیر التواء",
   "updateBookingFailed": "بکنگ اسٹیٹس اپ ڈیٹ کرنے میں ناکامی",
   "dashboard": {
     "welcomeBack": "خوش آمدید{{name}}!",
@@ -91,7 +94,17 @@
     "quickFlow": "فوری اقدامات",
     "jobRequests": "کام کی درخواستیں",
     "manageIncomingBookings": "آنے والی بکنگز کا انتظام کریں",
-    "clientCommunications": "صارفین کے پیغامات"
+    "clientCommunications": "صارفین کے پیغامات",
+    "quickActions": {
+      "jobRequestsTitle": "نیا کام آپ کا انتظار کر رہا ہے",
+      "jobRequestsSubtitle": "نئی کام کی درخواستیں دیکھیں اور اپنی فعال بکنگز ایک جگہ سے سنبھالیں۔",
+      "messagesTitle": "صارفین سے جڑے رہیں",
+      "messagesSubtitle": "گفتگو جاری رکھیں اور نئے صارفین کو تیزی سے جواب دیں۔"
+    },
+    "verificationCta": {
+      "title": "اپنی کارکن تصدیق مکمل کریں",
+      "subtitle": "اپنا CNIC اپ لوڈ کریں تاکہ صارفین اور ایڈمن آپ کے پروفائل پر اعتماد کریں اور آپ کو مزید بکنگز مل سکیں۔"
+    }
   },
   "uploadCnic": {
     "title": "CNIC تصدیق",

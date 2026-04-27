@@ -170,7 +170,7 @@
     "browseNow": "Browse available workers now"
   },
   "featured": {
-    "title": "Top Rated Professionals",
+    "title": "Top rated professionals",
     "subtitle": "Highest rated workers across all skills",
     "filteredTitle": "{{skill}} Workers",
     "filteredSubtitle": "Professionals available for {{skill}} in {{city}}",
@@ -181,6 +181,7 @@
     "experienceOne": "{{count}} yr experience",
     "experienceOther": "{{count}} yrs experience",
     "verified": "Verified",
+    "reviews": "reviews",
     "new": "New"
   },
   "about": {

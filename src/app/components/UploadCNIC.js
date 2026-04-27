@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/axios';
 import { X } from 'lucide-react';
@@ -120,7 +121,14 @@ export default function UploadCNIC({ userId, onUploadSuccess }) {
           )}
           {previews.front && (
             <div className="relative mt-2">
-              <img src={previews.front} alt={t('uploadCnic.cnicFront')} className="w-full h-32 object-cover rounded-lg" />
+              <Image
+                src={previews.front}
+                alt={t('uploadCnic.cnicFront')}
+                width={512}
+                height={128}
+                unoptimized
+                className="w-full h-32 object-cover rounded-lg"
+              />
               <button
                 onClick={() => handleRemove('front')}
                 className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg transition-colors"
@@ -145,7 +153,14 @@ export default function UploadCNIC({ userId, onUploadSuccess }) {
           )}
           {previews.back && (
             <div className="relative mt-2">
-              <img src={previews.back} alt={t('uploadCnic.cnicBack')} className="w-full h-32 object-cover rounded-lg" />
+              <Image
+                src={previews.back}
+                alt={t('uploadCnic.cnicBack')}
+                width={512}
+                height={128}
+                unoptimized
+                className="w-full h-32 object-cover rounded-lg"
+              />
               <button
                 onClick={() => handleRemove('back')}
                 className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg transition-colors"

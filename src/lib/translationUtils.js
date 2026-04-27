@@ -201,7 +201,7 @@ export const translateCity = (city, language) => {
  * }
  */
 
-export default {
+const translationUtils = {
   tWithFallback,
   tPlural,
   tInterpolate,
@@ -215,3 +215,5 @@ export default {
   SKILL_TRANSLATIONS,
   CITY_TRANSLATIONS,
 };
+
+export default translationUtils;

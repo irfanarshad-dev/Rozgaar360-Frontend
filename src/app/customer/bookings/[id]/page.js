@@ -7,6 +7,8 @@ import api from '@/lib/axios';
 import { chatAPI } from '@/lib/chatAPI';
 import Link from 'next/link';
 import DashboardLayout from '@/app/components/ui/DashboardLayout';
+import Badge from '@/app/components/ui/Badge';
+import { AlertTriangle, CreditCard, MapPin, MessageCircle } from 'lucide-react';
 
 export default function BookingDetails() {
   const params = useParams();
@@ -48,7 +50,7 @@ export default function BookingDetails() {
       }
     };
     init();
-  }, [params.id, router]);
+  }, [params.id, router, t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -90,14 +92,62 @@ export default function BookingDetails() {
 
   const getStatusColor = (status) => {
     switch(status) {
-      case 'confirmed': return 'bg-green-100 text-green-700 border-green-300';
-      case 'pending': return 'bg-yellow-100 text-yellow-700 border-yellow-300';
-      case 'in_progress': return 'bg-blue-100 text-blue-700 border-blue-300';
-      case 'completed': return 'bg-gray-100 text-gray-700 border-gray-300';
-      case 'cancelled': return 'bg-red-100 text-red-700 border-red-300';
-      default: return 'bg-gray-100 text-gray-700 border-gray-300';
+      case 'confirmed':
+      case 'in_progress':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'completed':
+        return 'info';
+      case 'cancelled':
+        return 'error';
+      default:
+        return 'neutral';
     }
   };
+
+  const bookingDateLabel = booking
+    ? new Date(booking.date).toLocaleDateString(i18n.language === 'ur' ? 'ur-PK' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : '';
+
+  const bookingTimeLabel = booking
+    ? new Date(`2000-01-01T${booking.time}`).toLocaleTimeString(i18n.language === 'ur' ? 'ur-PK' : 'en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      })
+    : '';
+
+  const timelineEvents = booking ? [
+    {
+      key: 'booked',
+      label: t('customer:bookingDetails.timeline.bookedOn'),
+      value: new Date(booking.createdAt).toLocaleString(i18n.language === 'ur' ? 'ur-PK' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
+      tone: 'bg-green-500',
+    },
+    ...(booking.completedAt ? [{
+      key: 'completed',
+      label: t('customer:bookingDetails.timeline.completedOn'),
+      value: new Date(booking.completedAt).toLocaleString(i18n.language === 'ur' ? 'ur-PK' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
+      tone: 'bg-green-500',
+    }] : []),
+    ...(booking.cancelledAt ? [{
+      key: 'cancelled',
+      label: t('customer:bookingDetails.timeline.cancelledOn'),
+      value: new Date(booking.cancelledAt).toLocaleString(i18n.language === 'ur' ? 'ur-PK' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }),
+      tone: 'bg-red-500',
+    }] : []),
+  ] : [];
+
+  const paymentBadgeVariant = payment
+    ? payment.status === 'completed'
+      ? 'success'
+      : payment.status === 'failed'
+        ? 'error'
+        : payment.status === 'processing'
+          ? 'info'
+          : 'warning'
+    : 'warning';
 
   if (loading) {
     return (
@@ -115,220 +165,200 @@ export default function BookingDetails() {
 
   return (
     <DashboardLayout role="customer" contentClassName="pt-0 px-3 pb-3 sm:pt-0 sm:px-4 sm:pb-4 lg:pt-0 lg:px-5 lg:pb-5">
-      <div className="max-w-5xl mx-auto mt-[5px] pb-2 sm:pb-3">
-        <div className="bg-white rounded-none shadow-sm border border-gray-100 overflow-hidden">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-sky-100 to-blue-200 p-3 sm:p-4 text-slate-900">
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-              <div className="min-w-0">
-                <h1 className="text-lg sm:text-xl font-black mb-1">{t('customer:bookingDetails.title')}</h1>
-                <p className="text-blue-700 text-xs sm:text-sm truncate">{t('customer:bookingDetails.bookingId', { id: booking._id })}</p>
-              </div>
-              <div className="self-start flex items-center gap-2">
-                <span className={`px-2.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold capitalize border ${getStatusColor(booking.status)}`}>
-                  {t(`customer:bookings.status.${booking.status}`)}
-                </span>
-                <button
-                  onClick={() => router.push('/customer/bookings')}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-blue-300 bg-white/85 hover:bg-white px-2.5 py-1.5 text-[11px] sm:text-xs font-bold text-blue-700 transition"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  <span>{t('customer:bookingDetails.backToBookings')}</span>
-                </button>
-              </div>
+      <div className="mx-auto max-w-6xl px-3 pb-8 sm:px-6 lg:px-8">
+        <div className="sticky top-0 z-10 -mx-3 mb-5 border-b border-gray-100 bg-white px-3 py-3 sm:-mx-6 sm:px-6 sm:py-4 lg:-mx-8 lg:px-8">
+          <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
+            <div>
+              <h1 className="text-lg font-medium text-gray-900 sm:text-xl">{t('customer:bookingDetails.title')}</h1>
+              <p className="mt-1 font-mono text-xs text-gray-400">{t('customer:bookingDetails.bookingId', { id: booking._id })}</p>
+            </div>
+
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <Badge variant={getStatusColor(booking.status)} className="rounded-full px-3 py-1 text-xs font-medium capitalize">
+                {t(`customer:bookings.status.${booking.status}`)}
+              </Badge>
+              <button
+                onClick={() => router.push('/customer/bookings')}
+                className="text-sm font-medium text-blue-600 transition hover:text-blue-700"
+              >
+                ← {t('customer:bookingDetails.backToBookings')}
+              </button>
             </div>
           </div>
+        </div>
 
-          {/* Content */}
-          <div className="p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-[minmax(0,1.45fr)_minmax(300px,0.82fr)] gap-3">
-            <div className="space-y-3">
-              {/* Worker Info */}
-              <div className="border border-gray-100 rounded-xl p-3 sm:p-3.5">
-                <h2 className="text-[11px] sm:text-xs font-black text-gray-800 mb-2.5 uppercase tracking-wider">{t('customer:bookingDetails.sections.workerInfo')}</h2>
-                <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white text-sm font-black shrink-0">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.78fr)] lg:gap-6">
+          <div className="rounded-xl border border-gray-200 bg-white p-4 pb-4 shadow-sm sm:p-5">
+            <div className="space-y-4 sm:space-y-6">
+              <section>
+                <h2 className="mb-3 text-xs uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.sections.workerInfo')}</h2>
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
                     {booking.workerId?.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm sm:text-base font-black text-gray-900 truncate">{booking.workerId?.name}</h3>
-                    <p className="text-blue-600 font-semibold text-xs sm:text-sm truncate">{booking.service}</p>
-                    <p className="text-gray-500 text-[11px] sm:text-xs truncate">{booking.workerId?.phone}</p>
+                    <h3 className="text-sm font-medium text-gray-900">{booking.workerId?.name}</h3>
+                    <p className="text-xs text-blue-600">{booking.service}</p>
+                    <p className="text-xs text-gray-400">{booking.workerId?.phone}</p>
                   </div>
                 </div>
-              </div>
+              </section>
 
-              {/* Service Details */}
-              <div className="border border-gray-100 rounded-xl p-3 sm:p-3.5">
-                <h2 className="text-[11px] sm:text-xs font-black text-gray-800 mb-2.5 uppercase tracking-wider">{t('customer:bookingDetails.sections.serviceDetails')}</h2>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-gray-50 p-2.5 rounded-lg min-w-0">
-                    <p className="text-[9px] text-gray-500 mb-1 font-bold uppercase tracking-wide">{t('customer:bookingDetails.labels.serviceType')}</p>
-                    <p className="font-bold text-gray-800 text-xs sm:text-sm truncate">{booking.service}</p>
+              <section>
+                <h2 className="mb-3 text-xs uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.sections.serviceDetails')}</h2>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="rounded-lg bg-gray-50 p-3">
+                    <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.serviceType')}</p>
+                    <p className="mt-1 text-sm font-medium text-gray-800">{booking.service}</p>
                   </div>
-                  <div className="bg-gray-50 p-2.5 rounded-lg min-w-0">
-                    <p className="text-[9px] text-gray-500 mb-1 font-bold uppercase tracking-wide">{t('customer:bookingDetails.labels.date')}</p>
-                    <p className="font-bold text-gray-800 text-xs sm:text-sm truncate">{new Date(booking.date).toLocaleDateString(i18n.language === 'ur' ? 'ur-PK' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                  <div className="rounded-lg bg-gray-50 p-3">
+                    <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.date')}</p>
+                    <p className="mt-1 text-sm font-medium text-gray-800">{bookingDateLabel}</p>
                   </div>
-                  <div className="bg-gray-50 p-2.5 rounded-lg min-w-0">
-                    <p className="text-[9px] text-gray-500 mb-1 font-bold uppercase tracking-wide">{t('customer:bookingDetails.labels.time')}</p>
-                    <p className="font-bold text-gray-800 text-xs sm:text-sm truncate">
-                      {new Date(`2000-01-01T${booking.time}`).toLocaleTimeString(i18n.language === 'ur' ? 'ur-PK' : 'en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                      })}
+                  <div className="rounded-lg bg-gray-50 p-3">
+                    <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.time')}</p>
+                    <p className="mt-1 text-sm font-medium text-gray-800">{bookingTimeLabel}</p>
+                  </div>
+                  <div className="rounded-lg bg-gray-50 p-3">
+                    <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.status')}</p>
+                    <p className={`mt-1 text-sm font-medium capitalize ${booking.status === 'cancelled' ? 'text-red-600' : booking.status === 'completed' ? 'text-green-600' : 'text-gray-800'}`}>
+                      {t(`customer:bookings.status.${booking.status}`)}
                     </p>
                   </div>
-                  <div className="bg-gray-50 p-2.5 rounded-lg min-w-0">
-                    <p className="text-[9px] text-gray-500 mb-1 font-bold uppercase tracking-wide">{t('customer:bookingDetails.labels.status')}</p>
-                    <p className="font-bold text-gray-800 text-xs sm:text-sm capitalize truncate">{t(`customer:bookings.status.${booking.status}`)}</p>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="mb-3 text-xs uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.sections.serviceLocation')}</h2>
+                <div className="rounded-lg bg-gray-50 p-3">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600" />
+                    <p className="text-sm text-gray-700">{booking.address}</p>
                   </div>
                 </div>
-              </div>
+              </section>
 
-              {/* Location */}
-              <div className="border border-gray-100 rounded-xl p-3 sm:p-3.5">
-                <h2 className="text-[11px] sm:text-xs font-black text-gray-800 mb-2.5 uppercase tracking-wider">{t('customer:bookingDetails.sections.serviceLocation')}</h2>
-                <div className="bg-gray-50 p-2.5 rounded-lg">
-                <div className="flex items-start gap-2.5">
-                  <svg className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <p className="text-gray-800 text-xs sm:text-sm leading-relaxed">{booking.address}</p>
-                </div>
-              </div>
-              </div>
-            </div>
-
-            <div className="space-y-3 lg:sticky lg:top-20 lg:self-start">
-              {/* Payment Details */}
-              <div className="border border-gray-100 rounded-xl p-3 sm:p-3.5">
-                <h2 className="text-[11px] sm:text-xs font-black text-gray-800 mb-2.5 uppercase tracking-wider">{t('customer:bookingDetails.sections.paymentInfo')}</h2>
-                {payment ? (
-                  <div className="bg-green-50 border border-green-200 p-2.5 rounded-lg">
-                    <div className="space-y-1.5 mb-2.5">
-                      <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="text-gray-600">{t('customer:bookingDetails.labels.serviceCost')}:</span>
-                        <span className="font-semibold">${booking.estimatedCost?.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="text-gray-600">{t('customer:bookingDetails.labels.platformFee')}:</span>
-                        <span className="font-semibold">${booking.platformFee?.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between font-bold text-sm border-t border-green-300 pt-2">
-                        <span className="text-gray-900">{t('customer:bookingDetails.labels.totalPaid')}:</span>
-                        <span className="text-green-600">${(payment.amount || booking.totalAmount)?.toFixed(2)}</span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 gap-2 pt-2 border-t border-green-200">
-                      <div>
-                        <p className="text-[9px] text-gray-500 mb-0.5">{t('customer:bookingDetails.labels.paymentMethod')}</p>
-                        <p className="font-semibold text-gray-800 text-xs sm:text-sm uppercase">{t('customer:bookingDetails.labels.stripe')}</p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] text-gray-500 mb-0.5">{t('customer:bookingDetails.labels.status')}</p>
-                        <p className={`font-semibold text-sm capitalize ${
-                          payment.status === 'completed' ? 'text-green-600' :
-                          payment.status === 'failed' ? 'text-red-600' :
-                          payment.status === 'processing' ? 'text-blue-600' :
-                          'text-yellow-600'
-                        }`}>{t(`customer:bookings.payment.status.${payment.status}`)}</p>
-                      </div>
-                      {payment.transactionId && (
-                        <div>
-                          <p className="text-[9px] text-gray-500 mb-0.5">{t('customer:bookingDetails.labels.transactionId')}</p>
-                          <p className="font-semibold text-[11px] sm:text-sm text-gray-800 break-all">{payment.transactionId}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : booking.totalAmount > 0 ? (
-                  <div className="bg-blue-50 border border-blue-200 p-2.5 rounded-lg">
-                    <div className="space-y-1.5 mb-2.5">
-                      <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="text-gray-600">{t('customer:bookingDetails.labels.serviceCost')}:</span>
-                        <span className="font-semibold">${booking.estimatedCost?.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="text-gray-600">{t('customer:bookingDetails.labels.platformFee')}:</span>
-                        <span className="font-semibold">${booking.platformFee?.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between font-bold text-sm border-t border-blue-300 pt-2">
-                        <span className="text-gray-900">{t('customer:bookingDetails.labels.totalAmount')}:</span>
-                        <span className="text-blue-600">${booking.totalAmount?.toFixed(2)}</span>
-                      </div>
-                    </div>
-                    <p className="text-xs sm:text-sm text-blue-700">{t('customer:bookingDetails.readyForStripe')}</p>
-                  </div>
-                ) : (
-                  <div className="bg-yellow-50 border border-yellow-200 p-2.5 rounded-lg flex items-center gap-2.5">
-                    <svg className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-yellow-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <div>
-                      <p className="font-semibold text-yellow-800 text-xs sm:text-sm">{t('customer:bookingDetails.waitingForWorker.title')}</p>
-                      <p className="text-[11px] sm:text-sm text-yellow-700">{t('customer:bookingDetails.waitingForWorker.message')}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Timestamps */}
-              <div className="border border-gray-100 rounded-xl p-3 sm:p-3.5">
-                <h2 className="text-[11px] sm:text-xs font-black text-gray-800 mb-2.5 uppercase tracking-wider">{t('customer:bookingDetails.sections.timeline')}</h2>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-[11px] sm:text-sm">
-                    <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-gray-500">{t('customer:bookingDetails.timeline.bookedOn')}:</span>
-                    <span className="font-semibold text-gray-800">{new Date(booking.createdAt).toLocaleString(i18n.language === 'ur' ? 'ur-PK' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</span>
-                  </div>
-                  {booking.completedAt && (
-                    <div className="flex items-center gap-2 text-[11px] sm:text-sm">
-                      <svg className="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="text-gray-500">{t('customer:bookingDetails.timeline.completedOn')}:</span>
-                      <span className="font-semibold text-gray-800">{new Date(booking.completedAt).toLocaleString(i18n.language === 'ur' ? 'ur-PK' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</span>
-                    </div>
-                  )}
-                  {booking.cancelledAt && (
-                    <div className="flex items-center gap-2 text-[11px] sm:text-sm">
-                      <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="text-gray-500">{t('customer:bookingDetails.timeline.cancelledOn')}:</span>
-                      <span className="font-semibold text-gray-800">{new Date(booking.cancelledAt).toLocaleString(i18n.language === 'ur' ? 'ur-PK' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <section>
+                <h2 className="mb-3 text-xs uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.sections.issueDescription')}</h2>
+                <textarea
+                  rows={3}
+                  placeholder="Describe your issue..."
+                  value={booking.description || ''}
+                  readOnly
+                  className="min-h-[96px] w-full resize-none rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+                />
+              </section>
             </div>
           </div>
 
-          <div className="px-2.5 sm:px-3 pb-2 sm:pb-2.5 grid grid-cols-1 xl:grid-cols-[minmax(0,1.35fr)_minmax(260px,0.65fr)] gap-2.5">
-            <div className="border border-gray-100 rounded-xl p-2.5 sm:p-3">
-              <h2 className="text-[11px] sm:text-xs font-black text-gray-800 mb-2.5 uppercase tracking-wider">{t('customer:bookingDetails.sections.issueDescription')}</h2>
-              <div className="bg-gray-50 p-2 rounded-lg">
-                <p className="text-gray-700 leading-relaxed text-xs sm:text-sm">{booking.description}</p>
-              </div>
-            </div>
+          <div className="flex h-full flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5 lg:sticky lg:top-6 lg:self-start lg:gap-4">
+            <section>
+              <h2 className="mb-3 text-xs uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.sections.paymentInfo')}</h2>
+              {payment ? (
+                <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+                  <div className="mb-4 flex items-start gap-3 rounded-lg border border-gray-100 bg-white p-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                      <CreditCard className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-900">{t('customer:bookingDetails.labels.stripe')}</p>
+                      <Badge variant={paymentBadgeVariant} className="mt-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium capitalize">
+                        {t(`customer:bookings.payment.status.${payment.status}`)}
+                      </Badge>
+                    </div>
+                  </div>
 
-            <div className="border border-gray-100 rounded-xl p-2.5 sm:p-3">
-              <h2 className="text-[11px] sm:text-xs font-black text-gray-800 mb-2 uppercase tracking-wider">{t('customer:bookingDetails.sections.quickActions')}</h2>
-              <div className="grid grid-cols-1 gap-2.5">
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="rounded-lg bg-white p-3">
+                      <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.serviceCost')}</p>
+                      <p className="mt-1 text-sm font-medium text-gray-800">${booking.estimatedCost?.toFixed(2)}</p>
+                    </div>
+                    <div className="rounded-lg bg-white p-3">
+                      <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.platformFee')}</p>
+                      <p className="mt-1 text-sm font-medium text-gray-800">${booking.platformFee?.toFixed(2)}</p>
+                    </div>
+                    <div className="rounded-lg bg-white p-3">
+                      <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.totalPaid')}</p>
+                      <p className="mt-1 text-sm font-medium text-green-600">${(payment.amount || booking.totalAmount)?.toFixed(2)}</p>
+                    </div>
+                    {payment.transactionId && (
+                      <div className="rounded-lg bg-white p-3">
+                        <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.transactionId')}</p>
+                        <p className="mt-1 break-all text-sm font-medium text-gray-800">{payment.transactionId}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : booking.totalAmount > 0 ? (
+                <div className="rounded-xl border border-amber-100 bg-amber-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                      <AlertTriangle className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-amber-800">{t('customer:bookingDetails.waitingForWorker.title')}</p>
+                      <p className="mt-1 text-xs text-amber-600">{t('customer:bookingDetails.waitingForWorker.message')}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-1 gap-3">
+                    <div className="rounded-lg bg-white p-3">
+                      <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.serviceCost')}</p>
+                      <p className="mt-1 text-sm font-medium text-gray-800">${booking.estimatedCost?.toFixed(2)}</p>
+                    </div>
+                    <div className="rounded-lg bg-white p-3">
+                      <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.platformFee')}</p>
+                      <p className="mt-1 text-sm font-medium text-gray-800">${booking.platformFee?.toFixed(2)}</p>
+                    </div>
+                    <div className="rounded-lg bg-white p-3">
+                      <p className="text-[10px] uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.labels.totalAmount')}</p>
+                      <p className="mt-1 text-sm font-medium text-amber-700">${booking.totalAmount?.toFixed(2)}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-xl border border-amber-100 bg-amber-50 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                      <AlertTriangle className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-amber-800">{t('customer:bookingDetails.waitingForWorker.title')}</p>
+                      <p className="mt-1 text-xs text-amber-600">{t('customer:bookingDetails.waitingForWorker.message')}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            <section>
+              <h2 className="mb-3 text-xs uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.sections.timeline')}</h2>
+              <div className="space-y-3">
+                {timelineEvents.map((event, index) => (
+                  <div key={event.key} className="relative pl-6">
+                    <span className={`absolute left-0 top-1.5 h-3 w-3 rounded-full ${event.tone}`} />
+                    {index !== timelineEvents.length - 1 && (
+                      <span className="absolute left-[5px] top-4 h-full w-px bg-gray-200" />
+                    )}
+                    <p className="text-xs text-gray-500">{event.label}</p>
+                    <p className="mt-0.5 text-xs font-medium text-gray-700">{event.value}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="mt-auto pt-0">
+              <h2 className="mb-3 text-xs uppercase tracking-wide text-gray-400">{t('customer:bookingDetails.sections.quickActions')}</h2>
+              <div className="space-y-2">
                 {booking.conversationId && (
                   <Link
                     href={`/customer/chat?workerId=${booking.workerId?._id || booking.workerId}`}
-                    className="relative bg-green-600 text-white py-2.5 px-4 rounded-xl hover:bg-green-700 text-sm font-bold text-center transition shadow-sm"
+                    className="relative inline-flex w-full items-center justify-start rounded-lg border border-blue-200 px-4 py-2 text-sm text-blue-600 transition hover:bg-blue-50"
                   >
+                    <MessageCircle className="mr-2 h-4 w-4" />
                     {t('customer:bookingDetails.actions.chatWithWorker')}
                     {chatUnread > 0 && (
-                      <span className="absolute -top-2 -right-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-white text-[10px] font-black text-green-700 border border-green-200 px-2 shadow-sm">
+                      <span className="absolute -right-2 -top-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full border border-blue-200 bg-white px-2 text-[10px] font-medium text-blue-600 shadow-sm">
                         {chatUnread > 9 ? '9+' : chatUnread}
                       </span>
                     )}
@@ -337,7 +367,7 @@ export default function BookingDetails() {
                 {!payment && booking.totalAmount > 0 && booking.status !== 'cancelled' && (
                   <Link
                     href={`/payment?bookingId=${booking._id}`}
-                    className="bg-emerald-600 text-white py-2.5 px-4 rounded-xl hover:bg-emerald-700 text-sm font-bold text-center transition shadow-sm"
+                    className="inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm text-white transition hover:bg-blue-700"
                   >
                     {t('customer:bookingDetails.actions.payNowAmount', { amount: booking.totalAmount.toFixed(2) })}
                   </Link>
@@ -345,33 +375,36 @@ export default function BookingDetails() {
                 {booking.status === 'completed' && (
                   <Link
                     href={`/customer/reviews/new/${booking._id}`}
-                    className="bg-amber-600 text-white py-2.5 px-4 rounded-xl hover:bg-amber-700 text-sm font-bold text-center transition shadow-sm"
+                    className="inline-flex w-full items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-50"
                   >
                     {t('customer:bookingDetails.actions.leaveReview')}
                   </Link>
                 )}
                 {booking.status === 'pending' && (
-                  <button
-                    onClick={async () => {
-                      if (confirm(t('customer:bookingDetails.actions.cancelConfirm'))) {
-                        try {
-                          await api.put(`/api/bookings/${booking._id}/status`, {
-                            status: 'cancelled',
-                            cancellationReason: 'Cancelled by customer'
-                          });
-                          router.push('/customer/bookings');
-                        } catch (error) {
-                          alert(t('customer:bookingDetails.errors.cancelFailed'));
+                  <div>
+                    <button
+                      onClick={async () => {
+                        if (confirm(t('customer:bookingDetails.actions.cancelConfirm'))) {
+                          try {
+                            await api.put(`/api/bookings/${booking._id}/status`, {
+                              status: 'cancelled',
+                              cancellationReason: 'Cancelled by customer'
+                            });
+                            router.push('/customer/bookings');
+                          } catch (error) {
+                            alert(t('customer:bookingDetails.errors.cancelFailed'));
+                          }
                         }
-                      }
-                    }}
-                    className="bg-red-600 text-white py-2.5 px-4 rounded-xl hover:bg-red-700 text-sm font-bold text-center transition shadow-sm"
-                  >
-                    {t('customer:bookingDetails.actions.cancelBooking')}
-                  </button>
+                      }}
+                      className="inline-flex w-full items-center justify-center rounded-lg border border-red-200 px-4 py-2 text-sm text-red-600 transition hover:bg-red-50"
+                    >
+                      {t('customer:bookingDetails.actions.cancelBooking')}
+                    </button>
+                    <p className="mt-1 text-center text-xs text-gray-400">This action cannot be undone</p>
+                  </div>
                 )}
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </div>

@@ -1,31 +1,47 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 const SplashScreen = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [progress, setProgress] = useState(0);
+  const progressIntervalRef = useRef(null);
+  const hideTimerRef = useRef(null);
 
   useEffect(() => {
+    if (!isVisible) {
+      return undefined;
+    }
+
     // Progress bar animation for Desktop
-    const progressInterval = setInterval(() => {
+    progressIntervalRef.current = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 100) return 100;
-        return prev + 1.5;
+        const next = Math.min(prev + 1.5, 100);
+        if (next >= 100 && progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+          progressIntervalRef.current = null;
+        }
+        return next;
       });
     }, 30); // Reach 100% in ~2 seconds
 
     // Total display time 3.5s
-    const hideTimer = setTimeout(() => {
+    hideTimerRef.current = setTimeout(() => {
       setIsVisible(false);
     }, 3500);
 
     return () => {
-      clearInterval(progressInterval);
-      clearTimeout(hideTimer);
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current);
+        hideTimerRef.current = null;
+      }
     };
-  }, []);
+  }, [isVisible]);
 
   if (!isVisible) return null;
 
