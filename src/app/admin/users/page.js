@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AdminShell from '../_components/AdminShell';
 import { Card, ConfirmModal, TableSkeleton, Toast } from '../_components/UiBits';
 import { adminRequest } from '../_lib/adminApi';
@@ -15,7 +15,7 @@ export default function AdminUsersPage() {
   const [toast, setToast] = useState(null);
   const [confirmState, setConfirmState] = useState(null);
 
-  const fetchUsers = async (nextPage = page, nextSearch = search) => {
+  const fetchUsers = useCallback(async (nextPage = page, nextSearch = search) => {
     try {
       setLoading(true);
       const res = await adminRequest('/admin/users', {
@@ -29,11 +29,11 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search, limit]);
 
   useEffect(() => {
     fetchUsers(1, '');
-  }, []);
+  }, [fetchUsers]);
 
   useEffect(() => {
     if (!toast) return undefined;

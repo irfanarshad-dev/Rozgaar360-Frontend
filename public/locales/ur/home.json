@@ -198,10 +198,10 @@
     "browseNow": "ابھی دستیاب کارکن دیکھیں"
   },
   "featured": {
-    "title": "اعلیٰ درجہ بندی والے پیشہ ور",
-    "subtitle": "تمام مہارتوں میں اعلیٰ درجہ رکھنے والے کارکن",
-    "filteredTitle": "{{skill}} کارکن",
-    "filteredSubtitle": "{{skill}} کے لیے {{city}} میں دستیاب پیشہ ور",
+    "title": "اعلیٰ ترین درجہ یافتہ پیشہ ور",
+    "subtitle": "تمام مہارتوں میں سب سے زیادہ ریٹنگ والے ماہرین",
+    "filteredTitle": "{{skill}} کے ماہرین",
+    "filteredSubtitle": "{{city}} میں دستیاب {{skill}} کے ماہرین",
     "allCities": "تمام شہر",
     "clearFilter": "فلٹر صاف کریں",
     "seeAllWorkers": "تمام کارکن دیکھیں",

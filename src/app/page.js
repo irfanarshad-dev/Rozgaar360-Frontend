@@ -148,7 +148,7 @@ function WorkerCard({ worker, t, getSkillLabel, onViewProfile }) {
       </div>
 
       <h3 className="mt-3 text-base font-medium text-gray-900 truncate text-center">{worker.name}</h3>
-      <p className="text-sm text-gray-400 text-center">{translatedSkill} ΓÇó {worker.city}</p>
+      <p className="text-sm text-gray-400 text-center">{translatedSkill} - {worker.city}</p>
 
       <div className="mt-2 flex items-center justify-center gap-1.5">
         <Stars rating={worker.rating} />
@@ -695,7 +695,7 @@ export default function Home() {
                 }}
                 className="text-sm text-blue-600 hover:underline"
               >
-                {t('home:featured.seeAllWorkers')} ΓåÆ
+                {t('home:featured.seeAllWorkers')} →
               </button>
             )}
             {skill && (

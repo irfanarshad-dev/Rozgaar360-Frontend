@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AdminShell from '../_components/AdminShell';
 import { Card, ConfirmModal, TableSkeleton, Toast } from '../_components/UiBits';
 import { adminRequest } from '../_lib/adminApi';
@@ -18,7 +18,7 @@ export default function AdminBookingsPage() {
   const [toast, setToast] = useState(null);
   const [confirmState, setConfirmState] = useState(null);
 
-  const fetchBookings = async (nextPage = page, nextSearch = search, status = tab) => {
+  const fetchBookings = useCallback(async (nextPage = page, nextSearch = search, status = tab) => {
     try {
       setLoading(true);
       const res = await adminRequest('/admin/bookings', {
@@ -32,12 +32,12 @@ export default function AdminBookingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, search, tab, limit]);
 
   useEffect(() => {
     setPage(1);
     fetchBookings(1, search, tab);
-  }, [tab]);
+  }, [fetchBookings, search, tab]);
 
   useEffect(() => {
     if (!toast) return undefined;
