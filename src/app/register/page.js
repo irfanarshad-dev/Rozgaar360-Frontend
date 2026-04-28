@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -10,6 +10,7 @@ import { Eye, EyeOff, ShieldCheck, Users, Wrench, ArrowLeft, Briefcase, User as 
 import Button from '../components/ui/Button';
 
 export default function Register() {
+  const [mounted, setMounted] = useState(false);
   const [selectedRole, setSelectedRole] = useState('');
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
@@ -21,6 +22,10 @@ export default function Register() {
   const [locationStatus, setLocationStatus] = useState('');
   const router = useRouter();
   const { t } = useTranslation('auth');
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const checkPasswordStrength = (password) => {
     if (!password) {
@@ -167,8 +172,12 @@ export default function Register() {
               />
               <span className="text-xl font-bold text-gray-900 tracking-tight">Rozgaar<span className="text-blue-600">360</span></span>
             </Link>
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">{t('createAccount')}</h2>
-            <p className="text-gray-500 mt-2">{t('joinRozgaar')}</p>
+            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+              {mounted ? t('createAccount') : 'Create Account'}
+            </h2>
+            <p className="text-gray-500 mt-2">
+              {mounted ? t('joinRozgaar') : "Join Pakistan's leading job platform"}
+            </p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8 sm:p-10 relative">
