@@ -318,11 +318,22 @@ export default function WorkerBookingDetails() {
             <p className="mb-4 text-xs uppercase tracking-wide text-gray-400">{t('worker:bookingDetails.paymentStatus')}</p>
             {payment ? (
               <div className="flex flex-1 flex-col justify-center">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mb-2">
                   <span className="h-2 w-2 rounded-full bg-green-500" />
-                  <p className="text-base font-semibold text-gray-700">{formatCurrency(payment.amount || booking.totalAmount || 0)}</p>
+                  <p className="text-sm font-semibold text-green-700">{t('worker:bookingDetails.paymentReceived', { defaultValue: 'Payment Received' })}</p>
                 </div>
-                {paymentDateLabel && <p className="mt-1 text-xs text-gray-400">{paymentDateLabel}</p>}
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(payment.amount || booking.totalAmount || 0)}</p>
+                {paymentDateLabel && <p className="mt-2 text-xs text-gray-400">{t('worker:bookingDetails.receivedOn', { defaultValue: 'Received on' })} {paymentDateLabel}</p>}
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <div className="flex justify-between text-xs text-gray-600 mb-1">
+                    <span>{t('worker:bookingDetails.paymentMethod', { defaultValue: 'Method' })}</span>
+                    <span className="font-semibold">{payment.paymentMethod || 'Card'}</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-600">
+                    <span>{t('worker:bookingDetails.transactionId', { defaultValue: 'Transaction ID' })}</span>
+                    <span className="font-mono text-[10px]">{payment._id?.slice(-8) || 'N/A'}</span>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="flex flex-1 items-center">

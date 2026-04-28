@@ -456,12 +456,12 @@ export default function WorkerDashboard() {
       iconWrapClass: 'bg-emerald-50',
     },
     {
-      label: 'This Month Earnings',
-      labelKey: 'worker:myEarnings',
+      label: 'Total Earnings',
+      labelKey: 'worker:dashboard.stats.totalEarnings',
       value: formatMoney(stats.monthlyEarnings),
-      trend: t('common:fromLastMonth', { defaultValue: '+12% from last month' }),
+      trend: t('common:thisMonth', { defaultValue: 'This month earnings' }),
       icon: DollarSign,
-      accent: 'text-blue-600',
+      accent: 'text-indigo-600',
       iconWrapClass: 'bg-indigo-50',
     },
   ];

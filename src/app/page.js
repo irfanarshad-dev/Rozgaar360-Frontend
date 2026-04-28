@@ -109,7 +109,7 @@ function Counter({ end, suffix = '' }) {
 }
 
 // Worker card using real backend data
-function WorkerCard({ worker, t, getSkillLabel, onViewProfile }) {
+function WorkerCard({ worker, t, getSkillLabel, onViewProfile, mounted }) {
   const router = useRouter();
   const translatedSkill = getSkillLabel(worker.skill);
   const avatarSrc = worker.profilePicture && worker.profilePicture !== '/user.png'
@@ -141,8 +141,8 @@ function WorkerCard({ worker, t, getSkillLabel, onViewProfile }) {
           </div>
         )}
         {worker.verified && (
-          <span className="mt-2 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
-            {t('home:featured.verified', { defaultValue: 'Verified' })}
+          <span className="mt-2 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full" suppressHydrationWarning>
+            {mounted ? t('home:featured.verified', { defaultValue: 'Verified' }) : 'Verified'}
           </span>
         )}
       </div>
@@ -152,14 +152,18 @@ function WorkerCard({ worker, t, getSkillLabel, onViewProfile }) {
 
       <div className="mt-2 flex items-center justify-center gap-1.5">
         <Stars rating={worker.rating} />
-        <span className="text-xs text-gray-400">({worker.reviewCount || 0} {t('home:featured.reviews', { defaultValue: 'reviews' })})</span>
+        <span className="text-xs text-gray-400" suppressHydrationWarning>({worker.reviewCount || 0} {mounted ? t('home:featured.reviews', { defaultValue: 'reviews' }) : 'reviews'})</span>
       </div>
 
       {worker.experience != null && (
-        <span className="mt-2 inline-block text-xs text-gray-500 bg-gray-50 rounded-md px-2 py-1">
-          {worker.experience === 1
-            ? t('home:featured.experienceOne', { count: worker.experience })
-            : t('home:featured.experienceOther', { count: worker.experience })}
+        <span className="mt-2 inline-block text-xs text-gray-500 bg-gray-50 rounded-md px-2 py-1" suppressHydrationWarning>
+          {mounted ? (
+            worker.experience === 1
+              ? t('home:featured.experienceOne', { count: worker.experience })
+              : t('home:featured.experienceOther', { count: worker.experience })
+          ) : (
+            `${worker.experience} year${worker.experience === 1 ? '' : 's'} experience`
+          )}
         </span>
       )}
 
@@ -172,8 +176,9 @@ function WorkerCard({ worker, t, getSkillLabel, onViewProfile }) {
           router.push(`/profile/${worker.id}`);
         }}
         className="mt-3 w-full border border-gray-200 text-gray-700 text-sm py-2 rounded-lg hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all"
+        suppressHydrationWarning
       >
-        {t('home:featured.viewProfile')}
+        {mounted ? t('home:featured.viewProfile') : 'View Profile'}
       </button>
     </div>
   );
@@ -184,6 +189,9 @@ export default function Home() {
   const { t } = useTranslation(['home', 'common']);
   const { language, changeLanguage } = useLanguage();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   // Search state
   const [query,     setQuery]     = useState('');
@@ -385,32 +393,43 @@ export default function Home() {
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 md:py-20">
           <div className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 rounded-full px-4 py-1.5 text-sm font-medium mb-6 animate-fadeInUp">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 rounded-full px-4 py-1.5 text-sm font-medium mb-6 animate-fadeInUp" suppressHydrationWarning>
               <Sparkles className="w-4 h-4 text-cyan-400" />
-              {t('home:hero.badge')}
+              {mounted ? t('home:hero.badge') : "Pakistan's #1 Skilled Workers Platform"}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-[52px] font-black text-white leading-tight md:leading-[1.05] tracking-tight mb-5 sm:mb-6 animate-fadeInUp delay-100 max-w-[16ch] sm:max-w-[18ch] mx-auto sm:mx-0">
-              {isWorker ? (
-                <>
-                  {t('home:worker.hero.line1')}<br />
-                  <span className="gradient-text">{t('home:worker.hero.line2')}</span><br />
-                  {t('home:worker.hero.line3')}
-                </>
+            <h1 className="text-3xl sm:text-4xl md:text-[52px] font-black text-white leading-tight md:leading-[1.05] tracking-tight mb-5 sm:mb-6 animate-fadeInUp delay-100 max-w-[16ch] sm:max-w-[18ch] mx-auto sm:mx-0" suppressHydrationWarning>
+              {mounted ? (
+                isWorker ? (
+                  <>
+                    {t('home:worker.hero.line1')}<br />
+                    <span className="gradient-text">{t('home:worker.hero.line2')}</span><br />
+                    {t('home:worker.hero.line3')}
+                  </>
+                ) : (
+                  <>
+                    {t('home:hero.line1')}<br />
+                    <span className="gradient-text">{t('home:hero.line2')}</span><br />
+                    {t('home:hero.line3')}
+                  </>
+                )
               ) : (
                 <>
-                  {t('home:hero.line1')}<br />
-                  <span className="gradient-text">{t('home:hero.line2')}</span><br />
-                  {t('home:hero.line3')}
+                  Find Skilled<br />
+                  <span className="gradient-text">Workers</span><br />
+                  Near You
                 </>
               )}
             </h1>
 
-            <p className="text-white/80 text-[15px] sm:text-lg leading-relaxed max-w-lg mx-auto sm:mx-0 mb-8 sm:mb-10 animate-fadeInUp delay-200">
-              {isWorker 
-                ? t('home:worker.hero.description')
-                : t('home:hero.description')
-              }
+            <p className="text-white/80 text-[15px] sm:text-lg leading-relaxed max-w-lg mx-auto sm:mx-0 mb-8 sm:mb-10 animate-fadeInUp delay-200" suppressHydrationWarning>
+              {mounted ? (
+                isWorker 
+                  ? t('home:worker.hero.description')
+                  : t('home:hero.description')
+              ) : (
+                'Connect with verified skilled workers in your area for all your home service needs'
+              )}
             </p>
 
             {/* Search bar - Hidden for workers */}
@@ -425,7 +444,7 @@ export default function Home() {
                       value={query}
                       onChange={e => setQuery(e.target.value)}
                       type="text"
-                      placeholder={isWorker ? 'Search for jobs...' : t('home:hero.searchPlaceholder')}
+                      placeholder={mounted ? (isWorker ? 'Search for jobs...' : t('home:hero.searchPlaceholder')) : 'e.g. Plumber, Electrician...'}
                       className="w-full border-0 outline-none bg-transparent text-gray-800 text-sm placeholder-gray-400"
                     />
                   </div>
@@ -444,14 +463,14 @@ export default function Home() {
                     className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-500 hover:text-blue-600 transition-colors flex-shrink-0"
                   >
                     <MapPin className="w-[14px] h-[14px] text-blue-500" />
-                    <span className="hidden sm:inline">{t('home:hero.viewMap')}</span>
+                    <span className="hidden sm:inline" suppressHydrationWarning>{mounted ? t('home:hero.viewMap') : 'View Map'}</span>
                   </button>
 
                   <button
                     type="submit"
                     className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 sm:px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 flex-shrink-0"
                   >
-                    <span>{t('home:hero.findButton')}</span>
+                    <span suppressHydrationWarning>{mounted ? t('home:hero.findButton') : 'Find Workers'}</span>
                     <ArrowRight className="w-[14px] h-[14px]" />
                   </button>
                 </div>
@@ -533,14 +552,14 @@ export default function Home() {
       <section className="py-16 sm:py-20 bg-slate-50/50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="text-center mb-10 sm:mb-12">
-            <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
-              <Sparkles className="w-3 h-3" /> {t('home:ai.badge')}
+            <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3" suppressHydrationWarning>
+              <Sparkles className="w-3 h-3" /> {mounted ? t('home:ai.badge') : 'New AI Feature'}
             </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
-              {t('home:ai.titlePrefix')} <span className="text-blue-600">{t('home:ai.titleHighlight')}</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight" suppressHydrationWarning>
+              {mounted ? t('home:ai.titlePrefix') : 'Get'} <span className="text-blue-600">{mounted ? t('home:ai.titleHighlight') : 'AI-Powered'}</span> {mounted ? '' : 'Recommendations'}
             </h2>
-            <p className="text-gray-500 mt-4 text-[15px] sm:text-[17px] max-w-2xl mx-auto leading-relaxed">
-              {t('home:ai.description')}
+            <p className="text-gray-500 mt-4 text-[15px] sm:text-[17px] max-w-2xl mx-auto leading-relaxed" suppressHydrationWarning>
+              {mounted ? t('home:ai.description') : 'Let our AI assistant help you find the perfect worker for your needs'}
             </p>
           </div>
           
@@ -551,10 +570,10 @@ export default function Home() {
             />
           ) : (
             <div className="max-w-3xl mx-auto bg-white border border-blue-100 rounded-2xl p-6 text-center shadow-sm">
-              <p className="text-gray-700 font-semibold mb-2">{t('home:ai.accessCard.title')}</p>
-              <p className="text-sm text-gray-500 mb-4">{t('home:ai.accessCard.description')}</p>
-              <Link href="/register" className="btn-primary text-white font-semibold px-6 py-2.5 rounded-xl inline-flex items-center gap-2">
-                {t('home:ai.accessCard.cta')}
+              <p className="text-gray-700 font-semibold mb-2" suppressHydrationWarning>{mounted ? t('home:ai.accessCard.title') : 'Register to Access AI Recommendations'}</p>
+              <p className="text-sm text-gray-500 mb-4" suppressHydrationWarning>{mounted ? t('home:ai.accessCard.description') : 'Create an account to get personalized worker recommendations'}</p>
+              <Link href="/register" className="btn-primary text-white font-semibold px-6 py-2.5 rounded-xl inline-flex items-center gap-2" suppressHydrationWarning>
+                {mounted ? t('home:ai.accessCard.cta') : 'Register Now'}
               </Link>
             </div>
           )}
@@ -567,14 +586,14 @@ export default function Home() {
       <section className="py-16 sm:py-20 bg-slate-50/50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="text-center mb-8 sm:mb-12">
-            <span className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
-              <Sparkles className="w-3 h-3" /> {t('home:worker.ai.badge')}
+            <span className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3" suppressHydrationWarning>
+              <Sparkles className="w-3 h-3" /> {mounted ? t('home:worker.ai.badge') : 'AI Job Finder'}
             </span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
-              {t('home:worker.ai.titlePrefix')} <span className="text-emerald-600">{t('home:worker.ai.titleHighlight')}</span> {t('home:worker.ai.titleSuffix')}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight" suppressHydrationWarning>
+              {mounted ? t('home:worker.ai.titlePrefix') : 'Find'} <span className="text-emerald-600">{mounted ? t('home:worker.ai.titleHighlight') : 'Perfect Jobs'}</span> {mounted ? t('home:worker.ai.titleSuffix') : 'For You'}
             </h2>
-            <p className="text-gray-500 mt-4 text-[15px] sm:text-[17px] max-w-2xl mx-auto leading-relaxed">
-              {t('home:worker.ai.description')}
+            <p className="text-gray-500 mt-4 text-[15px] sm:text-[17px] max-w-2xl mx-auto leading-relaxed" suppressHydrationWarning>
+              {mounted ? t('home:worker.ai.description') : 'AI-powered job matching based on your skills and location'}
             </p>
           </div>
           
@@ -647,12 +666,12 @@ export default function Home() {
           ) : (
             <>
           <div className="text-center mb-10 sm:mb-12">
-            <span className="text-blue-600 font-semibold text-sm tracking-widest uppercase mb-2 block">{t('home:services.badge')}</span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
-              {t('home:services.titlePrefix')} <span className="gradient-text">{t('home:services.titleHighlight')}</span>
+            <span className="text-blue-600 font-semibold text-sm tracking-widest uppercase mb-2 block" suppressHydrationWarning>{mounted ? t('home:services.badge') : 'Browse by Skill'}</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4" suppressHydrationWarning>
+              {mounted ? t('home:services.titlePrefix') : 'Popular'} <span className="gradient-text">{mounted ? t('home:services.titleHighlight') : 'Services'}</span>
             </h2>
-            <p className="text-gray-500 text-[15px] sm:text-[16px] max-w-xl mx-auto leading-relaxed">
-              {t('home:services.description')}
+            <p className="text-gray-500 text-[15px] sm:text-[16px] max-w-xl mx-auto leading-relaxed" suppressHydrationWarning>
+              {mounted ? t('home:services.description') : 'Browse our most requested services and find skilled workers'}
             </p>
           </div>
 
@@ -693,7 +712,7 @@ export default function Home() {
                     <h3 className="font-bold text-gray-900 text-[14px] sm:text-[15px]">{getSkillLabel(s)}</h3>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-gray-400 text-[12px] leading-tight">{active ? t('home:services.showingWorkers') : t('home:services.browseWorkers')}</p>
+                    <p className="text-gray-400 text-[12px] leading-tight">{active ? (mounted ? t('home:services.showingWorkers') : 'Showing workers') : (mounted ? t('home:services.browseWorkers') : 'Browse workers')}</p>
                     <ChevronRight className={`w-4 h-4 transition-all ${active ? 'text-blue-500 rotate-90' : 'text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1'}`} />
                   </div>
                 </button>
@@ -711,13 +730,17 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
-                {skill ? t('home:featured.filteredTitle', { skill: getSkillLabel(skill) }) : t('home:featured.title')}
+              <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight" suppressHydrationWarning>
+                {mounted ? (skill ? t('home:featured.filteredTitle', { skill: getSkillLabel(skill) }) : t('home:featured.title')) : 'Top rated professionals'}
               </h2>
-              <p className="text-sm sm:text-[15px] text-gray-400 mt-1 leading-relaxed">
-                {skill
-                  ? t('home:featured.filteredSubtitle', { skill: getSkillLabel(skill), city: city || t('home:featured.allCities') })
-                  : t('home:featured.subtitle')}
+              <p className="text-sm sm:text-[15px] text-gray-400 mt-1 leading-relaxed" suppressHydrationWarning>
+                {mounted ? (
+                  skill
+                    ? t('home:featured.filteredSubtitle', { skill: getSkillLabel(skill), city: city || t('home:featured.allCities') })
+                    : t('home:featured.subtitle')
+                ) : (
+                  'Verified workers with excellent ratings'
+                )}
               </p>
             </div>
             {!skill && (
@@ -728,14 +751,17 @@ export default function Home() {
                   router.push('/recommendations');
                 }}
                 className="text-sm text-blue-600 hover:underline"
+                suppressHydrationWarning
               >
-                {t('home:featured.seeAllWorkers')} →
+                {mounted ? t('home:featured.seeAllWorkers') : 'See all workers'} →
               </button>
             )}
             {skill && (
               <button onClick={() => { setSkill(''); setSearchWorkers([]); }}
-                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 border border-gray-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition-all">
-                <RefreshCw className="w-3.5 h-3.5" /> {t('home:featured.clearFilter')}
+                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 border border-gray-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition-all"
+                suppressHydrationWarning
+              >
+                <RefreshCw className="w-3.5 h-3.5" /> {mounted ? t('home:featured.clearFilter') : 'Clear filter'}
               </button>
             )}
           </div>
@@ -743,16 +769,16 @@ export default function Home() {
           {displayLoading && (
             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
               <Loader2 className="w-10 h-10 animate-spin mb-3 text-blue-500" />
-              <p className="text-sm">{t('home:messages.loadingWorkers')}</p>
+              <p className="text-sm" suppressHydrationWarning>{mounted ? t('home:messages.loadingWorkers') : 'Loading workers...'}</p>
             </div>
           )}
 
           {workersError && !displayLoading && (
             <div className="flex flex-col items-center justify-center py-16 text-gray-400 gap-4">
               <AlertCircle className="w-10 h-10 text-red-400" />
-              <p className="text-sm text-red-500">{t('home:messages.workersLoadError')}</p>
-              <button onClick={loadFeatured} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm border border-blue-200 px-4 py-2 rounded-full">
-                <RefreshCw className="w-4 h-4" /> {t('home:messages.retry')}
+              <p className="text-sm text-red-500" suppressHydrationWarning>{mounted ? t('home:messages.workersLoadError') : 'Failed to load workers'}</p>
+              <button onClick={loadFeatured} className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm border border-blue-200 px-4 py-2 rounded-full" suppressHydrationWarning>
+                <RefreshCw className="w-4 h-4" /> {mounted ? t('home:messages.retry') : 'Retry'}
               </button>
             </div>
           )}
@@ -760,14 +786,14 @@ export default function Home() {
           {!displayLoading && !workersError && displayWorkers.length === 0 && (
             <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-3">
               <UserIcon className="w-14 h-14 text-gray-200" />
-              <p className="text-lg font-semibold text-gray-500">
-                {skill ? t('home:messages.noSkillWorkersTitle', { skill: getSkillLabel(skill) }) : t('home:messages.noWorkersTitle')}
+              <p className="text-lg font-semibold text-gray-500" suppressHydrationWarning>
+                {mounted ? (skill ? t('home:messages.noSkillWorkersTitle', { skill: getSkillLabel(skill) }) : t('home:messages.noWorkersTitle')) : 'No workers found'}
               </p>
-              <p className="text-sm text-center max-w-xs">
-                {skill ? t('home:messages.noSkillWorkersDescription', { skill: getSkillLabel(skill) }) : t('home:messages.noWorkersDescription')}
+              <p className="text-sm text-center max-w-xs" suppressHydrationWarning>
+                {mounted ? (skill ? t('home:messages.noSkillWorkersDescription', { skill: getSkillLabel(skill) }) : t('home:messages.noWorkersDescription')) : 'Try adjusting your search criteria'}
               </p>
-              <Link href="/register" className="btn-primary text-white font-semibold px-6 py-2.5 rounded-full text-sm mt-2">
-                {t('home:cta.registerWorker')}
+              <Link href="/register" className="btn-primary text-white font-semibold px-6 py-2.5 rounded-full text-sm mt-2" suppressHydrationWarning>
+                {mounted ? t('home:cta.registerWorker') : 'Register as Worker'}
               </Link>
             </div>
           )}
@@ -781,6 +807,7 @@ export default function Home() {
                   t={t}
                   getSkillLabel={getSkillLabel}
                   onViewProfile={handleViewProfile}
+                  mounted={mounted}
                 />
               ))}
             </div>
@@ -830,21 +857,40 @@ export default function Home() {
       )}
 
       {showRegisterPrompt && (
-        <div className="fixed inset-0 z-[10000] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-gray-100 text-center">
-            <h3 className="text-xl font-black text-gray-900 mb-2">Register First</h3>
-            <p className="text-gray-600 text-sm mb-6">Please register as Worker or Customer before using home page actions.</p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/register" className="btn-primary text-white font-semibold px-5 py-2.5 rounded-xl" onClick={() => setShowRegisterPrompt(false)}>
-                Go to Register
-              </Link>
-              <button
-                type="button"
+        <div className="fixed inset-0 z-[10000] bg-black/50 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-gray-100 animate-scale-in">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                <Shield className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-2xl font-black text-gray-900 mb-2">Sign Up Required</h3>
+              <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                Please create an account as a <span className="font-semibold text-blue-600">Worker</span> or <span className="font-semibold text-blue-600">Customer</span> to access this feature and enjoy all platform benefits.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
+                <Link 
+                  href="/register" 
+                  className="flex-1 btn-primary text-white font-bold px-6 py-3 rounded-xl inline-flex items-center justify-center gap-2 transition-all active:scale-95" 
+                  onClick={() => setShowRegisterPrompt(false)}
+                >
+                  <UserIcon className="w-4 h-4" />
+                  Register Now
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setShowRegisterPrompt(false)}
+                  className="flex-1 px-6 py-3 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 active:bg-gray-100 transition-all active:scale-95"
+                >
+                  Maybe Later
+                </button>
+              </div>
+              <Link 
+                href="/login" 
+                className="mt-4 text-sm text-gray-500 hover:text-blue-600 font-medium transition-colors"
                 onClick={() => setShowRegisterPrompt(false)}
-                className="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50"
               >
-                Cancel
-              </button>
+                Already have an account? <span className="font-bold">Login</span>
+              </Link>
             </div>
           </div>
         </div>
@@ -883,11 +929,11 @@ export default function Home() {
           ) : (
             <>
           <div className="text-center mb-12 sm:mb-16">
-            <span className="text-blue-600 font-semibold text-sm tracking-widest uppercase mb-2 block">{t('home:howItWorks.badge')}</span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
-              {t('home:howItWorks.titlePrefix')} <span className="gradient-text">{t('home:howItWorks.titleHighlight')}</span>
+            <span className="text-blue-600 font-semibold text-sm tracking-widest uppercase mb-2 block" suppressHydrationWarning>{mounted ? t('home:howItWorks.badge') : 'The Process'}</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4" suppressHydrationWarning>
+              {mounted ? t('home:howItWorks.titlePrefix') : 'How It'} <span className="gradient-text">{mounted ? t('home:howItWorks.titleHighlight') : 'Works'}</span>
             </h2>
-            <p className="text-gray-500 text-[15px] sm:text-[16px] max-w-xl mx-auto leading-relaxed">{t('home:howItWorks.subtitle')}</p>
+            <p className="text-gray-500 text-[15px] sm:text-[16px] max-w-xl mx-auto leading-relaxed" suppressHydrationWarning>{mounted ? t('home:howItWorks.subtitle') : 'Get started in three simple steps'}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 sm:gap-10 relative">
@@ -905,21 +951,28 @@ export default function Home() {
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3">{t(titleKey)}</h3>
-                  <p className="text-gray-500 text-[14px] md:text-[15px] leading-relaxed max-w-[280px] md:max-w-[230px]">{t(descKey)}</p>
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 md:mb-3" suppressHydrationWarning>{mounted ? t(titleKey) : (num === '01' ? 'Search & Browse' : num === '02' ? 'Book Service' : 'Get Work Done')}</h3>
+                  <p className="text-gray-500 text-[14px] md:text-[15px] leading-relaxed max-w-[280px] md:max-w-[230px]" suppressHydrationWarning>{mounted ? t(descKey) : (num === '01' ? 'Find skilled workers in your area' : num === '02' ? 'Schedule and confirm booking' : 'Quality service delivered')}</p>
                 </div>
               </div>
             ))}
           </div>
 
           <div className="mt-14 text-center">
-            <Link href="/recommendations"
-              className="inline-flex items-center gap-3 text-gray-600 hover:text-blue-600 font-medium transition-colors">
+            <button
+              type="button"
+              onClick={() => {
+                if (!ensureRegistered()) return;
+                router.push('/recommendations');
+              }}
+              className="inline-flex items-center gap-3 text-gray-600 hover:text-blue-600 font-medium transition-colors cursor-pointer"
+              suppressHydrationWarning
+            >
               <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-300 animate-pulse-ring">
                 <Play className="w-4 h-4 text-white ml-0.5 fill-white" />
               </div>
-              {t('home:howItWorks.browseNow')}
-            </Link>
+              {mounted ? t('home:howItWorks.browseNow') : 'Browse Workers Now'}
+            </button>
           </div>
             </>
           )}
@@ -931,19 +984,19 @@ export default function Home() {
       <section id="about" className="py-20 sm:py-24 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-10 lg:gap-16 items-start lg:items-center">
           <div className="animate-fadeInLeft">
-            <span className="text-blue-600 font-semibold text-sm tracking-widest uppercase mb-2 block">{t('home:about.badge')}</span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-5 sm:mb-6">
-              {t('home:about.titlePrefix')} <span className="gradient-text">{t('home:about.titleHighlight')}</span>
+            <span className="text-blue-600 font-semibold text-sm tracking-widest uppercase mb-2 block" suppressHydrationWarning>{mounted ? t('home:about.badge') : 'Why Rozgaar360'}</span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-5 sm:mb-6" suppressHydrationWarning>
+              {mounted ? t('home:about.titlePrefix') : 'Why Choose'} <span className="gradient-text">{mounted ? t('home:about.titleHighlight') : 'Us'}</span>
             </h2>
-            <p className="text-gray-500 text-[15px] sm:text-[16px] leading-relaxed mb-6 sm:mb-8">
-              {t('home:about.description')}
+            <p className="text-gray-500 text-[15px] sm:text-[16px] leading-relaxed mb-6 sm:mb-8" suppressHydrationWarning>
+              {mounted ? t('home:about.description') : 'We connect you with verified skilled workers across Pakistan'}
             </p>
             <div className="space-y-3 sm:space-y-4">
               {[
-                { icon: Shield,       title: t('home:about.features.cnic.title'),       desc: t('home:about.features.cnic.description') },
-                { icon: Star,         title: t('home:about.features.reviews.title'),    desc: t('home:about.features.reviews.description') },
-                { icon: Clock,        title: t('home:about.features.connect.title'),    desc: t('home:about.features.connect.description') },
-                { icon: CheckCircle2, title: t('home:about.features.profile.title'),    desc: t('home:about.features.profile.description') },
+                { icon: Shield,       title: mounted ? t('home:about.features.cnic.title') : 'CNIC Verified Workers',       desc: mounted ? t('home:about.features.cnic.description') : 'All workers verified with CNIC' },
+                { icon: Star,         title: mounted ? t('home:about.features.reviews.title') : 'Ratings & Reviews',    desc: mounted ? t('home:about.features.reviews.description') : 'Real customer reviews and ratings' },
+                { icon: Clock,        title: mounted ? t('home:about.features.connect.title') : '24/7 Support',    desc: mounted ? t('home:about.features.connect.description') : 'Connect anytime, anywhere' },
+                { icon: CheckCircle2, title: mounted ? t('home:about.features.profile.title') : 'Detailed Profiles',    desc: mounted ? t('home:about.features.profile.description') : 'View complete worker profiles' },
               ].map(({ icon: Icon, title, desc }, index) => (
                 <div key={index} className="flex items-start gap-4 p-4 rounded-xl hover:bg-blue-50/60 transition-colors">
                   <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
@@ -962,15 +1015,15 @@ export default function Home() {
           <div className="animate-fadeInRight">
             <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-[28px] sm:rounded-[32px] p-5 sm:p-8 shadow-[0_32px_80px_rgba(0,0,0,0.25)] overflow-hidden relative">
               <div className="absolute -top-20 -right-20 w-60 h-60 bg-blue-500 opacity-20 rounded-full blur-3xl" />
-              <span className="inline-flex items-center gap-1.5 bg-blue-100/10 text-blue-100 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                <Play className="w-3 h-3" /> {t('home:ad.badge')}
+              <span className="inline-flex items-center gap-1.5 bg-blue-100/10 text-blue-100 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider" suppressHydrationWarning>
+                <Play className="w-3 h-3" /> {mounted ? t('home:ad.badge') : 'Watch Video'}
               </span>
-              <h2 className="text-white text-base sm:text-lg font-black mt-3 leading-tight">{t('home:ad.title')}</h2>
-              <p className="text-white/60 text-xs sm:text-sm mt-1 leading-relaxed">{t('home:ad.subtitle')}</p>
+              <h2 className="text-white text-base sm:text-lg font-black mt-3 leading-tight" suppressHydrationWarning>{mounted ? t('home:ad.title') : 'See How It Works'}</h2>
+              <p className="text-white/60 text-xs sm:text-sm mt-1 leading-relaxed" suppressHydrationWarning>{mounted ? t('home:ad.subtitle') : 'Watch our platform demo'}</p>
 
               <div className="mt-5 relative rounded-2xl overflow-hidden border border-white/10 bg-white/5">
                 <video
-                  src="/Rozgaar360-ad.mp4"
+                  src="/ad-byRizwan.mp4"
                   className="w-full h-full aspect-video object-cover"
                   autoPlay
                   muted
@@ -984,8 +1037,9 @@ export default function Home() {
               <Link
                 href="/recommendations"
                 className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-blue-200 hover:text-blue-100"
+                suppressHydrationWarning
               >
-                {t('home:ad.cta')} <ArrowRight className="w-3.5 h-3.5" />
+                {mounted ? t('home:ad.cta') : 'Explore Now'} <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
@@ -999,28 +1053,35 @@ export default function Home() {
         <div className="absolute inset-0 opacity-[0.05]"
              style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)', backgroundSize: '60px 60px' }} />
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/80 rounded-full px-4 py-1.5 text-sm mb-6">
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/80 rounded-full px-4 py-1.5 text-sm mb-6" suppressHydrationWarning>
             <Sparkles className="w-4 h-4 text-yellow-300" />
-            {isWorker ? 'GROW YOUR BUSINESS' : t('home:cta.badge')}
+            {mounted ? (isWorker ? 'GROW YOUR BUSINESS' : t('home:cta.badge')) : "Join Pakistan's fastest growing labor platform"}
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-white tracking-tight mb-5 sm:mb-6">
-            {isWorker ? (
-              <>Start Getting <span className="gradient-text">More Bookings</span></>
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-white tracking-tight mb-5 sm:mb-6" suppressHydrationWarning>
+            {mounted ? (
+              isWorker ? (
+                <>Start Getting <span className="gradient-text">More Bookings</span></>
+              ) : (
+                <>{t('home:cta.titleLine1')}<br /><span className="gradient-text">{t('home:cta.titleLine2')}</span></>
+              )
             ) : (
-              <>{t('home:cta.titleLine1')}<br /><span className="gradient-text">{t('home:cta.titleLine2')}</span></>
+              <>Ready to Get Started?<br /><span className="gradient-text">Find Workers Today</span></>
             )}
           </h2>
-          <p className="text-white/70 text-[15px] sm:text-lg mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
-            {isWorker 
-              ? 'Complete your profile, stay available, and deliver quality service to grow your reputation.'
-              : t('home:cta.description')
-            }
+          <p className="text-white/70 text-[15px] sm:text-lg mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed" suppressHydrationWarning>
+            {mounted ? (
+              isWorker 
+                ? 'Complete your profile, stay available, and deliver quality service to grow your reputation.'
+                : t('home:cta.description')
+            ) : (
+              'Connect with verified skilled workers for all your service needs'
+            )}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             {isWorker ? (
               <>
-                <Link href="/recommendations" className="btn-primary text-white font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[16px] inline-flex items-center gap-2 justify-center">
-                  {t('home:cta.findWorkerNow')} <ArrowRight className="w-5 h-5" />
+                <Link href="/recommendations" className="btn-primary text-white font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[16px] inline-flex items-center gap-2 justify-center" suppressHydrationWarning>
+                  {mounted ? t('home:cta.findWorkerNow') : 'Find Workers Now'} <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link href="/worker/bookings" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[16px] transition-all">
                   <CalendarDays className="w-5 h-5" /> View Bookings
@@ -1035,11 +1096,12 @@ export default function Home() {
                     router.push('/recommendations');
                   }}
                   className="btn-primary text-white font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[16px] inline-flex items-center gap-2 justify-center"
+                  suppressHydrationWarning
                 >
-                  {t('home:cta.findWorkerNow')} <ArrowRight className="w-5 h-5" />
+                  {mounted ? t('home:cta.findWorkerNow') : 'Find Workers Now'} <ArrowRight className="w-5 h-5" />
                 </button>
-                <Link href="/register" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[16px] transition-all text-center">
-                  {t('home:cta.registerWorker')}
+                <Link href="/register" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[16px] transition-all text-center" suppressHydrationWarning>
+                  {mounted ? t('home:cta.registerWorker') : 'Register as Worker'}
                 </Link>
               </>
             )}
@@ -1061,8 +1123,8 @@ export default function Home() {
               />
               <span className="text-lg font-black tracking-tight">Rozgaar360</span>
             </div>
-            <p className="text-gray-300 text-[13px] leading-relaxed mb-3">
-              {t('home:footer.brandDescription')}
+            <p className="text-gray-300 text-[13px] leading-relaxed mb-3" suppressHydrationWarning>
+              {mounted ? t('home:footer.brandDescription') : "Pakistan's trusted platform for finding skilled local workers quickly and safely."}
             </p>
             <div className="grid grid-cols-4 gap-2">
               {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
@@ -1075,16 +1137,21 @@ export default function Home() {
 
           <details className="group rounded-2xl border border-white/10 bg-white/5 p-3" open>
             <summary className="list-none flex items-center justify-between cursor-pointer">
-              <span className="font-bold text-[14px] text-white/90">{t('home:footer.ourSkills')}</span>
+              <span className="font-bold text-[14px] text-white/90" suppressHydrationWarning>{mounted ? t('home:footer.ourSkills') : 'Our Services'}</span>
               <ChevronDown className="w-4 h-4 text-blue-400 transition-transform group-open:rotate-180" />
             </summary>
             <ul className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-300 text-[13px]">
               {SKILLS.map(s => (
                 <li key={s}>
-                  <Link href={`/recommendations?skill=${encodeURIComponent(s)}`}
-                    className="block rounded-lg px-2.5 py-2 bg-white/5 hover:bg-white/10 transition-colors truncate">
+                  <button
+                    onClick={() => {
+                      if (!ensureRegistered()) return;
+                      router.push(`/recommendations?skill=${encodeURIComponent(s)}`);
+                    }}
+                    className="block rounded-lg px-2.5 py-2 bg-white/5 hover:bg-white/10 transition-colors truncate text-left w-full"
+                  >
                     {getSkillLabel(s)}
-                  </Link>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -1092,20 +1159,32 @@ export default function Home() {
 
           <details className="group rounded-2xl border border-white/10 bg-white/5 p-3">
             <summary className="list-none flex items-center justify-between cursor-pointer">
-              <span className="font-bold text-[14px] text-white/90">{t('home:footer.company')}</span>
+              <span className="font-bold text-[14px] text-white/90" suppressHydrationWarning>{mounted ? t('home:footer.company') : 'Company'}</span>
               <ChevronDown className="w-4 h-4 text-blue-400 transition-transform group-open:rotate-180" />
             </summary>
             <ul className="mt-3 space-y-2 text-gray-300 text-[13px]">
               {[
-                { label: t('home:footer.links.aboutUs'), href: '#about' },
-                { label: t('home:footer.links.registerWorker'), href: '/register' },
-                { label: t('home:footer.links.findWorkers'), href: '/recommendations' },
-                { label: t('home:footer.links.login'), href: '/login' },
-              ].map(({ label, href }, index) => (
+                { label: mounted ? t('home:footer.links.aboutUs') : 'About Us', href: '#about', requireAuth: false },
+                { label: mounted ? t('home:footer.links.registerWorker') : 'Register as Worker', href: '/register', requireAuth: false },
+                { label: mounted ? t('home:footer.links.findWorkers') : 'Find Workers', href: '/recommendations', requireAuth: true },
+                { label: mounted ? t('home:footer.links.login') : 'Login', href: '/login', requireAuth: false },
+              ].map(({ label, href, requireAuth }, index) => (
                 <li key={index}>
-                  <Link href={href} className="block rounded-lg px-2.5 py-2 bg-white/5 hover:bg-white/10 transition-colors">
-                    {label}
-                  </Link>
+                  {requireAuth ? (
+                    <button
+                      onClick={() => {
+                        if (!ensureRegistered()) return;
+                        router.push(href);
+                      }}
+                      className="block rounded-lg px-2.5 py-2 bg-white/5 hover:bg-white/10 transition-colors text-left w-full"
+                    >
+                      {label}
+                    </button>
+                  ) : (
+                    <Link href={href} className="block rounded-lg px-2.5 py-2 bg-white/5 hover:bg-white/10 transition-colors">
+                      {label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -1113,14 +1192,14 @@ export default function Home() {
 
           <details className="group rounded-2xl border border-white/10 bg-white/5 p-3">
             <summary className="list-none flex items-center justify-between cursor-pointer">
-              <span className="font-bold text-[14px] text-white/90">{t('home:footer.contact')}</span>
+              <span className="font-bold text-[14px] text-white/90" suppressHydrationWarning>{mounted ? t('home:footer.contact') : 'Contact'}</span>
               <ChevronDown className="w-4 h-4 text-blue-400 transition-transform group-open:rotate-180" />
             </summary>
             <ul className="mt-3 space-y-3 text-gray-300 text-[13px]">
-              <li className="flex items-center gap-2.5"><Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />{t('home:footer.email')}</li>
-              <li className="flex items-center gap-2.5"><Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />{t('home:footer.phone')}</li>
-              <li className="flex items-start gap-2.5"><MapPin className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-                <span>{t('home:footer.coveragePrefix')} {CITIES.slice(0, 3).join(', ')} {t('home:footer.coverageSuffix')}</span>
+              <li className="flex items-center gap-2.5" suppressHydrationWarning><Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />{mounted ? t('home:footer.email') : 'support@rozgaar360.com'}</li>
+              <li className="flex items-center gap-2.5" suppressHydrationWarning><Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />{mounted ? t('home:footer.phone') : '+92 300 1234567'}</li>
+              <li className="flex items-start gap-2.5" suppressHydrationWarning><MapPin className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                <span>{mounted ? `${t('home:footer.coveragePrefix')} ${CITIES.slice(0, 3).join(', ')} ${t('home:footer.coverageSuffix')}` : 'Available in Karachi, Lahore, Islamabad and more'}</span>
               </li>
             </ul>
           </details>
@@ -1139,8 +1218,8 @@ export default function Home() {
               />
               <span className="text-xl font-black tracking-tight">Rozgaar360</span>
             </div>
-            <p className="text-gray-400 text-[14px] leading-relaxed mb-6">
-              {t('home:footer.brandDescription')}
+            <p className="text-gray-400 text-[14px] leading-relaxed mb-6" suppressHydrationWarning>
+              {mounted ? t('home:footer.brandDescription') : "Pakistan's trusted platform for finding skilled local workers quickly and safely."}
             </p>
             <div className="flex gap-3">
               {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
@@ -1153,14 +1232,19 @@ export default function Home() {
 
           {/* Skills from constants */}
           <div>
-            <h4 className="font-bold text-[15px] mb-5 text-white/90">{t('home:footer.ourSkills')}</h4>
+            <h4 className="font-bold text-[15px] mb-5 text-white/90" suppressHydrationWarning>{mounted ? t('home:footer.ourSkills') : 'Our Services'}</h4>
             <ul className="space-y-3 text-gray-400 text-[14px]">
               {SKILLS.map(s => (
                 <li key={s}>
-                  <Link href={`/recommendations?skill=${encodeURIComponent(s)}`}
-                    className="hover:text-white transition-colors flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      if (!ensureRegistered()) return;
+                      router.push(`/recommendations?skill=${encodeURIComponent(s)}`);
+                    }}
+                    className="hover:text-white transition-colors flex items-center gap-2 text-left w-full"
+                  >
                     <ChevronRight className="w-3.5 h-3.5 text-blue-500" />{getSkillLabel(s)}
-                  </Link>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -1168,18 +1252,30 @@ export default function Home() {
 
           {/* Company */}
           <div>
-            <h4 className="font-bold text-[15px] mb-5 text-white/90">{t('home:footer.company')}</h4>
+            <h4 className="font-bold text-[15px] mb-5 text-white/90" suppressHydrationWarning>{mounted ? t('home:footer.company') : 'Company'}</h4>
             <ul className="space-y-3 text-gray-400 text-[14px]">
               {[
-                { label: t('home:footer.links.aboutUs'), href: '#about' },
-                { label: t('home:footer.links.registerWorker'), href: '/register' },
-                { label: t('home:footer.links.findWorkers'), href: '/recommendations' },
-                { label: t('home:footer.links.login'), href: '/login' },
-              ].map(({ label, href }, index) => (
+                { label: mounted ? t('home:footer.links.aboutUs') : 'About Us', href: '#about', requireAuth: false },
+                { label: mounted ? t('home:footer.links.registerWorker') : 'Register as Worker', href: '/register', requireAuth: false },
+                { label: mounted ? t('home:footer.links.findWorkers') : 'Find Workers', href: '/recommendations', requireAuth: true },
+                { label: mounted ? t('home:footer.links.login') : 'Login', href: '/login', requireAuth: false },
+              ].map(({ label, href, requireAuth }, index) => (
                 <li key={index}>
-                  <Link href={href} className="hover:text-white transition-colors flex items-center gap-2">
-                    <ChevronRight className="w-3.5 h-3.5 text-blue-500" />{label}
-                  </Link>
+                  {requireAuth ? (
+                    <button
+                      onClick={() => {
+                        if (!ensureRegistered()) return;
+                        router.push(href);
+                      }}
+                      className="hover:text-white transition-colors flex items-center gap-2 text-left w-full"
+                    >
+                      <ChevronRight className="w-3.5 h-3.5 text-blue-500" />{label}
+                    </button>
+                  ) : (
+                    <Link href={href} className="hover:text-white transition-colors flex items-center gap-2">
+                      <ChevronRight className="w-3.5 h-3.5 text-blue-500" />{label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -1187,20 +1283,20 @@ export default function Home() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-bold text-[15px] mb-5 text-white/90">{t('home:footer.contact')}</h4>
+            <h4 className="font-bold text-[15px] mb-5 text-white/90" suppressHydrationWarning>{mounted ? t('home:footer.contact') : 'Contact'}</h4>
             <ul className="space-y-4 text-gray-400 text-[14px]">
-              <li className="flex items-center gap-3"><Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />{t('home:footer.email')}</li>
-              <li className="flex items-center gap-3"><Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />{t('home:footer.phone')}</li>
-              <li className="flex items-start gap-3"><MapPin className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-                <span>{t('home:footer.coveragePrefix')} {CITIES.slice(0, 3).join(', ')} {t('home:footer.coverageSuffix')}</span>
+              <li className="flex items-center gap-3" suppressHydrationWarning><Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />{mounted ? t('home:footer.email') : 'support@rozgaar360.com'}</li>
+              <li className="flex items-center gap-3" suppressHydrationWarning><Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />{mounted ? t('home:footer.phone') : '+92 300 1234567'}</li>
+              <li className="flex items-start gap-3" suppressHydrationWarning><MapPin className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                <span>{mounted ? `${t('home:footer.coveragePrefix')} ${CITIES.slice(0, 3).join(', ')} ${t('home:footer.coverageSuffix')}` : 'Available in Karachi, Lahore, Islamabad and more'}</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 border-t border-white/8 pt-5 lg:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 lg:gap-4 text-gray-500 text-[12px] lg:text-[13px] text-center sm:text-left">
-          <p>{t('home:footer.copyright', { year: new Date().getFullYear() })}</p>
-          <p className="flex items-center gap-1">{t('home:footer.madeWith')} <span className="text-red-400">♥</span> {t('home:footer.inPakistan')}</p>
+          <p suppressHydrationWarning>{mounted ? t('home:footer.copyright', { year: new Date().getFullYear() }) : `© ${new Date().getFullYear()} Rozgaar360. All rights reserved.`}</p>
+          <p className="flex items-center gap-1" suppressHydrationWarning>{mounted ? t('home:footer.madeWith') : 'Made with'} <span className="text-red-400">♥</span> {mounted ? t('home:footer.inPakistan') : 'in Pakistan'}</p>
         </div>
       </footer>
     </div>

@@ -18,7 +18,6 @@ const CUSTOMER_LINKS = [
   { href: '/customer/dashboard',      labelKey: 'common:dashboard',     fallback: 'Dashboard', icon: Home },
   { href: '/customer/recommendations', labelKey: 'common:findWorkers',   fallback: 'Find Workers', icon: Search },
   { href: '/customer/bookings',       labelKey: 'common:myBookings',    fallback: 'My Bookings', icon: Calendar },
-  { href: '/customer/notifications',  labelKey: 'common:notifications', fallback: 'Notifications', icon: Bell },
   { href: '/customer/chat',           labelKey: 'common:messages',      fallback: 'Messages', icon: MessageCircle },
 ];
 
@@ -140,7 +139,6 @@ export default function DashboardLayout({
     if (!pathname) return t('common:dashboard');
     if (pathname.startsWith('/worker/dashboard') || pathname.startsWith('/customer/dashboard')) return t('common:dashboard');
     if (pathname.startsWith('/worker/bookings') || pathname.startsWith('/customer/bookings')) return t('common:myBookings');
-    if (pathname.startsWith('/customer/notifications')) return t('common:notifications');
     if (pathname.startsWith('/recommendations') || pathname.startsWith('/customer/recommendations')) return t('common:findWorkers');
     if (pathname.startsWith('/customer/chat') || pathname.startsWith('/worker/chat')) return t('common:messages');
     return t('common:dashboard');

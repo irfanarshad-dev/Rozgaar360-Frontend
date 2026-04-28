@@ -17,12 +17,12 @@ export default function AdminLayout({ children }) {
     const user = authService.getUser();
 
     if (!hasValidToken) {
-      router.replace('/login');
+      router.replace('/admin/login');
       return;
     }
 
     if (user && user.role !== 'admin') {
-      router.replace('/login');
+      router.replace('/admin/login');
     }
   }, [pathname, router]);
 

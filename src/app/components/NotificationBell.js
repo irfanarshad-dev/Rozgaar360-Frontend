@@ -116,11 +116,12 @@ export default function NotificationBell() {
     <div className="relative">
       <button
         onClick={handleBellClick}
-        className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+        className="relative p-1.5 sm:p-2 hover:bg-gray-100 rounded-full transition-colors"
+        aria-label="Notifications"
       >
-        <Bell className="w-6 h-6 text-gray-600" />
+        <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 bg-red-500 text-white text-[10px] sm:text-xs font-bold rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -132,36 +133,37 @@ export default function NotificationBell() {
             className="fixed inset-0 z-40"
             onClick={() => setShowDropdown(false)}
           />
-          <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[600px] flex flex-col">
-            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="font-bold text-gray-900">Notifications</h3>
-              <div className="flex items-center gap-2">
+          <div className="fixed sm:absolute right-2 sm:right-0 top-16 sm:top-auto sm:mt-2 w-[calc(100vw-1rem)] sm:w-96 max-w-md bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[calc(100vh-5rem)] sm:max-h-[600px] flex flex-col">
+            <div className="p-3 sm:p-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+              <h3 className="font-bold text-sm sm:text-base text-gray-900">Notifications</h3>
+              <div className="flex items-center gap-1 sm:gap-2">
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllRead}
-                    className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-[11px] sm:text-xs text-blue-600 hover:text-blue-700 font-medium px-2 py-1 rounded hover:bg-blue-50 transition-colors"
                   >
                     Mark all read
                   </button>
                 )}
                 <button
                   onClick={() => setShowDropdown(false)}
-                  className="p-1 hover:bg-gray-100 rounded-full"
+                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                  aria-label="Close notifications"
                 >
                   <X className="w-4 h-4 text-gray-500" />
                 </button>
               </div>
             </div>
 
-            <div className="overflow-y-auto flex-1">
+            <div className="overflow-y-auto flex-1 overscroll-contain">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
-                  <Bell className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                  <p className="text-sm">No notifications yet</p>
+                  <Bell className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-300" />
+                  <p className="text-xs sm:text-sm">No notifications yet</p>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100">
@@ -169,30 +171,31 @@ export default function NotificationBell() {
                     <div
                       key={notification._id}
                       onClick={() => handleNotificationClick(notification)}
-                      className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                      className={`p-3 sm:p-4 hover:bg-gray-50 cursor-pointer transition-colors active:bg-gray-100 ${
                         !notification.isRead ? 'bg-blue-50' : ''
                       }`}
                     >
-                      <div className="flex items-start gap-3">
-                        <span className="text-2xl flex-shrink-0">
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <span className="text-xl sm:text-2xl flex-shrink-0">
                           {getNotificationIcon(notification.type)}
                         </span>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <h4 className="font-semibold text-sm text-gray-900">
+                            <h4 className="font-semibold text-xs sm:text-sm text-gray-900 leading-tight">
                               {notification.title}
                             </h4>
                             <button
                               onClick={(e) => handleDelete(e, notification._id)}
-                              className="p-1 hover:bg-gray-200 rounded-full flex-shrink-0"
+                              className="p-1 hover:bg-gray-200 rounded-full flex-shrink-0 transition-colors"
+                              aria-label="Delete notification"
                             >
                               <Trash2 className="w-3 h-3 text-gray-400" />
                             </button>
                           </div>
-                          <p className="text-xs text-gray-600 mt-1">
+                          <p className="text-[11px] sm:text-xs text-gray-600 mt-1 leading-relaxed">
                             {notification.message}
                           </p>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-[10px] sm:text-xs text-gray-400 mt-1">
                             {formatTime(notification.createdAt)}
                           </p>
                         </div>

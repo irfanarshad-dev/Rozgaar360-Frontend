@@ -185,12 +185,19 @@ export default function CustomerDashboard() {
             <p className="mt-1 text-sm text-gray-500 sm:text-[15px]">Ready to hire skilled professionals today?</p>
           </div>
 
-          <Link
-            href="/customer/recommendations"
+          <button
+            type="button"
+            onClick={() => {
+              if (!authService.isAuthenticated()) {
+                router.push('/register');
+                return;
+              }
+              router.push('/customer/recommendations');
+            }}
             className="inline-flex w-full items-center justify-center rounded-lg border border-blue-600 px-4 py-2.5 text-sm font-medium text-blue-600 transition duration-200 hover:-translate-y-0.5 hover:bg-blue-600 hover:text-white md:w-auto animate-[dashboardFadeUp_0.55s_ease-out_0.05s_both]"
           >
             {t('customer:findWorkers')}
-          </Link>
+          </button>
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -273,12 +280,19 @@ export default function CustomerDashboard() {
                 <div>
                   {quickActions.map((action) => {
                     const Icon = action.icon;
+                    const isBrowseWorkers = action.key === 'browse-workers';
 
                     return (
                       <button
                         key={action.key}
                         type="button"
-                        onClick={() => router.push(action.href)}
+                        onClick={() => {
+                          if (isBrowseWorkers && !authService.isAuthenticated()) {
+                            router.push('/register');
+                            return;
+                          }
+                          router.push(action.href);
+                        }}
                         className="group flex w-full items-center justify-between gap-4 border-b border-gray-100 px-5 py-4 text-left transition duration-200 last:border-b-0 hover:bg-gray-50 sm:px-6 lg:px-7 lg:py-5"
                       >
                         <div className="flex min-w-0 items-center gap-3">
