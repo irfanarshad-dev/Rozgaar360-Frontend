@@ -57,7 +57,7 @@ export default function Register() {
 
   const captureCurrentLocation = () => {
     if (!navigator.geolocation) {
-      setLocationStatus('Location is not supported in this browser.');
+      setLocationStatus(t('locationUnsupported'));
       return;
     }
 
@@ -76,11 +76,11 @@ export default function Register() {
             : { customerLatitude: lat, customerLongitude: lng }),
         }));
 
-        setLocationStatus('Current location saved successfully.');
+        setLocationStatus(t('locationSaved'));
         setLocationLoading(false);
       },
       () => {
-        setLocationStatus('Could not access your location. Please allow location permission and try again.');
+        setLocationStatus(t('locationDenied'));
         setLocationLoading(false);
       },
       { enableHighAccuracy: true, timeout: 10000 },
@@ -100,7 +100,7 @@ export default function Register() {
       setSuccess(true);
       setTimeout(() => router.push('/login'), 2000);
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Registration failed. Please try again.';
+      const errorMessage = error.response?.data?.message || error.message || t('registrationFailed');
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -128,10 +128,10 @@ export default function Register() {
           </Link>
 
           <h1 className="text-4xl xl:text-5xl font-bold text-white mt-16 leading-tight">
-            Join the fastest<br />growing platform.
+            {t('signupHeroTitleLine1')}<br />{t('signupHeroTitleLine2')}
           </h1>
           <p className="text-blue-100/70 text-lg mt-6 max-w-md">
-            Whether you&apos;re looking to hire skilled professionals or offer your services, you&apos;re in the right place.
+            {t('signupHeroDescription')}
           </p>
         </div>
 
@@ -141,8 +141,8 @@ export default function Register() {
               <Briefcase className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-white font-semibold">More Opportunities</h3>
-              <p className="text-white/60 text-sm mt-0.5">Find work that matches your skills</p>
+              <h3 className="text-white font-semibold">{t('signupHeroFeatureOneTitle')}</h3>
+              <p className="text-white/60 text-sm mt-0.5">{t('signupHeroFeatureOneDescription')}</p>
             </div>
           </div>
           <div className="flex items-center gap-4 bg-white/5 backdrop-blur-sm border border-white/10 p-5 rounded-2xl">
@@ -150,8 +150,8 @@ export default function Register() {
               <Users className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-white font-semibold">Quality Service</h3>
-              <p className="text-white/60 text-sm mt-0.5">Hire the best in your city</p>
+              <h3 className="text-white font-semibold">{t('signupHeroFeatureTwoTitle')}</h3>
+              <p className="text-white/60 text-sm mt-0.5">{t('signupHeroFeatureTwoDescription')}</p>
             </div>
           </div>
         </div>
@@ -205,7 +205,7 @@ export default function Register() {
             {/* Step 1: Select Role */}
             {!selectedRole ? (
               <div className="space-y-6 animate-fadeInRight">
-                <p className="text-sm font-semibold text-gray-800 text-center uppercase tracking-wide">Tell us what you need</p>
+                <p className="text-sm font-semibold text-gray-800 text-center uppercase tracking-wide">{t('signupNeedsTitle')}</p>
                 <div className="grid gap-4">
                   <button 
                     onClick={() => setSelectedRole(ROLES.WORKER)}
@@ -215,8 +215,8 @@ export default function Register() {
                       <Wrench className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">I am a Worker</h3>
-                      <p className="text-sm text-gray-500 mt-1 leading-snug">I want to offer my services and get hired by customers.</p>
+                      <h3 className="font-bold text-gray-900 group-hover:text-blue-700 transition-colors">{t('signupWorkerTitle')}</h3>
+                      <p className="text-sm text-gray-500 mt-1 leading-snug">{t('signupWorkerDescription')}</p>
                     </div>
                   </button>
 
@@ -228,8 +228,8 @@ export default function Register() {
                       <UserIcon className="w-6 h-6 text-emerald-600" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">I am a Customer</h3>
-                      <p className="text-sm text-gray-500 mt-1 leading-snug">I want to hire skilled professionals for my needs.</p>
+                      <h3 className="font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">{t('signupCustomerTitle')}</h3>
+                      <p className="text-sm text-gray-500 mt-1 leading-snug">{t('signupCustomerDescription')}</p>
                     </div>
                   </button>
                 </div>
@@ -242,20 +242,20 @@ export default function Register() {
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${selectedRole === ROLES.WORKER ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600'}`}>
                       {selectedRole === ROLES.WORKER ? <Wrench className="w-4 h-4" /> : <UserIcon className="w-4 h-4" />}
                     </div>
-                    <h3 className="font-bold text-gray-900 capitalize">{selectedRole} Registration</h3>
+                    <h3 className="font-bold text-gray-900 capitalize">{selectedRole === ROLES.WORKER ? t('worker') : t('customer')} {t('registration')}</h3>
                   </div>
                   <button 
                     onClick={() => { setSelectedRole(''); setFormData({}); setError(''); }}
                     className="flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition-colors"
                   >
-                    <ArrowLeft className="w-4 h-4" /> Back
+                    <ArrowLeft className="w-4 h-4" /> {t('back')}
                   </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Name */}
                   <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Full Name</label>
+                    <label className="text-sm font-semibold text-gray-700">{t('fullName')}</label>
                     <input
                       name="name"
                       placeholder="e.g. John Doe"
@@ -269,7 +269,7 @@ export default function Register() {
                   {/* Contact Duo */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Phone</label>
+                      <label className="text-sm font-semibold text-gray-700">{t('phone')}</label>
                       <input
                         name="phone"
                         placeholder="03001234567"
@@ -280,7 +280,7 @@ export default function Register() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Email <span className="text-red-500 font-normal">*</span></label>
+                      <label className="text-sm font-semibold text-gray-700">{t('email')} <span className="text-red-500 font-normal">*</span></label>
                       <input
                         name="email"
                         type="email"
@@ -295,7 +295,7 @@ export default function Register() {
 
                   {/* Password */}
                   <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Password</label>
+                    <label className="text-sm font-semibold text-gray-700">{t('password')}</label>
                     <div className="relative">
                       <input
                         name="password"
@@ -326,7 +326,7 @@ export default function Register() {
                         <span className={`text-[11px] font-bold uppercase tracking-wider ${
                           passwordStrength === 'weak' ? 'text-red-500' : passwordStrength === 'good' ? 'text-amber-500' : 'text-emerald-500'
                         }`}>
-                          {passwordStrength}
+                          {t(passwordStrength)}
                         </span>
                       </div>
                     )}
@@ -334,7 +334,7 @@ export default function Register() {
 
                   {/* Location */}
                   <div className="space-y-1.5">
-                    <label className="text-sm font-semibold text-gray-700">City</label>
+                      <label className="text-sm font-semibold text-gray-700">{t('city')}</label>
                     <select
                       name="city"
                       value={formData.city || ''}
@@ -342,25 +342,25 @@ export default function Register() {
                       className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900 cursor-pointer"
                       required
                     >
-                      <option value="" disabled>Select your city...</option>
+                      <option value="" disabled>{t('cityPlaceholder')}</option>
                       {CITIES.map(city => <option key={city} value={city}>{city}</option>)}
                     </select>
                   </div>
 
                   <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3.5">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-blue-800">Use precise map location</p>
-                        <p className="text-xs text-blue-700/80 mt-0.5">This improves nearest-worker matching accuracy.</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="w-full">
+                        <p className="text-sm font-semibold text-blue-800">{t('usePreciseMapLocation')}</p>
+                        <p className="text-xs text-blue-700/80 mt-0.5">{t('usePreciseMapLocationDescription')}</p>
                       </div>
                       <button
                         type="button"
                         onClick={captureCurrentLocation}
                         disabled={locationLoading}
-                        className="inline-flex items-center gap-1.5 bg-white hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold px-3 py-2 rounded-lg transition-colors disabled:opacity-70"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold px-3 py-2 rounded-lg transition-colors disabled:opacity-70"
                       >
                         {locationLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
-                        {locationLoading ? 'Detecting...' : 'Use Current Location'}
+                        {locationLoading ? t('detectingLocation') : t('useCurrentLocation')}
                       </button>
                     </div>
                     {locationStatus && (
@@ -372,7 +372,7 @@ export default function Register() {
                   {selectedRole === ROLES.WORKER && (
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-gray-700">Primary Skill</label>
+                        <label className="text-sm font-semibold text-gray-700">{t('primarySkill')}</label>
                         <select
                           name="skill"
                           value={formData.skill || ''}
@@ -380,12 +380,12 @@ export default function Register() {
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900 cursor-pointer"
                           required
                         >
-                          <option value="" disabled>Select skill...</option>
+                          <option value="" disabled>{t('selectSkill')}</option>
                           {SKILLS.map(skill => <option key={skill} value={skill}>{skill}</option>)}
                         </select>
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-gray-700">Experience (Yrs)</label>
+                        <label className="text-sm font-semibold text-gray-700">{t('experience')}</label>
                         <input
                           name="experience"
                           type="number"
@@ -404,10 +404,10 @@ export default function Register() {
                   {selectedRole === ROLES.WORKER && (
                     <>
                       <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-gray-700">Work Address (Optional)</label>
+                        <label className="text-sm font-semibold text-gray-700">{t('workAddressOptional')}</label>
                         <input
                           name="workerAddress"
-                          placeholder="Street / Area"
+                          placeholder={t('streetArea')}
                           value={formData.workerAddress || ''}
                           onChange={handleInputChange}
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900"
@@ -415,7 +415,7 @@ export default function Register() {
                       </div>
 
                       <label className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 cursor-pointer">
-                        <span className="text-sm font-semibold text-gray-700">Currently Available for Jobs</span>
+                        <span className="text-sm font-semibold text-gray-700">{t('currentlyAvailableForJobs')}</span>
                         <input
                           type="checkbox"
                           checked={formData.isAvailableNow !== false}
@@ -431,10 +431,10 @@ export default function Register() {
                   {/* Customer specifics */}
                   {selectedRole === ROLES.CUSTOMER && (
                     <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Full Address</label>
+                      <label className="text-sm font-semibold text-gray-700">{t('fullAddress')}</label>
                       <input
                         name="address"
-                        placeholder="House / Street / Area"
+                        placeholder={t('houseStreetArea')}
                         value={formData.address || ''}
                         onChange={handleInputChange}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900"
@@ -445,7 +445,7 @@ export default function Register() {
 
                   <div className="pt-4">
                     <Button type="submit" fullWidth loading={loading} size="lg" className="font-bold shadow-lg">
-                      {loading ? 'Processing...' : 'Complete Registration'}
+                      {loading ? t('processing') : t('completeRegistration')}
                     </Button>
                   </div>
                 </form>
@@ -454,9 +454,9 @@ export default function Register() {
           </div>
 
           <p className="text-center mt-8 text-gray-600 font-medium">
-            Already have an account?{' '}
+            {t('alreadyHaveAccount')}{' '}
             <Link href="/login" className="text-blue-600 hover:text-blue-700 font-bold hover:underline underline-offset-2">
-              Sign In Here
+              {t('signInHere')}
             </Link>
           </p>
         </div>

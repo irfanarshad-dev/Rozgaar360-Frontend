@@ -30,14 +30,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning className="h-full">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gray-50`} suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen max-w-full overflow-x-hidden bg-gray-50`} suppressHydrationWarning>
         <SplashScreen />
         <I18nProvider>
           <LanguageInitializer />
           <AutoTranslateHardcodedText />
           <TokenExpiryChecker />
           <Navbar />
-          <main className="min-h-screen">
+          <main className="min-h-screen max-w-full overflow-x-hidden">
             {children}
           </main>
         </I18nProvider>

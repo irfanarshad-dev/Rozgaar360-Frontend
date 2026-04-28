@@ -81,6 +81,8 @@ export default function Navbar() {
   if (isDashboardRoute) return null;
 
   const dashboardHref = user?.role === 'worker' ? '/worker/dashboard' : '/customer/dashboard';
+  const loginLabel = 'Login';
+  const signUpLabel = 'Sign Up';
 
   return (
     <>
@@ -94,7 +96,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16">
 
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0" aria-label={t('common:home', { defaultValue: 'Home' })}>
+            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 leading-none" aria-label={t('common:home', { defaultValue: 'Home' })}>
               <Image
                 src="/assests/Logo/Rozgaar360-logo.png"
                 alt="Rozgaar360"
@@ -103,7 +105,7 @@ export default function Navbar() {
                 priority
                 className="h-11 w-auto object-contain"
               />
-              <span className="inline text-base sm:text-xl font-bold text-gray-900 tracking-tight">Rozgaar<span className="text-blue-600">360</span></span>
+              <span className="inline text-base sm:text-xl font-bold text-gray-900 tracking-tight leading-none">Rozgaar<span className="text-blue-600">360</span></span>
             </Link>
 
             {/* Desktop Nav Links */}
@@ -118,7 +120,7 @@ export default function Navbar() {
                     onClick={() => setActiveSection(href)}
                     onMouseEnter={() => setHoveredLink(href)}
                     onMouseLeave={() => setHoveredLink(null)}
-                    className={`px-4 py-2 rounded-xl text-[14px] font-medium transition-all duration-150 ${
+                    className={`inline-flex items-center h-10 px-4 py-2 rounded-xl text-[14px] font-medium transition-all duration-150 ${
                       shouldHighlight
                         ? 'bg-blue-50 text-blue-700'
                         : 'text-gray-600'
@@ -137,7 +139,7 @@ export default function Navbar() {
                 <button
                   onClick={() => changeLanguage(language === 'en' ? 'ur' : 'en')}
                   disabled={isChangingLanguage}
-                  className="flex items-center gap-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-xl text-sm font-medium transition-all"
+                  className="inline-flex items-center h-10 gap-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 px-3 py-2 rounded-xl text-sm font-medium transition-all"
                   title={t('common:toggleLanguage')}
                 >
                   <Globe className="w-4 h-4" />
@@ -154,14 +156,14 @@ export default function Navbar() {
                 <>
                   <Link
                     href={dashboardHref}
-                    className="flex items-center gap-1.5 text-blue-600 font-semibold hover:bg-blue-50 px-4 py-2 rounded-xl text-[14px] transition-all"
+                    className="inline-flex items-center h-10 gap-1.5 text-blue-600 font-semibold hover:bg-blue-50 px-4 py-2 rounded-xl text-[14px] transition-all"
                   >
                     <LayoutDashboard className="w-4 h-4" />
                     {t('dashboard')}
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl text-[14px] font-medium transition-all"
+                    className="inline-flex items-center h-10 gap-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl text-[14px] font-medium transition-all"
                   >
                     <LogOut className="w-4 h-4" />
                     {t('logout')}
@@ -172,16 +174,16 @@ export default function Navbar() {
                   <Link
                     href="/login"
                     id="nav-login-btn"
-                    className="text-gray-700 hover:text-blue-600 border border-gray-200 hover:border-blue-300 font-medium px-5 py-2 rounded-xl text-sm transition-all"
+                    className="inline-flex items-center h-10 text-gray-700 hover:text-blue-600 border border-gray-200 hover:border-blue-300 font-medium px-5 py-2 rounded-xl text-sm transition-all"
                   >
-                    {t('common:login')}
+                    <span suppressHydrationWarning>{loginLabel}</span>
                   </Link>
                   <Link
                     href="/register"
                     id="nav-signup-btn"
-                    className="btn-primary text-white font-semibold px-5 py-2 rounded-xl text-sm"
+                    className="inline-flex items-center h-10 btn-primary text-white font-semibold px-5 py-2 rounded-xl text-sm"
                   >
-                    {t('common:signUp')}
+                    <span suppressHydrationWarning>{signUpLabel}</span>
                   </Link>
                 </>
               )}
@@ -197,7 +199,7 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(!mobileOpen)}
                 aria-label={mobileOpen ? t('common:closeMenu') : t('common:openMenu')}
                 aria-expanded={mobileOpen}
-                className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
+                className="inline-flex items-center justify-center h-10 w-10 p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -305,14 +307,14 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className="flex justify-center items-center py-3 rounded-xl text-sm font-semibold text-gray-700 border border-gray-200 hover:bg-gray-50 transition-all"
               >
-                {t('common:login')}
+                <span suppressHydrationWarning>{loginLabel}</span>
               </Link>
               <Link
                 href="/register"
                 onClick={() => setMobileOpen(false)}
                 className="flex justify-center items-center btn-primary py-3 rounded-xl text-sm font-semibold text-white"
               >
-                {t('common:signUp')}
+                <span suppressHydrationWarning>{signUpLabel}</span>
               </Link>
             </div>
           )}

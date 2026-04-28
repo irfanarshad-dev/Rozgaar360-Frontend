@@ -107,13 +107,22 @@ const SplashScreen = () => {
           </h2>
         </div>
 
-        {/* Bottom Spacer and Spinner */}
+        {/* Bottom Spacer and Dot Loader */}
         <div className="flex-1 flex flex-col justify-end items-center pb-8">
-          {/* Mobile Spinner matching Image 2 */}
-          <svg className="animate-spin w-[50px] h-[50px] text-blue-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="3" />
-            <path d="M12 2A10 10 0 0 1 22 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-          </svg>
+          <div className="flex items-end gap-2" aria-label="Loading" role="status">
+            <span
+              className="h-2.5 w-2.5 rounded-full bg-blue-500 animate-bounce"
+              style={{ animationDuration: '0.9s', animationDelay: '0ms' }}
+            />
+            <span
+              className="h-2.5 w-2.5 rounded-full bg-blue-600 animate-bounce"
+              style={{ animationDuration: '0.9s', animationDelay: '150ms' }}
+            />
+            <span
+              className="h-2.5 w-2.5 rounded-full bg-blue-700 animate-bounce"
+              style={{ animationDuration: '0.9s', animationDelay: '300ms' }}
+            />
+          </div>
         </div>
       </div>
     </div>

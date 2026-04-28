@@ -416,58 +416,92 @@ export default function Home() {
             {/* Search bar - Hidden for workers */}
             {!isWorker && (
             <form onSubmit={handleSearch} className="animate-fadeInUp delay-300">
-              <div className="flex flex-col sm:flex-row items-stretch bg-white rounded-[24px] sm:rounded-[30px] shadow-[0_20px_50px_rgba(15,23,42,0.18)] overflow-hidden max-w-[760px] mx-auto">
-                {/* Skill input */}
-                <div className="flex items-center flex-1 px-4 sm:px-5 py-3.5 sm:py-4 gap-3 border-b sm:border-b-0 sm:border-r border-gray-100">
-                  <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <input
-                    value={query}
-                    onChange={e => setQuery(e.target.value)}
-                    type="text"
-                    placeholder={isWorker ? 'Search for jobs...' : t('home:hero.searchPlaceholder')}
-                    className="w-full outline-none text-gray-800 placeholder-gray-400 text-[15px] font-medium bg-transparent"
-                  />
+              <div className="w-full max-w-4xl mx-0 px-4 sm:px-0">
+                <div className="bg-white rounded-2xl p-1.5 flex items-center gap-1 shadow-lg shadow-blue-900/30 border border-white/20 w-full md:flex-nowrap md:overflow-visible overflow-x-auto">
+                  {/* Skill input */}
+                  <div className="flex flex-1 items-center gap-2 px-3 py-2.5 min-w-0">
+                    <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <input
+                      value={query}
+                      onChange={e => setQuery(e.target.value)}
+                      type="text"
+                      placeholder={isWorker ? 'Search for jobs...' : t('home:hero.searchPlaceholder')}
+                      className="w-full border-0 outline-none bg-transparent text-gray-800 text-sm placeholder-gray-400"
+                    />
+                  </div>
+
+                  <div className="w-px h-5 bg-gray-200 flex-shrink-0" />
+
+                  {/* City picker - Map Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!ensureRegistered()) return;
+                      setShowMap(true);
+                      requestSharedLocation();
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-500 hover:text-blue-600 transition-colors flex-shrink-0"
+                  >
+                    <MapPin className="w-[14px] h-[14px] text-blue-500" />
+                    <span className="hidden sm:inline">{t('home:hero.viewMap')}</span>
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 sm:px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all duration-200 flex-shrink-0"
+                  >
+                    <span>{t('home:hero.findButton')}</span>
+                    <ArrowRight className="w-[14px] h-[14px]" />
+                  </button>
                 </div>
 
-                {/* City picker - Map Button */}
-                <button type="button" onClick={(e) => {
-                  e.preventDefault();
-                  if (!ensureRegistered()) return;
-                  setShowMap(true);
-                  requestSharedLocation();
-                }}
-                  className="flex items-center justify-center gap-2 px-4 py-3.5 sm:py-4 text-gray-600 text-[14px] border-b sm:border-b-0 sm:border-r border-gray-100 hover:bg-gray-50 transition-colors">
-                  <MapPin className="w-4 h-4 text-blue-500" />
-                  {t('home:hero.viewMap')}
-                </button>
-
-                <button type="submit" className="btn-primary text-white font-bold px-6 sm:px-7 py-3.5 sm:py-4 text-[15px] flex items-center justify-center gap-2 rounded-b-[22px] sm:rounded-none">
-                  {isWorker ? 'Find Jobs' : t('home:hero.findButton')} <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-
               {/* Quick skill tags from SKILLS constants */}
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-3 px-1 sm:px-0 overflow-hidden">
-                {SKILLS.slice(0, 5).map(s => (
-                  <button key={s} type="button" onClick={() => { setQuery(s); handleSkillFilter(s); }}
-                    className={`border text-sm px-3.5 sm:px-4 py-2 rounded-full transition-all ${
-                      skill === s
-                        ? 'bg-white text-blue-700 border-blue-200 font-semibold shadow-sm'
-                        : 'bg-white/10 hover:bg-white/20 border-gray-100 text-white/85 hover:border-blue-100'
-                    }`}>
-                    {getSkillLabel(s)}
-                  </button>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!ensureRegistered()) return;
-                    router.push('/recommendations');
-                  }}
-                  className="bg-white/10 hover:bg-white/20 border border-gray-100 text-white/85 text-sm px-3.5 sm:px-4 py-2 rounded-full transition-all"
-                >
-                  {t('home:hero.allSkills')}
-                </button>
+                <div className="mt-3 hidden md:flex flex-nowrap gap-2 justify-start overflow-x-auto pb-1">
+                  {SKILLS.map(s => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => { setQuery(s); handleSkillFilter(s); }}
+                      className={`bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-full border border-white/20 cursor-pointer transition backdrop-blur-sm ${
+                        skill === s
+                          ? 'bg-white text-blue-600 border-white font-medium'
+                          : ''
+                      }`}
+                    >
+                      {getSkillLabel(s)}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="mt-3 flex md:hidden flex-wrap justify-center gap-2 overflow-hidden">
+                  {SKILLS.slice(0, 4).map(s => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => { setQuery(s); handleSkillFilter(s); }}
+                      className={`border text-sm px-3.5 py-2 rounded-full transition-all ${
+                        skill === s
+                          ? 'bg-white text-blue-700 border-blue-200 font-semibold shadow-sm'
+                          : 'bg-white/10 hover:bg-white/20 border-gray-100 text-white/85 hover:border-blue-100'
+                      }`}
+                    >
+                      {getSkillLabel(s)}
+                    </button>
+                  ))}
+                  {SKILLS.length > 4 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!ensureRegistered()) return;
+                        router.push('/recommendations');
+                      }}
+                      className="bg-white/10 hover:bg-white/20 border border-gray-100 text-white/85 text-sm px-3.5 py-2 rounded-full transition-all"
+                    >
+                      {`+ ${SKILLS.length - 4} more`}
+                    </button>
+                  )}
+                </div>
               </div>
             </form>
             )}
@@ -517,10 +551,10 @@ export default function Home() {
             />
           ) : (
             <div className="max-w-3xl mx-auto bg-white border border-blue-100 rounded-2xl p-6 text-center shadow-sm">
-              <p className="text-gray-700 font-semibold mb-2">Register first to use AI Worker Assistant.</p>
-              <p className="text-sm text-gray-500 mb-4">Create your account as Worker or Customer to continue.</p>
+              <p className="text-gray-700 font-semibold mb-2">{t('home:ai.accessCard.title')}</p>
+              <p className="text-sm text-gray-500 mb-4">{t('home:ai.accessCard.description')}</p>
               <Link href="/register" className="btn-primary text-white font-semibold px-6 py-2.5 rounded-xl inline-flex items-center gap-2">
-                Register Now
+                {t('home:ai.accessCard.cta')}
               </Link>
             </div>
           )}
@@ -622,7 +656,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {SKILLS.map((s) => {
               const meta = SKILL_META[s] || DEFAULT_META;
               const Icon = meta.icon;

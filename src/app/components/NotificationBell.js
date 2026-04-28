@@ -22,7 +22,10 @@ export default function NotificationBell() {
       const res = await api.get('/api/notifications/unread-count');
       setUnreadCount(res.data.count);
     } catch (err) {
-      console.error('Failed to fetch unread count:', err);
+      if (err?.response?.status !== 401) {
+        console.error('Failed to fetch unread count:', err);
+      }
+      setUnreadCount(0);
     }
   };
 
@@ -32,7 +35,10 @@ export default function NotificationBell() {
       const res = await api.get('/api/notifications');
       setNotifications(res.data);
     } catch (err) {
-      console.error('Failed to fetch notifications:', err);
+      if (err?.response?.status !== 401) {
+        console.error('Failed to fetch notifications:', err);
+      }
+      setNotifications([]);
     } finally {
       setLoading(false);
     }

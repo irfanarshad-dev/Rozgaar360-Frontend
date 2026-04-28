@@ -25,7 +25,12 @@
     "badge": "New AI Feature",
     "titlePrefix": "Can't find the right",
     "titleHighlight": "Skill?",
-    "description": "Tell our AI assistant what you need, and it will match you with the best professional for the job even if you don't know the exact category."
+    "description": "Tell our AI assistant what you need, and it will match you with the best professional for the job even if you don't know the exact category.",
+    "accessCard": {
+      "title": "Register first to use AI Worker Assistant.",
+      "description": "Create your account as a Worker or Customer to continue.",
+      "cta": "Register Now"
+    }
   },
   "aiBox": {
     "title": "AI Worker Assistant",
