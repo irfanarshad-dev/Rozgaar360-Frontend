@@ -49,9 +49,9 @@
   "paymentPending": "زیر التواء",
   "updateBookingFailed": "بکنگ اسٹیٹس اپ ڈیٹ کرنے میں ناکامی",
   "dashboard": {
-    "welcomeBack": "خوش آمدید{{name}}!",
+    "welcomeBack": "خوش آمدید، {{name}}!",
     "subtitle": "اپنا پروفائل سنبھالیں اور اپنے کام کی پیش رفت دیکھیں",
-    "verificationStatus": "تصدیق {{status}}",
+    "verificationStatus": "{{status}} کی تصدیق",
     "waitForApproval": "براہ کرم ایڈمن کی منظوری کا انتظار کریں۔",
     "submitCnicBelow": "براہ کرم نیچے اپنا CNIC جمع کروائیں۔",
     "stats": {

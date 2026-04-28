@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { MapPin, Star } from 'lucide-react';
@@ -24,9 +25,11 @@ export default function WorkerCard({ worker, animationDelay = 0 }) {
       style={{ animationDelay: `${animationDelay}ms` }}
     >
       <div className="flex items-start gap-3">
-        <img
+        <Image
           src={worker.profilePicture || '/default-avatar.png'}
           alt={worker.name}
+          width={36}
+          height={36}
           className="h-9 w-9 rounded-full bg-gray-100 object-cover"
         />
 

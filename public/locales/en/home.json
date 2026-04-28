@@ -20,6 +20,7 @@
     "allSkills": "All Skills →",
     "badge": "Pakistan's #1 Skilled Workers Platform"
   },
+  "moreSkills": "+ more",
   "ai": {
     "badge": "New AI Feature",
     "titlePrefix": "Can't find the right",
@@ -150,11 +151,38 @@
     "showingWorkers": "Showing workers ↓",
     "browseWorkers": "Browse workers"
   },
+  "popularServices": {
+    "plumber": {
+      "title": "Plumbing",
+      "description": "Leaks, fittings, installations"
+    },
+    "electrician": {
+      "title": "Electrical",
+      "description": "Wiring, switches, fixtures"
+    },
+    "carpenter": {
+      "title": "Carpentry",
+      "description": "Furniture, repairs, fittings"
+    },
+    "painter": {
+      "title": "Painting",
+      "description": "Interior and exterior jobs"
+    },
+    "chef": {
+      "title": "Cooking",
+      "description": "Home-cooked meals on demand"
+    },
+    "driver": {
+      "title": "Driver",
+      "description": "Daily, delivery, or travel"
+    }
+  },
   "howItWorks": {
     "badge": "The Process",
     "titlePrefix": "How It",
     "titleHighlight": "Works",
     "subtitle": "Three simple steps to get any job done professionally.",
+    "stepLabel": "Step",
     "step1": {
       "title": "Search",
       "description": "Browse real verified professionals filtered by skill and city."

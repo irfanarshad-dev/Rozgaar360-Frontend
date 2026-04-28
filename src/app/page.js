@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -23,7 +23,7 @@ import AIJobRecommendationBox from './components/AIJobRecommendationBox';
 import JobCard from './components/JobCard';
 import { jobsService } from '@/lib/jobs';
 
-// ─── Skill → icon + color map ─────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇ Skill ΓåÆ icon + color map ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 const SKILL_META = {
   Plumber:      { icon: Wrench,     color: 'from-blue-500 to-blue-600',     bg: 'bg-blue-50'     },
   Electrician:  { icon: Zap,        color: 'from-yellow-500 to-orange-500', bg: 'bg-yellow-50'   },
@@ -69,7 +69,7 @@ const HOW_IT_WORKS = [
   { num: '03', icon: Handshake,    titleKey: 'home:howItWorks.step3.title', descKey: 'home:howItWorks.step3.description', color: 'text-emerald-500', ring: 'ring-emerald-100', bg: 'bg-emerald-50' },
 ];
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇ Sub-components ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 
 function Stars({ rating = 0 }) {
   const full = Math.floor(rating);
@@ -148,7 +148,7 @@ function WorkerCard({ worker, t, getSkillLabel, onViewProfile }) {
       </div>
 
       <h3 className="mt-3 text-base font-medium text-gray-900 truncate text-center">{worker.name}</h3>
-      <p className="text-sm text-gray-400 text-center">{translatedSkill} • {worker.city}</p>
+      <p className="text-sm text-gray-400 text-center">{translatedSkill} ΓÇó {worker.city}</p>
 
       <div className="mt-2 flex items-center justify-center gap-1.5">
         <Stars rating={worker.rating} />
@@ -179,7 +179,7 @@ function WorkerCard({ worker, t, getSkillLabel, onViewProfile }) {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
+// ΓöÇΓöÇΓöÇ Main Page ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 export default function Home() {
   const { t } = useTranslation(['home', 'common']);
   const { language, changeLanguage } = useLanguage();
@@ -256,7 +256,7 @@ export default function Home() {
     });
   }, [sharedLocation]);
 
-  // ── Fetch top-rated workers on mount ──────────────────────────────────────
+  // ΓöÇΓöÇ Fetch top-rated workers on mount ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   const loadFeatured = useCallback(async () => {
     setWorkersLoading(true);
     setWorkersError(false);
@@ -312,7 +312,7 @@ export default function Home() {
     loadWorkerStats();
   }, [loadJobs, loadWorkerStats]);
 
-  // ── Handle search ──────────────────────────────────────────────────────────
+  // ΓöÇΓöÇ Handle search ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
   const handleSearch = async (e) => {
     e?.preventDefault();
     if (!ensureRegistered()) return;
@@ -350,7 +350,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
 
-      {/* ──── LOGGED-IN BANNER ──── */}
+      {/* ΓöÇΓöÇΓöÇΓöÇ LOGGED-IN BANNER ΓöÇΓöÇΓöÇΓöÇ */}
       {user && hasRegisteredRole && (
         <div className={`text-white text-center py-2.5 px-4 text-sm font-medium ${
           isWorker ? 'bg-emerald-600' : 'bg-blue-600'
@@ -372,7 +372,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* ──────────── HERO ──────────── */}
+      {/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ HERO ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       <section className="hero-gradient relative min-h-[82vh] md:min-h-[88vh] flex items-center overflow-hidden">
         {/* Blobs */}
         <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full opacity-20 animate-blob"
@@ -383,14 +383,14 @@ export default function Home() {
         <div className="absolute inset-0 opacity-[0.04]"
              style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)', backgroundSize: '60px 60px' }} />
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-18 md:py-20">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16 md:py-20">
           <div className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white/90 rounded-full px-4 py-1.5 text-sm font-medium mb-6 animate-fadeInUp">
               <Sparkles className="w-4 h-4 text-cyan-400" />
               {t('home:hero.badge')}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-[52px] font-black text-white leading-tight md:leading-[1.05] tracking-tight mb-6 animate-fadeInUp delay-100 max-w-lg mx-auto sm:mx-0">
+            <h1 className="text-3xl sm:text-4xl md:text-[52px] font-black text-white leading-tight md:leading-[1.05] tracking-tight mb-5 sm:mb-6 animate-fadeInUp delay-100 max-w-[16ch] sm:max-w-[18ch] mx-auto sm:mx-0">
               {isWorker ? (
                 <>
                   {t('home:worker.hero.line1')}<br />
@@ -406,7 +406,7 @@ export default function Home() {
               )}
             </h1>
 
-            <p className="text-white/80 text-base sm:text-lg leading-relaxed max-w-md mx-auto sm:mx-0 mb-10 animate-fadeInUp delay-200">
+            <p className="text-white/80 text-[15px] sm:text-lg leading-relaxed max-w-lg mx-auto sm:mx-0 mb-8 sm:mb-10 animate-fadeInUp delay-200">
               {isWorker 
                 ? t('home:worker.hero.description')
                 : t('home:hero.description')
@@ -416,9 +416,9 @@ export default function Home() {
             {/* Search bar - Hidden for workers */}
             {!isWorker && (
             <form onSubmit={handleSearch} className="animate-fadeInUp delay-300">
-              <div className="flex flex-col sm:flex-row items-stretch bg-white rounded-[30px] shadow-[0_28px_80px_rgba(15,23,42,0.18)] overflow-hidden max-w-[760px] mx-auto">
+              <div className="flex flex-col sm:flex-row items-stretch bg-white rounded-[24px] sm:rounded-[30px] shadow-[0_20px_50px_rgba(15,23,42,0.18)] overflow-hidden max-w-[760px] mx-auto">
                 {/* Skill input */}
-                <div className="flex items-center flex-1 px-5 py-4 gap-3 border-b sm:border-b-0 sm:border-r border-gray-100">
+                <div className="flex items-center flex-1 px-4 sm:px-5 py-3.5 sm:py-4 gap-3 border-b sm:border-b-0 sm:border-r border-gray-100">
                   <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
                   <input
                     value={query}
@@ -436,21 +436,21 @@ export default function Home() {
                   setShowMap(true);
                   requestSharedLocation();
                 }}
-                  className="flex items-center justify-center gap-2 px-4 py-4 text-gray-600 text-[14px] border-b sm:border-b-0 sm:border-r border-gray-100 hover:bg-gray-50 transition-colors">
+                  className="flex items-center justify-center gap-2 px-4 py-3.5 sm:py-4 text-gray-600 text-[14px] border-b sm:border-b-0 sm:border-r border-gray-100 hover:bg-gray-50 transition-colors">
                   <MapPin className="w-4 h-4 text-blue-500" />
                   {t('home:hero.viewMap')}
                 </button>
 
-                <button type="submit" className="btn-primary text-white font-bold px-6 sm:px-7 py-4 text-[15px] flex items-center justify-center gap-2 rounded-b-xl sm:rounded-none">
+                <button type="submit" className="btn-primary text-white font-bold px-6 sm:px-7 py-3.5 sm:py-4 text-[15px] flex items-center justify-center gap-2 rounded-b-[22px] sm:rounded-none">
                   {isWorker ? 'Find Jobs' : t('home:hero.findButton')} <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Quick skill tags from SKILLS constants */}
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-2 px-2 sm:px-0 overflow-hidden">
+              <div className="flex flex-wrap justify-center sm:justify-start gap-2 mt-3 px-1 sm:px-0 overflow-hidden">
                 {SKILLS.slice(0, 5).map(s => (
                   <button key={s} type="button" onClick={() => { setQuery(s); handleSkillFilter(s); }}
-                    className={`border text-sm px-4 py-2 rounded-full transition-all ${
+                    className={`border text-sm px-3.5 sm:px-4 py-2 rounded-full transition-all ${
                       skill === s
                         ? 'bg-white text-blue-700 border-blue-200 font-semibold shadow-sm'
                         : 'bg-white/10 hover:bg-white/20 border-gray-100 text-white/85 hover:border-blue-100'
@@ -464,7 +464,7 @@ export default function Home() {
                     if (!ensureRegistered()) return;
                     router.push('/recommendations');
                   }}
-                  className="bg-white/10 hover:bg-white/20 border border-gray-100 text-white/85 text-sm px-4 py-2 rounded-full transition-all"
+                  className="bg-white/10 hover:bg-white/20 border border-gray-100 text-white/85 text-sm px-3.5 sm:px-4 py-2 rounded-full transition-all"
                 >
                   {t('home:hero.allSkills')}
                 </button>
@@ -474,11 +474,11 @@ export default function Home() {
 
             {/* Worker Quick Actions */}
             {isWorker && (
-              <div className="flex flex-col sm:flex-row gap-4 animate-fadeInUp delay-300 w-full sm:w-auto">
-                <Link href="/worker/dashboard" className="btn-primary text-white font-bold px-8 py-4 rounded-xl text-[15px] flex items-center justify-center gap-2 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fadeInUp delay-300 w-full sm:w-auto">
+                <Link href="/worker/dashboard" className="btn-primary text-white font-bold px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl text-[15px] flex items-center justify-center gap-2 w-full sm:w-auto">
                   <Briefcase className="w-5 h-5" /> {t('home:worker.hero.dashboardButton')}
                 </Link>
-                <Link href="/worker/bookings" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-8 py-4 rounded-xl text-[15px] flex items-center justify-center gap-2 transition-all w-full sm:w-auto">
+                <Link href="/worker/bookings" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl text-[15px] flex items-center justify-center gap-2 transition-all w-full sm:w-auto">
                   <CalendarDays className="w-5 h-5" /> {t('home:worker.hero.bookingsButton')}
                 </Link>
               </div>
@@ -494,18 +494,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────── AI ASSISTANT (Customer Only) ──────────── */}
+      {/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ AI ASSISTANT (Customer Only) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       {!isWorker && (
-      <section className="py-20 bg-slate-50/50 relative">
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <div className="text-center mb-12">
+      <section className="py-16 sm:py-20 bg-slate-50/50 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+          <div className="text-center mb-10 sm:mb-12">
             <span className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
               <Sparkles className="w-3 h-3" /> {t('home:ai.badge')}
             </span>
-            <h2 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
               {t('home:ai.titlePrefix')} <span className="text-blue-600">{t('home:ai.titleHighlight')}</span>
             </h2>
-            <p className="text-gray-500 mt-4 text-[17px] max-w-2xl mx-auto">
+            <p className="text-gray-500 mt-4 text-[15px] sm:text-[17px] max-w-2xl mx-auto leading-relaxed">
               {t('home:ai.description')}
             </p>
           </div>
@@ -528,18 +528,18 @@ export default function Home() {
       </section>
       )}
 
-      {/* ──────────── AI JOB FINDER (Worker Only) ──────────── */}
+      {/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ AI JOB FINDER (Worker Only) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       {isWorker && (
       <section className="py-16 sm:py-20 bg-slate-50/50 relative">
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="text-center mb-8 sm:mb-12">
             <span className="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
               <Sparkles className="w-3 h-3" /> {t('home:worker.ai.badge')}
             </span>
-            <h2 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
               {t('home:worker.ai.titlePrefix')} <span className="text-emerald-600">{t('home:worker.ai.titleHighlight')}</span> {t('home:worker.ai.titleSuffix')}
             </h2>
-            <p className="text-gray-500 mt-4 text-[17px] max-w-2xl mx-auto">
+            <p className="text-gray-500 mt-4 text-[15px] sm:text-[17px] max-w-2xl mx-auto leading-relaxed">
               {t('home:worker.ai.description')}
             </p>
           </div>
@@ -552,7 +552,7 @@ export default function Home() {
       </section>
       )}
 
-      {/* ──────────── MAP MODAL ──────────── */}
+      {/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ MAP MODAL ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       {showMap && (
         <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4">
           <div className="bg-white rounded-xl sm:rounded-2xl w-full max-w-7xl h-[90vh] sm:h-[85vh] flex flex-col shadow-2xl">
@@ -579,32 +579,32 @@ export default function Home() {
         </div>
       )}
 
-      {/* ──────────── SERVICES (Customer) / STATS (Worker) ──────────── */}
-      <section id="services" className="py-20 sm:py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
+      {/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ SERVICES (Customer) / STATS (Worker) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
+      <section id="services" className="py-16 sm:py-20 md:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           {isWorker ? (
             <>
               <div className="text-center mb-10 sm:mb-12">
                 <span className="text-emerald-600 font-semibold text-sm tracking-widest uppercase mb-2 block">{t('home:worker.performance.badge')}</span>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
                   {t('home:worker.performance.titlePrefix')} <span className="gradient-text">{t('home:worker.performance.titleHighlight')}</span>
                 </h2>
-                <p className="text-gray-500 text-[16px] max-w-xl mx-auto">
+                <p className="text-gray-500 text-[15px] sm:text-[16px] max-w-xl mx-auto leading-relaxed">
                   {t('home:worker.performance.description')}
                 </p>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
                 {[
                   { icon: Briefcase, label: 'Total Jobs', value: workerStats?.totalJobs || '0', bgColor: 'bg-blue-100', textColor: 'text-blue-600' },
                   { icon: Clock, label: 'Pending', value: workerStats?.pendingJobs || '0', bgColor: 'bg-amber-100', textColor: 'text-amber-600' },
                   { icon: CheckCircle2, label: 'Completed', value: workerStats?.completedJobs || '0', bgColor: 'bg-emerald-100', textColor: 'text-emerald-600' },
                   { icon: Star, label: 'Rating', value: workerStats?.rating?.toFixed(1) || '0.0', bgColor: 'bg-purple-100', textColor: 'text-purple-600' },
                 ].map(({ icon: Icon, label, value, bgColor, textColor }) => (
-                  <div key={label} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                    <div className={`w-12 h-12 rounded-xl ${bgColor} flex items-center justify-center mb-4`}>
+                  <div key={label} className="bg-white border border-gray-100 rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl ${bgColor} flex items-center justify-center mb-4`}>
                       <Icon className={`w-6 h-6 ${textColor}`} />
                     </div>
-                    <p className="text-3xl font-black text-gray-900 mb-1">{value}</p>
+                    <p className="text-2xl sm:text-3xl font-black text-gray-900 mb-1">{value}</p>
                     <p className="text-sm text-gray-500 font-medium">{t(`home:worker.performance.stats.${label === 'Total Jobs' ? 'totalJobs' : label === 'Pending' ? 'pending' : label === 'Completed' ? 'completed' : 'rating'}`)}</p>
                   </div>
                 ))}
@@ -614,15 +614,15 @@ export default function Home() {
             <>
           <div className="text-center mb-10 sm:mb-12">
             <span className="text-blue-600 font-semibold text-sm tracking-widest uppercase mb-2 block">{t('home:services.badge')}</span>
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
               {t('home:services.titlePrefix')} <span className="gradient-text">{t('home:services.titleHighlight')}</span>
             </h2>
-            <p className="text-gray-500 text-[16px] max-w-xl mx-auto">
+            <p className="text-gray-500 text-[15px] sm:text-[16px] max-w-xl mx-auto leading-relaxed">
               {t('home:services.description')}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             {SKILLS.map((s) => {
               const meta = SKILL_META[s] || DEFAULT_META;
               const Icon = meta.icon;
@@ -635,13 +635,13 @@ export default function Home() {
                     if (active) { setSkill(''); setSearchWorkers([]); }
                     else handleSkillFilter(s);
                   }}
-                  className={`service-card-hover group rounded-2xl p-6 cursor-pointer border text-left relative overflow-hidden transition-all ${
+                  className={`service-card-hover group rounded-2xl p-5 sm:p-6 cursor-pointer border text-left relative overflow-hidden transition-all ${
                     active
                       ? 'border-blue-400 bg-blue-50 shadow-lg'
                       : `${meta.bg} border-gray-100/80 bg-opacity-80`
                   }`}
                 >
-                  <div className={`w-14 h-14 rounded-2xl mb-4 shadow-md overflow-hidden group-hover:scale-110 transition-transform duration-300 ${avatarSrc ? 'bg-white ring-1 ring-gray-200' : `bg-gradient-to-br ${meta.color} flex items-center justify-center`}`}>
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl mb-4 shadow-md overflow-hidden group-hover:scale-110 transition-transform duration-300 ${avatarSrc ? 'bg-white ring-1 ring-gray-200' : `bg-gradient-to-br ${meta.color} flex items-center justify-center`}`}>
                     {avatarSrc ? (
                       <Image
                         src={avatarSrc}
@@ -656,10 +656,10 @@ export default function Home() {
                   </div>
                   <div className="flex items-center gap-2 mb-1">
                     <Icon className="w-4 h-4 text-gray-700" strokeWidth={2} />
-                    <h3 className="font-bold text-gray-900 text-[15px]">{getSkillLabel(s)}</h3>
+                    <h3 className="font-bold text-gray-900 text-[14px] sm:text-[15px]">{getSkillLabel(s)}</h3>
                   </div>
                   <div className="flex items-center justify-between">
-                    <p className="text-gray-400 text-[12px]">{active ? t('home:services.showingWorkers') : t('home:services.browseWorkers')}</p>
+                    <p className="text-gray-400 text-[12px] leading-tight">{active ? t('home:services.showingWorkers') : t('home:services.browseWorkers')}</p>
                     <ChevronRight className={`w-4 h-4 transition-all ${active ? 'text-blue-500 rotate-90' : 'text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1'}`} />
                   </div>
                 </button>
@@ -671,16 +671,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────── TOP WORKERS (Customer) / AVAILABLE JOBS (Worker) ──────────── */}
+      {/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ TOP WORKERS (Customer) / AVAILABLE JOBS (Worker) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       {!isWorker ? (
       <section className="pb-20 sm:pb-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
             <div>
-              <h2 className="text-2xl font-medium text-gray-900">
+              <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 tracking-tight">
                 {skill ? t('home:featured.filteredTitle', { skill: getSkillLabel(skill) }) : t('home:featured.title')}
               </h2>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm sm:text-[15px] text-gray-400 mt-1 leading-relaxed">
                 {skill
                   ? t('home:featured.filteredSubtitle', { skill: getSkillLabel(skill), city: city || t('home:featured.allCities') })
                   : t('home:featured.subtitle')}
@@ -695,7 +695,7 @@ export default function Home() {
                 }}
                 className="text-sm text-blue-600 hover:underline"
               >
-                {t('home:featured.seeAllWorkers')} →
+                {t('home:featured.seeAllWorkers')} ΓåÆ
               </button>
             )}
             {skill && (
@@ -739,7 +739,7 @@ export default function Home() {
           )}
 
           {!displayLoading && displayWorkers.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
               {displayWorkers.map(w => (
                 <WorkerCard
                   key={w.id}
@@ -757,19 +757,19 @@ export default function Home() {
       <>
         {!jobsLoading && !jobsError && jobs.length > 0 && (
         <section className="pb-20 sm:pb-24 bg-white">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-8 sm:mb-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">
               <div>
-                <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
                   {t('home:worker.bookings.titlePrefix')} <span className="gradient-text">{t('home:worker.bookings.titleHighlight')}</span>
                 </h2>
-                <p className="text-gray-500 mt-1 text-[15px]">
+                <p className="text-gray-500 mt-1 text-[14px] sm:text-[15px] leading-relaxed">
                   {t('home:worker.bookings.subtitle')}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
               {jobs.map(job => (
                 <JobCard 
                   key={job._id} 
@@ -816,20 +816,20 @@ export default function Home() {
         </div>
       )}
 
-      {/* ──────────── HOW IT WORKS (Customer) / TIPS (Worker) ──────────── */}
+      {/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ HOW IT WORKS (Customer) / TIPS (Worker) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       <section id="how-it-works" className="py-24 bg-gradient-to-b from-slate-50 to-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-72 h-72 bg-blue-50 rounded-full -translate-y-1/2 translate-x-1/2 opacity-60" />
-        <div className="max-w-6xl mx-auto px-4 relative z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
           {isWorker ? (
             <>
-              <div className="text-center mb-16">
+              <div className="text-center mb-12 sm:mb-16">
                 <span className="text-emerald-600 font-semibold text-sm tracking-widest uppercase mb-2 block">SUCCESS TIPS</span>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
                   Maximize Your <span className="gradient-text">Earnings</span>
                 </h2>
-                <p className="text-gray-500 text-[16px] max-w-xl mx-auto">Follow these tips to get more bookings</p>
+                <p className="text-gray-500 text-[15px] sm:text-[16px] max-w-xl mx-auto leading-relaxed">Follow these tips to get more bookings</p>
               </div>
-              <div className="grid md:grid-cols-3 gap-10 relative">
+              <div className="grid md:grid-cols-3 gap-8 sm:gap-10 relative">
                 <div className="hidden md:block absolute top-[40px] left-[calc(16.66%+28px)] right-[calc(16.66%+28px)] h-0.5 bg-gradient-to-r from-emerald-200 via-blue-200 to-purple-200" />
                 {[
                   { icon: Shield, title: 'Complete Verification', desc: 'Upload CNIC to gain customer trust', color: 'text-emerald-500', bg: 'bg-emerald-50' },
@@ -848,23 +848,23 @@ export default function Home() {
             </>
           ) : (
             <>
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 sm:mb-16">
             <span className="text-blue-600 font-semibold text-sm tracking-widest uppercase mb-2 block">{t('home:howItWorks.badge')}</span>
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
               {t('home:howItWorks.titlePrefix')} <span className="gradient-text">{t('home:howItWorks.titleHighlight')}</span>
             </h2>
-            <p className="text-gray-500 text-[16px] max-w-xl mx-auto">{t('home:howItWorks.subtitle')}</p>
+            <p className="text-gray-500 text-[15px] sm:text-[16px] max-w-xl mx-auto leading-relaxed">{t('home:howItWorks.subtitle')}</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-10 relative">
+          <div className="grid md:grid-cols-3 gap-8 sm:gap-10 relative">
             {/* Desktop Connector Line */}
             <div className="hidden md:block absolute top-[40px] left-[calc(16.66%+28px)] right-[calc(16.66%+28px)] h-0.5 bg-gradient-to-r from-blue-200 via-violet-200 to-emerald-200" />
             {/* Mobile Connector Line */}
             <div className="md:hidden absolute top-10 bottom-10 left-[40px] w-0.5 bg-gradient-to-b from-blue-200 via-violet-200 to-emerald-200" />
             
             {HOW_IT_WORKS.map(({ num, icon: Icon, titleKey, descKey, color, ring, bg }) => (
-              <div key={num} className="flex flex-row md:flex-col items-start md:items-center text-left md:text-center animate-fadeInUp gap-5 md:gap-0 relative z-10 pl-4 md:pl-0">
-                <div className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 ${bg} ${ring} ring-4 md:ring-8 rounded-full flex items-center justify-center md:mb-6`}>
+              <div key={num} className="flex flex-row md:flex-col items-start md:items-center text-left md:text-center animate-fadeInUp gap-4 sm:gap-5 md:gap-0 relative z-10 pl-4 md:pl-0">
+                <div className={`relative flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 ${bg} ${ring} ring-4 md:ring-8 rounded-full flex items-center justify-center md:mb-6`}>
                   <Icon className={`w-7 h-7 md:w-9 md:h-9 ${color}`} strokeWidth={1.75} />
                   <span className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-white border border-gray-100 text-gray-400 text-[10px] md:text-xs font-black w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center shadow-sm">
                     {num}
@@ -892,19 +892,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────── WHY CHOOSE US (Customer Only) ──────────── */}
+      {/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ WHY CHOOSE US (Customer Only) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       {!isWorker && (
-      <section id="about" className="py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+      <section id="about" className="py-20 sm:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-10 lg:gap-16 items-start lg:items-center">
           <div className="animate-fadeInLeft">
             <span className="text-blue-600 font-semibold text-sm tracking-widest uppercase mb-2 block">{t('home:about.badge')}</span>
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-5 sm:mb-6">
               {t('home:about.titlePrefix')} <span className="gradient-text">{t('home:about.titleHighlight')}</span>
             </h2>
-            <p className="text-gray-500 text-[16px] leading-relaxed mb-8">
+            <p className="text-gray-500 text-[15px] sm:text-[16px] leading-relaxed mb-6 sm:mb-8">
               {t('home:about.description')}
             </p>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {[
                 { icon: Shield,       title: t('home:about.features.cnic.title'),       desc: t('home:about.features.cnic.description') },
                 { icon: Star,         title: t('home:about.features.reviews.title'),    desc: t('home:about.features.reviews.description') },
@@ -924,15 +924,15 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right panel — Ad video (same size as stats panel) */}
+          {/* Right panel ΓÇö Ad video (same size as stats panel) */}
           <div className="animate-fadeInRight">
-            <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-[32px] p-8 shadow-[0_32px_80px_rgba(0,0,0,0.25)] overflow-hidden relative">
+            <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-[28px] sm:rounded-[32px] p-5 sm:p-8 shadow-[0_32px_80px_rgba(0,0,0,0.25)] overflow-hidden relative">
               <div className="absolute -top-20 -right-20 w-60 h-60 bg-blue-500 opacity-20 rounded-full blur-3xl" />
               <span className="inline-flex items-center gap-1.5 bg-blue-100/10 text-blue-100 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
                 <Play className="w-3 h-3" /> {t('home:ad.badge')}
               </span>
-              <h2 className="text-white text-lg font-black mt-3">{t('home:ad.title')}</h2>
-              <p className="text-white/60 text-xs mt-1">{t('home:ad.subtitle')}</p>
+              <h2 className="text-white text-base sm:text-lg font-black mt-3 leading-tight">{t('home:ad.title')}</h2>
+              <p className="text-white/60 text-xs sm:text-sm mt-1 leading-relaxed">{t('home:ad.subtitle')}</p>
 
               <div className="mt-5 relative rounded-2xl overflow-hidden border border-white/10 bg-white/5">
                 <video
@@ -959,36 +959,36 @@ export default function Home() {
       </section>
       )}
 
-      {/* ──────────── CTA (Role-based) ──────────── */}
-      <section className="py-28 relative overflow-hidden">
+      {/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ CTA (Role-based) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
+      <section className="py-20 sm:py-24 md:py-28 relative overflow-hidden">
         <div className="hero-gradient absolute inset-0" />
         <div className="absolute inset-0 opacity-[0.05]"
              style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)', backgroundSize: '60px 60px' }} />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white/80 rounded-full px-4 py-1.5 text-sm mb-6">
             <Sparkles className="w-4 h-4 text-yellow-300" />
             {isWorker ? 'GROW YOUR BUSINESS' : t('home:cta.badge')}
           </div>
-          <h2 className="text-4xl md:text-6xl font-black text-white tracking-tight mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-white tracking-tight mb-5 sm:mb-6">
             {isWorker ? (
               <>Start Getting <span className="gradient-text">More Bookings</span></>
             ) : (
               <>{t('home:cta.titleLine1')}<br /><span className="gradient-text">{t('home:cta.titleLine2')}</span></>
             )}
           </h2>
-          <p className="text-white/70 text-lg mb-10 max-w-2xl mx-auto">
+          <p className="text-white/70 text-[15px] sm:text-lg mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
             {isWorker 
               ? 'Complete your profile, stay available, and deliver quality service to grow your reputation.'
               : t('home:cta.description')
             }
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             {isWorker ? (
               <>
-                <Link href="/recommendations" className="btn-primary text-white font-bold px-10 py-4 rounded-full text-[16px] inline-flex items-center gap-2">
+                <Link href="/recommendations" className="btn-primary text-white font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[16px] inline-flex items-center gap-2 justify-center">
                   {t('home:cta.findWorkerNow')} <ArrowRight className="w-5 h-5" />
                 </Link>
-                <Link href="/worker/bookings" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-10 py-4 rounded-full text-[16px] transition-all">
+                <Link href="/worker/bookings" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[16px] transition-all">
                   <CalendarDays className="w-5 h-5" /> View Bookings
                 </Link>
               </>
@@ -1000,11 +1000,11 @@ export default function Home() {
                     if (!ensureRegistered()) return;
                     router.push('/recommendations');
                   }}
-                  className="btn-primary text-white font-bold px-10 py-4 rounded-full text-[16px] inline-flex items-center gap-2"
+                  className="btn-primary text-white font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[16px] inline-flex items-center gap-2 justify-center"
                 >
                   {t('home:cta.findWorkerNow')} <ArrowRight className="w-5 h-5" />
                 </button>
-                <Link href="/register" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-10 py-4 rounded-full text-[16px] transition-all">
+                <Link href="/register" className="bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-[16px] transition-all text-center">
                   {t('home:cta.registerWorker')}
                 </Link>
               </>
@@ -1013,7 +1013,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ──────────── FOOTER ──────────── */}
+      {/* ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ FOOTER ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ */}
       <footer className="bg-[#0b1120] text-white pt-10 lg:pt-16 pb-6 lg:pb-8">
         <div className="lg:hidden max-w-7xl mx-auto px-4 space-y-4 mb-8">
           <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-[#111a2f] to-[#0e1527] p-4">
@@ -1044,7 +1044,7 @@ export default function Home() {
               <span className="font-bold text-[14px] text-white/90">{t('home:footer.ourSkills')}</span>
               <ChevronDown className="w-4 h-4 text-blue-400 transition-transform group-open:rotate-180" />
             </summary>
-            <ul className="mt-3 grid grid-cols-2 gap-2 text-gray-300 text-[13px]">
+            <ul className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-gray-300 text-[13px]">
               {SKILLS.map(s => (
                 <li key={s}>
                   <Link href={`/recommendations?skill=${encodeURIComponent(s)}`}
@@ -1164,7 +1164,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 border-t border-white/8 pt-5 lg:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 lg:gap-4 text-gray-500 text-[12px] lg:text-[13px]">
+        <div className="max-w-7xl mx-auto px-4 border-t border-white/8 pt-5 lg:pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 lg:gap-4 text-gray-500 text-[12px] lg:text-[13px] text-center sm:text-left">
           <p>{t('home:footer.copyright', { year: new Date().getFullYear() })}</p>
           <p className="flex items-center gap-1">{t('home:footer.madeWith')} <span className="text-red-400">♥</span> {t('home:footer.inPakistan')}</p>
         </div>

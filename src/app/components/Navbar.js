@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
@@ -84,7 +84,7 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ── Main Navbar ── */}
+      {/* ΓöÇΓöÇ Main Navbar ΓöÇΓöÇ */}
       <nav className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
           ? 'glass-nav border-b border-gray-100/80 shadow-sm'
@@ -141,7 +141,7 @@ export default function Navbar() {
                   title={t('common:toggleLanguage')}
                 >
                   <Globe className="w-4 h-4" />
-                  {language === 'en' ? 'اردو' : 'EN'}
+                  {language === 'en' ? t('common:switchToUrdu') : t('common:switchToEnglish')}
                 </button>
               )}
 
@@ -206,7 +206,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* ── Mobile Menu Backdrop ── */}
+      {/* ΓöÇΓöÇ Mobile Menu Backdrop ΓöÇΓöÇ */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm md:hidden"
@@ -215,7 +215,7 @@ export default function Navbar() {
         />
       )}
 
-      {/* ── Mobile Drawer ── */}
+      {/* ΓöÇΓöÇ Mobile Drawer ΓöÇΓöÇ */}
       <div
         ref={menuRef}
         className={`fixed top-0 right-0 bottom-0 z-50 w-[85vw] max-w-xs bg-white shadow-2xl flex flex-col md:hidden transition-transform duration-300 ${
