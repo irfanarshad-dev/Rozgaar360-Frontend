@@ -14,11 +14,10 @@ export const jobsService = {
   },
 
   // Get all available bookings (pending status) - these are job opportunities
-  async getAvailableJobs(params = {}) {
+  async getAvailableJobs(skill = null) {
     try {
-      const response = await api.get('/api/bookings/my-bookings', { 
-        params: { status: 'pending', ...params } 
-      });
+      const params = skill ? { skill } : {};
+      const response = await api.get('/api/bookings/available-jobs', { params });
       return response.data;
     } catch (error) {
       console.error('Failed to fetch available jobs:', error);

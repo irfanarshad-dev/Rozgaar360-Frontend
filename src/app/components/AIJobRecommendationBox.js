@@ -50,18 +50,12 @@ export default function AIJobRecommendationBox({ workerSkills = [], workerLocati
     setError(null);
 
     try {
-      const [profileResponse, pendingBookingsResponse] = await Promise.all([
+      const [profileResponse, availableJobsResponse] = await Promise.all([
         authService.getProfile(),
-        jobsService.getWorkerJobs('pending'),
+        jobsService.getAvailableJobs(),
       ]);
 
-      // Pending jobs are preferred, but if there are none we still rank all jobs
-      // so workers are not blocked by an empty pending queue.
-      let bookings = Array.isArray(pendingBookingsResponse) ? pendingBookingsResponse : [];
-      if (bookings.length === 0) {
-        const allBookingsResponse = await jobsService.getWorkerJobs();
-        bookings = Array.isArray(allBookingsResponse) ? allBookingsResponse : [];
-      }
+      let bookings = Array.isArray(availableJobsResponse) ? availableJobsResponse : [];
 
       const workerProfile = {
         skills: Array.isArray(workerSkills) && workerSkills.length > 0
