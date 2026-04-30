@@ -2,8 +2,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import ChatWindow from '../components/ChatWindow';
-import ConversationsList from '../components/ConversationsList';
+import ChatWindow from './ChatWindow';
+import ConversationsList from './ConversationsList';
 import { chatAPI } from '@/lib/chatAPI';
 import { ChatProvider } from '@/lib/useChat';
 import { authService } from '@/lib/auth';
@@ -148,42 +148,42 @@ function ChatPageInner({ embedded = false }) {
       `}>
 
         {/* Header */}
-        <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <Link href="/" className="md:hidden p-2 -ml-1.5 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors">
-                <ArrowLeft className="w-5 h-5" />
+        <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-gray-100 flex-shrink-0">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link href="/" className="md:hidden p-1.5 sm:p-2 -ml-1.5 rounded-xl text-gray-500 hover:bg-gray-100 transition-colors">
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
               </Link>
               <div>
-                <h1 className="text-xl font-black text-gray-900 tracking-tight">{t('messages')}</h1>
+                <h1 className="text-lg sm:text-xl font-black text-gray-900 tracking-tight">{t('messages')}</h1>
                 {user && (
-                  <p className="text-xs text-gray-400 mt-0.5 capitalize" suppressHydrationWarning>
+                  <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 capitalize" suppressHydrationWarning>
                     {t(`role.${user.role}`, { defaultValue: user.role })} · {user.name}
                   </p>
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse" />
-              <span className="text-xs font-medium text-emerald-600">{t('live')}</span>
+            <div className="flex items-center gap-1 sm:gap-1.5">
+              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-500 rounded-full animate-pulse" />
+              <span className="text-[10px] sm:text-xs font-medium text-emerald-600">{t('live')}</span>
             </div>
           </div>
 
           {/* Error banner */}
           {error && (
-            <div className="flex items-center gap-2 px-3 py-2.5 bg-red-50 border border-red-100 rounded-xl text-xs text-red-700 animate-scaleIn">
-              <X className="w-3.5 h-3.5 flex-shrink-0" />
+            <div className="flex items-center gap-2 px-2.5 sm:px-3 py-2 sm:py-2.5 bg-red-50 border border-red-100 rounded-xl text-[10px] sm:text-xs text-red-700 animate-scaleIn">
+              <X className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
               <span className="flex-1">{error}</span>
               <button onClick={() => setError('')} className="hover:text-red-900">
-                <X className="w-3.5 h-3.5" />
+                <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               </button>
             </div>
           )}
 
           {/* Creating indicator */}
           {creating && (
-            <div className="flex items-center gap-2 px-3 py-2.5 bg-blue-50 border border-blue-100 rounded-xl text-xs text-blue-700 animate-scaleIn mt-2">
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <div className="flex items-center gap-2 px-2.5 sm:px-3 py-2 sm:py-2.5 bg-blue-50 border border-blue-100 rounded-xl text-[10px] sm:text-xs text-blue-700 animate-scaleIn mt-2">
+              <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin" />
               {t('openingConversation')}
             </div>
           )}
@@ -199,13 +199,13 @@ function ChatPageInner({ embedded = false }) {
 
         {/* User strip */}
         {user && (
-          <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center gap-3 flex-shrink-0" suppressHydrationWarning>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md" suppressHydrationWarning>
+          <div className="px-3 sm:px-4 py-2.5 sm:py-3 border-t border-gray-100 bg-gray-50/50 flex items-center gap-2 sm:gap-3 flex-shrink-0" suppressHydrationWarning>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md" suppressHydrationWarning>
               {user.name?.charAt(0)?.toUpperCase() || '?'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate" suppressHydrationWarning>{user.name}</p>
-              <p className="text-xs text-gray-400 capitalize" suppressHydrationWarning>{t(`role.${user.role}`, { defaultValue: user.role })}</p>
+              <p className="text-xs sm:text-sm font-semibold text-gray-900 truncate" suppressHydrationWarning>{user.name}</p>
+              <p className="text-[10px] sm:text-xs text-gray-400 capitalize" suppressHydrationWarning>{t(`role.${user.role}`, { defaultValue: user.role })}</p>
             </div>
           </div>
         )}

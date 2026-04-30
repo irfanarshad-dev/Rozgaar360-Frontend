@@ -280,7 +280,7 @@ export default function Register() {
                       />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-gray-700">{t('email')} <span className="text-red-500 font-normal">*</span></label>
+                      <label className="text-sm font-semibold text-gray-700">{t('email')}</label>
                       <input
                         name="email"
                         type="email"
@@ -411,6 +411,7 @@ export default function Register() {
                           value={formData.workerAddress || ''}
                           onChange={handleInputChange}
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-gray-900"
+                          required
                         />
                       </div>
 

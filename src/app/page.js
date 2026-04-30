@@ -1135,7 +1135,7 @@ export default function Home() {
             </div>
           </div>
 
-          <details className="group rounded-2xl border border-white/10 bg-white/5 p-3" open>
+          <details className="group rounded-2xl border border-white/10 bg-white/5 p-3">
             <summary className="list-none flex items-center justify-between cursor-pointer">
               <span className="font-bold text-[14px] text-white/90" suppressHydrationWarning>{mounted ? t('home:footer.ourSkills') : 'Our Services'}</span>
               <ChevronDown className="w-4 h-4 text-blue-400 transition-transform group-open:rotate-180" />

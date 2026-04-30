@@ -48,6 +48,12 @@ export function ChatProvider({ children }) {
 
     socket.on('message-received', (message) => {
       console.log('[Chat] message-received:', message);
+      console.log('[Chat] File fields:', {
+        messageType: message.messageType,
+        fileUrl: message.fileUrl,
+        fileName: message.fileName,
+        fileType: message.fileType,
+      });
       setMessages((prev) => {
         const msgConvId = String(message.conversationId);
         const curConvId = currentConvRef.current ? String(currentConvRef.current) : null;
@@ -86,8 +92,23 @@ export function ChatProvider({ children }) {
 
     socket.on('conversation-updated', (data) => {
       console.log('[Chat] conversation-updated:', data);
-      // We can use a simple counter/timestamp to trigger re-fetches in components
       window.dispatchEvent(new CustomEvent('chat:conversation-updated', { detail: data }));
+    });
+
+    socket.on('message-deleted', (data) => {
+      console.log('[Chat] message-deleted:', data);
+      setMessages((prev) => {
+        return prev.map((msg) => {
+          if (String(msg._id) === String(data.messageId)) {
+            if (data.deleteForEveryone) {
+              return { ...msg, deletedForEveryone: true, text: '', fileUrl: null, fileName: null };
+            } else {
+              return { ...msg, deletedForMe: true };
+            }
+          }
+          return msg;
+        });
+      });
     });
 
     return () => {
@@ -157,6 +178,17 @@ export function ChatProvider({ children }) {
     setMessages([]);
   }, []);
 
+  // ── Delete message ─────────────────────────────────────────
+  const deleteMessage = useCallback((messageId, deleteForEveryone = false) => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('delete-message', {
+        messageId,
+        conversationId: currentConvRef.current,
+        deleteForEveryone,
+      });
+    }
+  }, []);
+
   return (
     <ChatContext.Provider value={{
       isConnected,
@@ -166,6 +198,7 @@ export function ChatProvider({ children }) {
       sendMessage,
       setTyping,
       leaveConversation,
+      deleteMessage,
     }}>
       {children}
     </ChatContext.Provider>

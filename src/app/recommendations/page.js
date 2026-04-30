@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 import WorkerCard from '../components/WorkerCard';
 import { SkeletonCard } from '../components/ui/SkeletonCard';
+import Pagination from '../components/ui/Pagination';
 import api from '@/lib/axios';
 import { CITIES, SKILLS } from '@/lib/constants';
 import { MapPin, Search, RefreshCw } from 'lucide-react';
@@ -14,13 +15,17 @@ export default function Recommendations() {
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ city: '', skill: '', search: '', lat: '', lng: '', radiusKm: 5 });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalWorkers, setTotalWorkers] = useState(0);
+  const workersPerPage = 9; // 3x3 grid
   const filtersRef = useRef(filters);
 
   useEffect(() => {
     filtersRef.current = filters;
   }, [filters]);
 
-  const fetchRecommendations = useCallback(async (overrideFilters = null) => {
+  const fetchRecommendations = useCallback(async (overrideFilters = null, page = 1) => {
     setLoading(true);
     const activeFilters = overrideFilters || filtersRef.current;
     
@@ -50,19 +55,32 @@ export default function Recommendations() {
         );
       }
 
-      setWorkers(data);
+      // Calculate pagination
+      const total = data.length;
+      const pages = Math.ceil(total / workersPerPage) || 1;
+      const startIndex = (page - 1) * workersPerPage;
+      const endIndex = startIndex + workersPerPage;
+      const paginatedData = data.slice(startIndex, endIndex);
+
+      setTotalWorkers(total);
+      setTotalPages(pages);
+      setCurrentPage(page);
+      setWorkers(paginatedData);
     } catch (error) {
       console.error('Failed to fetch recommendations:', error);
       setWorkers([]);
+      setTotalWorkers(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [workersPerPage]);
 
   const clearFilters = () => {
     const empty = { city: '', skill: '', search: '', lat: '', lng: '', radiusKm: 5 };
     setFilters(empty);
-    fetchRecommendations(empty);
+    setCurrentPage(1);
+    fetchRecommendations(empty, 1);
   };
 
   const handleLocationSearch = () => {
@@ -77,7 +95,8 @@ export default function Recommendations() {
             radiusKm: 5,
           };
           setFilters(newFilters);
-          fetchRecommendations(newFilters);
+          setCurrentPage(1);
+          fetchRecommendations(newFilters, 1);
         },
         error => {
           console.error("Location error:", error);
@@ -98,7 +117,7 @@ export default function Recommendations() {
     
     const initialFilters = { city: initialCity, skill: initialSkill, search: '', lat: '', lng: '', radiusKm: 5 };
     setFilters(initialFilters);
-    fetchRecommendations(initialFilters);
+    fetchRecommendations(initialFilters, 1);
   }, [fetchRecommendations]);
 
   const handleFilterChange = (e) => {
@@ -107,7 +126,12 @@ export default function Recommendations() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    fetchRecommendations();
+    setCurrentPage(1);
+    fetchRecommendations(null, 1);
+  };
+
+  const handlePageChange = (page) => {
+    fetchRecommendations(null, page);
   };
 
   const hasActiveFilters = filters.city || filters.skill || filters.search || (filters.lat && filters.lng);
@@ -224,7 +248,12 @@ export default function Recommendations() {
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-base font-medium text-gray-800">
             {t('recommendations:workersFoundLabel')}
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">{loading ? '...' : workers.length}</span>
+            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">{loading ? '...' : totalWorkers}</span>
+            {totalWorkers > workersPerPage && (
+              <span className="text-xs text-gray-400">
+                (Showing {((currentPage - 1) * workersPerPage) + 1}-{Math.min(currentPage * workersPerPage, totalWorkers)})
+              </span>
+            )}
           </div>
 
           {hasActiveFilters && (
@@ -241,16 +270,26 @@ export default function Recommendations() {
         <div className="mt-4">
           {loading ? (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
+              {Array.from({ length: 9 }).map((_, i) => (
                 <SkeletonCard key={i} />
               ))}
             </div>
           ) : workers.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {workers.map((worker, index) => (
-                <WorkerCard key={worker.id} worker={worker} animationDelay={index * 45} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {workers.map((worker, index) => (
+                  <WorkerCard key={worker.id} worker={worker} animationDelay={index * 45} />
+                ))}
+              </div>
+              
+              {/* Pagination Component */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                loading={loading}
+              />
+            </>
           ) : (
             <div className="mx-auto mt-8 max-w-xl rounded-2xl border border-dashed border-gray-200 bg-white px-6 py-14 text-center shadow-sm animate-scaleIn sm:px-8">
               <div className="mx-auto h-20 w-20 rounded-2xl bg-gray-100" />

@@ -1,7 +1,7 @@
 'use client';
 
 import DashboardLayout from '@/app/components/ui/DashboardLayout';
-import ChatPage from '../../chat/page';
+import ChatPage from '@/app/components/ChatPage';
 
 export default function WorkerChatPage() {
   return (
