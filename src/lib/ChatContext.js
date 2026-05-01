@@ -17,7 +17,7 @@ export function ChatProvider({ children }) {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) return;
 
-    const socket = io('http://127.0.0.1:3001/chat', {
+    const socket = io('https://rozgaar360-backend-bubygegsewe9exb2.eastasia-01.azurewebsites.net/', {
       auth: { token },
       reconnection: true,
       reconnectionDelay: 1000,
