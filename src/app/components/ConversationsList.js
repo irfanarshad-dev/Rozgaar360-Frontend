@@ -17,7 +17,7 @@ function timeAgo(dateStr, language, t) {
   return new Date(dateStr).toLocaleDateString(language === 'ur' ? 'ur-PK' : 'en-US', { month: 'short', day: 'numeric' });
 }
 
-function Avatar({ name, size = 'md' }) {
+function Avatar({ name, src, size = 'md' }) {
   const colors = [
     'from-blue-500 to-blue-600',
     'from-violet-500 to-purple-600',
@@ -28,6 +28,22 @@ function Avatar({ name, size = 'md' }) {
   ];
   const idx = name ? name.charCodeAt(0) % colors.length : 0;
   const sizeClass = size === 'lg' ? 'w-12 h-12 sm:w-14 sm:h-14 text-base sm:text-lg' : 'w-10 h-10 sm:w-11 sm:h-11 text-xs sm:text-sm';
+
+  if (src) {
+    return (
+      <div className={`${sizeClass} rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-white ring-1 ring-gray-100`}>
+        <img
+          src={src}
+          alt={name || 'Conversation avatar'}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={`${sizeClass} bg-gradient-to-br ${colors[idx]} rounded-2xl flex items-center justify-center text-white font-bold flex-shrink-0 shadow-md`}>
       {name?.charAt(0)?.toUpperCase() || '?'}
@@ -67,16 +83,22 @@ export default function ConversationsList({ onSelectConversation, selectedId }) 
           typeof conv.workerId === 'object' ? conv.workerId?.name || t('workerLabel') : t('workerLabel');
         const customerName =
           typeof conv.customerId === 'object' ? conv.customerId?.name || t('customerLabel') : t('customerLabel');
+        const workerProfilePicture =
+          typeof conv.workerId === 'object' ? conv.workerId?.profilePicture || null : null;
+        const customerProfilePicture =
+          typeof conv.customerId === 'object' ? conv.customerId?.profilePicture || null : null;
 
         const isWorker = workerIdStr === String(currentUserId);
         const otherParticipantName = isWorker ? customerName : workerName;
         const otherParticipantId = isWorker ? customerIdStr : workerIdStr;
+        const otherParticipantProfilePicture = isWorker ? customerProfilePicture : workerProfilePicture;
 
         return {
           ...conv,
           _id: String(conv._id),
           otherParticipantName,
           otherParticipantId,
+          otherParticipantProfilePicture,
         };
       });
 
@@ -175,7 +197,7 @@ export default function ConversationsList({ onSelectConversation, selectedId }) 
                 }`}
               >
                 <div className="relative">
-                   <Avatar name={conv.otherParticipantName} />
+                   <Avatar name={conv.otherParticipantName} src={conv.otherParticipantProfilePicture} />
                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-emerald-500 border-2 border-white rounded-full" />
                 </div>
 

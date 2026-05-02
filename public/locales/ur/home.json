@@ -1,6 +1,7 @@
 {
   "banner": {
     "welcomeBack": "واپس خوش آمدید، {{name}}!",
+    "workerWelcomeBack": "واپس خوش آمدید، {{name}}! اپنی بکنگز اور دستیابی سنبھالیں۔",
     "goToDashboard": "اپنے ڈیش بورڈ پر جائیں →"
   },
   "ad": {
@@ -40,6 +41,10 @@
     "resultsTitle": "AI سفارشات",
     "viewProfile": "پروفائل دیکھیں",
     "reviewCount": "{{count}} ریویوز",
+    "searchButton": "تلاش کریں",
+    "searching": "تلاش جاری ہے...",
+    "skillFallback": "مہارت",
+    "matches": "{{count}} میچز",
     "match": "میچ",
     "disclaimer": "AI میچز مہارت، تجربہ اور قربت کی بنیاد پر بنائے جاتے ہیں۔",
     "noRelatedWorkers": "آپ کی تلاش سے متعلق کوئی کارکن نہیں ملا۔ براہ کرم اپنی ترجیح تبدیل کریں۔",

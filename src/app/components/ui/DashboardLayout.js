@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -8,9 +8,12 @@ import { authService } from '@/lib/auth';
 import { useLanguage } from '@/lib/i18nProvider';
 import NotificationBell from '../NotificationBell';
 import ProfilePhotoUpload from '../ProfilePhotoUpload';
+import EditProfile from '../EditProfile';
+import UploadCNIC from '../UploadCNIC';
 import {
   Home, Search, Calendar, Bell, MessageCircle, Briefcase,
-  LogOut, Menu, X, ChevronRight, Settings, Camera, User as UserIcon, Globe
+  LogOut, Menu, X, ChevronRight, Settings, Camera, User as UserIcon, Globe,
+  Mail, Phone, MapPin, Award, ChevronDown, Edit3, BadgeCheck, CheckCircle2
 } from 'lucide-react';
 import { Info } from 'lucide-react';
 
@@ -118,6 +121,289 @@ function SidebarContent({ links, pathname, onLogout, onClose, t }) {
   );
 }
 
+function ProfileDropdown({ user, onEditProfile, onLogout, onEditPhoto, onVerify, t, role }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ur';
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const workerProfile = user?.profile || user?.workerProfile || user?.worker || {};
+  const displayName = user?.name || 'User';
+  const email = user?.email || 'N/A';
+  const phone = user?.phone || user?.phoneNumber || user?.mobile || 'N/A';
+  const city = user?.city || user?.baseCity || 'N/A';
+  const skill = workerProfile?.skill || workerProfile?.primarySkill || 'N/A';
+  const address = user?.address || workerProfile?.address || workerProfile?.workerAddress || 'N/A';
+  const experience = workerProfile?.experience !== undefined && workerProfile?.experience !== null
+    ? `${workerProfile.experience} years`
+    : 'N/A';
+  const joinedDate = user?.createdAt 
+    ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    : 'N/A';
+
+  const verificationStatus = String(
+    workerProfile?.verificationStatus || user?.verificationStatus || ''
+  ).trim().toLowerCase();
+
+  const isVerified = Boolean(
+    workerProfile?.verified ||
+    user?.verified ||
+    verificationStatus === 'verified' ||
+    verificationStatus === 'approved'
+  );
+
+  // Only show verification for workers
+  const showVerification = role === 'worker';
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 sm:gap-3 p-1 pr-2 sm:pr-3 rounded-2xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-200 group"
+      >
+        <div className="relative">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md ring-2 ring-white group-hover:ring-blue-100 transition-all overflow-hidden">
+            {user?.profilePicture ? (
+              <Image
+                src={user.profilePicture}
+                alt={displayName}
+                width={36}
+                height={36}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              displayName.charAt(0).toUpperCase()
+            )}
+          </div>
+          {showVerification && isVerified && (
+            <div className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center">
+              <CheckCircle2 className="h-2 w-2 text-white" />
+            </div>
+          )}
+        </div>
+        <div className="hidden sm:block text-left">
+          <p className="text-xs font-black text-gray-900 truncate max-w-[100px]">{displayName.split(' ')[0]}</p>
+          <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{t('common:viewProfile')}</p>
+        </div>
+        <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+      )}
+      
+      {isOpen && (
+        <div 
+          className="w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-lg border border-gray-200 bg-white shadow-xl z-50 overflow-hidden"
+          style={{
+            position: 'fixed',
+            top: '4.5rem',
+            ...(isRTL ? { left: '1rem', right: 'auto' } : { right: '1rem', left: 'auto' })
+          }}
+          dir="ltr"
+        >
+          {/* Profile Header */}
+          <div className="bg-white border-b border-gray-200 p-5">
+            <div className="flex items-start gap-4">
+              <div className="relative group/avatar">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center overflow-hidden border-2 border-gray-200">
+                  {user?.profilePicture ? (
+                    <Image
+                      src={user.profilePicture}
+                      alt={displayName}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-2xl font-bold text-white">{displayName.charAt(0).toUpperCase()}</span>
+                  )}
+                </div>
+                {showVerification && isVerified && (
+                  <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center">
+                    <CheckCircle2 className="h-3 w-3 text-white" />
+                  </div>
+                )}
+                {/* Camera overlay */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsOpen(false);
+                    onEditPhoto();
+                  }}
+                  className="absolute inset-0 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity"
+                >
+                  <Camera className="h-6 w-6 text-white" />
+                </button>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg font-medium text-gray-900 truncate">{displayName}</h3>
+                {role === 'worker' && skill !== 'N/A' && (
+                  <p className="text-sm text-gray-600 mt-0.5">{skill}</p>
+                )}
+                {showVerification && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+                    isVerified 
+                      ? 'bg-green-50 text-green-700 border border-green-200' 
+                      : 'bg-amber-50 text-amber-700 border border-amber-200'
+                  }">
+                    {isVerified ? (
+                      <>
+                        <CheckCircle2 className="h-3 w-3" />
+                        {t('common:verified', { defaultValue: 'Verified' })}
+                      </>
+                    ) : (
+                      <>
+                        <BadgeCheck className="h-3 w-3" />
+                        {t('common:unverified', { defaultValue: 'Unverified' })}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Verification Alert - Only for unverified workers */}
+          {showVerification && !isVerified && (
+            <div className="bg-amber-50 border-b border-amber-100 p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <BadgeCheck className="h-5 w-5 text-amber-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-medium text-amber-900">
+                    {t('common:verificationRequired', { defaultValue: 'Verification required' })}
+                  </h4>
+                  <p className="text-xs text-amber-700 mt-1">
+                    {t('common:verificationDescription', { defaultValue: 'Complete your verification to unlock all features' })}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      onVerify();
+                    }}
+                    className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-amber-600 text-white text-xs font-medium rounded-md hover:bg-amber-700 transition-colors"
+                  >
+                    <BadgeCheck className="h-3.5 w-3.5" />
+                    {t('common:verifyNow', { defaultValue: 'Verify now' })}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Personal Details */}
+          <div className="p-4 space-y-3 border-b border-gray-100">
+            <h4 className="text-xs font-medium text-gray-500 mb-3">
+              {t('common:personalDetails', { defaultValue: 'Personal Details' })}
+            </h4>
+            
+            <div className="flex items-center gap-3 text-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 shrink-0">
+                <Mail className="h-4 w-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-500">{t('common:email', { defaultValue: 'Email' })}</p>
+                <p className="text-sm text-gray-900 truncate">{email}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 text-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 shrink-0">
+                <Phone className="h-4 w-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-500">{t('common:phone', { defaultValue: 'Phone' })}</p>
+                <p className="text-sm text-gray-900">{phone}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 text-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 shrink-0">
+                <MapPin className="h-4 w-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-500">{t('common:city', { defaultValue: 'City' })}</p>
+                <p className="text-sm text-gray-900">{city}</p>
+              </div>
+            </div>
+
+            {role === 'worker' && experience !== 'N/A' && (
+              <div className="flex items-center gap-3 text-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 shrink-0">
+                  <Award className="h-4 w-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500">{t('common:experience', { defaultValue: 'Experience' })}</p>
+                  <p className="text-sm text-gray-900">{experience}</p>
+                </div>
+              </div>
+            )}
+
+            {role === 'customer' && address !== 'N/A' && (
+              <div className="flex items-center gap-3 text-sm">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 shrink-0">
+                  <MapPin className="h-4 w-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500">{t('common:address', { defaultValue: 'Address' })}</p>
+                  <p className="text-sm text-gray-900">{address}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center gap-3 text-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-600 shrink-0">
+                <Calendar className="h-4 w-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-gray-500">{t('common:memberSince', { defaultValue: 'Member Since' })}</p>
+                <p className="text-sm text-gray-900">{joinedDate}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="p-2 space-y-1">
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                onEditProfile();
+              }}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100"
+            >
+              <Edit3 className="h-4 w-4" />
+              {t('common:editProfile', { defaultValue: 'Edit Profile' })}
+            </button>
+
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                onLogout();
+              }}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+            >
+              <LogOut className="h-4 w-4" />
+              {t('common:logout', { defaultValue: 'Logout' })}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function DashboardLayout({
   children,
   role = 'customer',
@@ -128,7 +414,10 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { t, i18n } = useTranslation(['common', 'worker']);
@@ -146,9 +435,29 @@ export default function DashboardLayout({
 
   const links = role === 'customer' ? CUSTOMER_LINKS : WORKER_LINKS;
 
+  const fetchUserProfile = async () => {
+    try {
+      setProfileLoading(true);
+      const profile = await authService.getProfile();
+      setUser(profile);
+      // Update localStorage with fresh data
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(profile));
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
   useEffect(() => {
     const u = authService.getUser();
     setUser(u);
+    // Fetch fresh profile data from database
+    if (u) {
+      fetchUserProfile();
+    }
   }, []);
 
   useEffect(() => {
@@ -158,9 +467,9 @@ export default function DashboardLayout({
   useEffect(() => { setSidebarOpen(false); }, [pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = (sidebarOpen || showPhotoModal) ? 'hidden' : '';
+    document.body.style.overflow = (sidebarOpen || showPhotoModal || showEditProfileModal || showVerificationModal) ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [sidebarOpen, showPhotoModal]);
+  }, [sidebarOpen, showPhotoModal, showEditProfileModal, showVerificationModal]);
 
   const handleLogout = () => {
     authService.logout();
@@ -169,8 +478,25 @@ export default function DashboardLayout({
 
   const handlePhotoUpdate = (newUrl) => {
     setUser(prev => ({ ...prev, profilePicture: newUrl }));
-    const u = authService.getUser();
-    authService.saveUser({ ...u, profilePicture: newUrl });
+    // Update localStorage
+    if (typeof window !== 'undefined') {
+      const currentUser = authService.getUser();
+      const updatedUser = { ...currentUser, profilePicture: newUrl };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+    // Refresh profile from database
+    fetchUserProfile();
+  };
+
+  const handleProfileUpdate = (updatedProfile) => {
+    setUser(updatedProfile);
+    // Update localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user', JSON.stringify(updatedProfile));
+    }
+    setShowEditProfileModal(false);
+    // Refresh profile from database
+    fetchUserProfile();
   };
 
   if (!isMounted) {
@@ -220,7 +546,7 @@ export default function DashboardLayout({
              </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <NotificationBell />
 
             <button
@@ -235,37 +561,19 @@ export default function DashboardLayout({
               <span className="hidden sm:inline">{language === 'en' ? 'اردو' : 'EN'}</span>
             </button>
             
-            <button 
-              onClick={() => setShowPhotoModal(true)}
-              className="flex items-center gap-3 p-1 pr-3 rounded-2xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-100 group"
-            >
-              <div className="relative">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md ring-2 ring-white group-hover:ring-blue-100 transition-all overflow-hidden">
-                  {user?.profilePicture ? (
-                    <Image
-                      src={user.profilePicture}
-                      alt={user?.name || 'Avatar'}
-                      width={36}
-                      height={36}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    user?.name?.charAt(0).toUpperCase() || '?'
-                  )}
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 group-hover:scale-110 transition-transform">
-                  <Camera className="w-2.5 h-2.5 text-blue-600" />
-                </div>
-              </div>
-              <div className="hidden sm:block text-left">
-                <p className="text-xs font-black text-gray-900 truncate max-w-[100px]">{user?.name || t('common:user')}</p>
-                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{t('common:editPhoto')}</p>
-              </div>
-            </button>
+            <ProfileDropdown 
+              user={user}
+              onEditProfile={() => setShowEditProfileModal(true)}
+              onEditPhoto={() => setShowPhotoModal(true)}
+              onVerify={() => setShowVerificationModal(true)}
+              onLogout={handleLogout}
+              t={t}
+              role={role}
+            />
           </div>
         </header>
 
-        <main className={`flex-1 min-h-0 ${contentClassName}`}>
+        <main className={`flex-1 min-h-0 ${contentClassName === 'p-4 lg:p-8' ? '' : contentClassName}`}>
           {children}
         </main>
 
@@ -278,35 +586,72 @@ export default function DashboardLayout({
 
       {showPhotoModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setShowPhotoModal(false)} />
-          <div className="relative bg-white rounded-[2rem] shadow-2xl p-8 w-full max-w-sm animate-scaleIn border border-gray-100">
+          <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setShowPhotoModal(false)} />
+          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md animate-scaleIn">
             <button 
               onClick={() => setShowPhotoModal(false)}
-              className="absolute top-4 right-4 p-2 rounded-xl hover:bg-gray-100 text-gray-400 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 transition-colors z-10"
             >
               <X className="w-5 h-5" />
             </button>
             
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <UserIcon className="w-8 h-8 text-blue-600" />
-              </div>
-              <h2 className="text-xl font-black text-gray-900 tracking-tight">{t('common:profileIdentity')}</h2>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-1">{t('common:uploadBestPhoto')}</p>
+            <div className="p-6">
+              <ProfilePhotoUpload 
+                userId={user?._id}
+                currentPhoto={user?.profilePicture}
+                onPhotoUpdate={handlePhotoUpdate}
+              />
             </div>
+          </div>
+        </div>
+      )}
 
-            <ProfilePhotoUpload 
-              userId={user?._id}
-              currentPhoto={user?.profilePicture}
-              onPhotoUpdate={handlePhotoUpdate}
-            />
-
+      {showEditProfileModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-y-auto">
+          <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setShowEditProfileModal(false)} />
+          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md my-8">
             <button 
-              onClick={() => setShowPhotoModal(false)}
-              className="w-full mt-6 py-4 bg-gray-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200"
+              onClick={() => setShowEditProfileModal(false)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 transition-colors z-10"
             >
-              {t('common:closeWindow')}
+              <X className="w-5 h-5" />
             </button>
+            <div className="p-6">
+              <EditProfile 
+                profile={user}
+                onProfileUpdate={handleProfileUpdate}
+                onCancel={() => setShowEditProfileModal(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showVerificationModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setShowVerificationModal(false)} />
+          <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md animate-scaleIn">
+            <button 
+              onClick={() => setShowVerificationModal(false)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 transition-colors z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            <div className="p-6">
+              <div className="mb-6">
+                <h3 className="text-xl font-normal text-gray-900">Verify your account</h3>
+                <p className="text-sm text-gray-600 mt-1">Upload your CNIC to complete verification</p>
+              </div>
+              
+              <UploadCNIC 
+                userId={user?._id} 
+                onUploadSuccess={() => {
+                  setShowVerificationModal(false);
+                  fetchUserProfile();
+                }} 
+              />
+            </div>
           </div>
         </div>
       )}

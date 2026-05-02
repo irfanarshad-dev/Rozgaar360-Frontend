@@ -107,5 +107,14 @@
   "today": "Today",
   "reconnecting": "Reconnecting...",
   "connecting": "Connecting...",
-  "messageUserPlaceholder": "Message {{name}}..."
+  "messageUserPlaceholder": "Message {{name}}...",
+  "personalDetails": "Personal Details",
+  "memberSince": "Member Since",
+  "editProfile": "Edit Profile",
+  "logout": "Logout",
+  "unverified": "Unverified",
+  "verificationRequired": "Verification required",
+  "verificationDescription": "Complete your verification to unlock all features",
+  "verifyNow": "Verify now",
+  "enterAddress": "Enter your address"
 }

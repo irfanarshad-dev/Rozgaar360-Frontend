@@ -107,5 +107,14 @@
   "today": "آج",
   "reconnecting": "دوبارہ جڑ رہا ہے...",
   "connecting": "کنیکٹ ہو رہا ہے...",
-  "messageUserPlaceholder": "{{name}} کو پیغام لکھیں..."
+  "messageUserPlaceholder": "{{name}} کو پیغام لکھیں...",
+  "personalDetails": "ذاتی تفصیلات",
+  "memberSince": "رکن بنے",
+  "editProfile": "پروفائل میں ترمیم",
+  "logout": "لاگ آؤٹ",
+  "unverified": "غیر تصدیق شدہ",
+  "verificationRequired": "تصدیق درکار ہے",
+  "verificationDescription": "تمام خصوصیات کو غیر مقفل کرنے کے لیے اپنی تصدیق مکمل کریں",
+  "verifyNow": "ابھی تصدیق کریں",
+  "enterAddress": "اپنا پتہ درج کریں"
 }

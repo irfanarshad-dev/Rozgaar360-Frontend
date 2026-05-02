@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DashboardLayout from '@/app/components/ui/DashboardLayout';
 import UploadCNIC from '../../components/UploadCNIC';
-import EditProfile from '../../components/EditProfile';
 import { authService } from '@/lib/auth';
 import api from '@/lib/axios';
 import { useTranslation } from 'react-i18next';
@@ -18,15 +17,8 @@ import {
   ChevronRight,
   Clock3,
   DollarSign,
-  Edit3,
   Loader2,
-  MapPin,
   MessageCircle,
-  Navigation2,
-  Phone,
-  ShieldCheck,
-  User,
-  Wrench,
 } from 'lucide-react';
 
 const WEEKDAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -161,17 +153,17 @@ function SkeletonDashboard() {
 
 function StatCard({ label, value, trend, accent, icon: Icon, iconWrapClass }) {
   return (
-    <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow duration-200 hover:shadow-md">
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 truncate">{label}</p>
           <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900">{value}</p>
         </div>
-        <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${iconWrapClass}`}>
+        <div className={`flex h-11 w-11 items-center justify-center rounded-xl shrink-0 ${iconWrapClass}`}>
           <Icon className={`h-5 w-5 ${accent}`} />
         </div>
       </div>
-      <p className="mt-3 text-xs font-medium text-slate-500">{trend}</p>
+      <p className="mt-3 text-xs font-medium text-slate-500 truncate">{trend}</p>
     </div>
   );
 }
@@ -248,7 +240,7 @@ function ScheduleDayRow({ item, dayLabel, index, onToggle, onTimeChange, closedL
   return (
     <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 transition-shadow duration-200 hover:shadow-sm">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-semibold text-slate-900">{dayLabel || item.day}</p>
+        <p className="text-sm font-semibold text-slate-900 truncate">{dayLabel || item.day}</p>
         <SwitchButton
           checked={item.enabled}
           onChange={() => onToggle(index)}
@@ -259,18 +251,18 @@ function ScheduleDayRow({ item, dayLabel, index, onToggle, onTimeChange, closedL
       </div>
 
       {item.enabled ? (
-        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <input
             type="time"
             value={item.start}
             onChange={(event) => onTimeChange(index, 'start', event.target.value)}
-            className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 [appearance:textfield]"
+            className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           />
           <input
             type="time"
             value={item.end}
             onChange={(event) => onTimeChange(index, 'end', event.target.value)}
-            className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 [appearance:textfield]"
+            className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           />
         </div>
       ) : (
@@ -287,7 +279,6 @@ export default function WorkerDashboard() {
   const [loading, setLoading] = useState(true);
   const [savingSchedule, setSavingSchedule] = useState(false);
   const [toast, setToast] = useState(null);
-  const [showEditProfile, setShowEditProfile] = useState(false);
   const [stats, setStats] = useState({ pending: 0, active: 0, completed: 0, monthlyEarnings: 0 });
   const [jobRequestsCount, setJobRequestsCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -312,16 +303,8 @@ export default function WorkerDashboard() {
     verificationStatus === 'approved'
   );
 
-  const accountBadge = isVerified
-    ? { label: t('common:approved', { defaultValue: 'Verified' }), className: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
-    : verificationStatus === 'pending'
-      ? { label: t('common:pending', { defaultValue: 'Pending' }), className: 'bg-amber-50 text-amber-700 border-amber-200' }
-      : verificationStatus === 'rejected'
-        ? { label: t('common:rejected', { defaultValue: 'Rejected' }), className: 'bg-rose-50 text-rose-700 border-rose-200' }
-        : { label: t('worker:dashboard.unverified', { defaultValue: 'Unverified' }), className: 'bg-slate-100 text-slate-600 border-slate-200' };
-
-  const displayName = safeText(userProfile?.name, 'Arshad');
-  const firstName = displayName.split(' ')[0] || 'Arshad';
+  const displayName = safeText(userProfile?.name, 'Worker');
+  const firstName = displayName.split(' ')[0] || 'Worker';
 
   const loadDashboard = useCallback(
     async ({ silent = false } = {}) => {
@@ -466,15 +449,6 @@ export default function WorkerDashboard() {
     },
   ];
 
-  const fullName = safeText(userProfile?.name, 'Your Name');
-  const phoneNumber = getFieldValue(userProfile, ['phone', 'phoneNumber', 'mobile'], 'N/A');
-  const baseCity = getFieldValue(userProfile, ['city', 'baseCity'], 'N/A');
-  const primarySkill = getFieldValue(workerProfile, ['skill', 'primarySkill'], 'Not set');
-  const experience = workerProfile?.experience !== undefined && workerProfile?.experience !== null
-    ? `${workerProfile.experience} years`
-    : 'Not set';
-  const serviceAddress = getFieldValue(workerProfile, ['workerAddress', 'address', 'serviceAddress'], 'Not set');
-
   const scheduleRadius = Math.max(0, Math.min(50, Number(schedule.serviceRadiusKm) || 0));
   const responseRate = Math.max(0, Math.min(100, Number(schedule.responseRate) || 0));
 
@@ -532,12 +506,6 @@ export default function WorkerDashboard() {
     }
   };
 
-  const handleProfileUpdate = (updatedProfile) => {
-    setProfile(updatedProfile);
-    setShowEditProfile(false);
-    setToast({ type: 'success', message: t('worker:editProfile.success', { defaultValue: 'Profile updated successfully.' }) });
-  };
-
   if (loading) {
     return (
       <DashboardLayout role="worker" contentClassName="p-0" showFooter={false} isFixedHeight={false}>
@@ -554,280 +522,205 @@ export default function WorkerDashboard() {
     <DashboardLayout role="worker" contentClassName="p-0" showFooter={false} isFixedHeight={false}>
       <Toast toast={toast} onClose={() => setToast(null)} closeLabel={t('common:close', { defaultValue: 'Close' })} />
 
-      <div className="min-h-[calc(100vh-4rem)] bg-slate-50 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-        <div className="mx-auto max-w-7xl space-y-6">
-          <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white px-6 py-5 shadow-sm lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">{t('worker:workerDashboard', { defaultValue: 'Worker Dashboard' })}</p>
-              <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                {t('worker:dashboard.welcomeBack', { name: `, ${firstName}`, defaultValue: `Welcome back, ${firstName}!` })} 👋
-              </h1>
-              <p className="mt-2 text-sm text-slate-500">{t('worker:dashboard.subtitle', { defaultValue: 'Manage your profile and track your business' })}</p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 whitespace-nowrap">
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-300" />
-                {t('worker:available', { defaultValue: 'Available' })}
-              </div>
-              <SwitchButton
-                checked={schedule.isAvailableNow}
-                onChange={() => setSchedule((prev) => ({ ...prev, isAvailableNow: !prev.isAvailableNow }))}
-                label={t('worker:dashboard.availableNow', { defaultValue: 'Available for Work' })}
-                onText={t('common:on', { defaultValue: 'On' })}
-                offText={t('common:off', { defaultValue: 'Off' })}
-                className={`rounded-full border px-3 sm:px-4 py-2 text-sm font-semibold transition-all duration-200 whitespace-nowrap shrink-0 ${
-                  schedule.isAvailableNow
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                    : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
-                }`}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {statCards.map((card) => (
-              <StatCard key={card.label} {...card} label={t(card.labelKey, { defaultValue: card.label })} />
-            ))}
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-[1.2fr_0.9fr] items-start">
-            <div className="space-y-6">
-              <SurfaceCard>
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{t('worker:dashboard.professionalDetails', { defaultValue: 'Professional Details' })}</p>
-                    <h2 className="mt-2 text-xl font-bold tracking-tight text-slate-900">{t('worker:dashboard.professionalDetails', { defaultValue: 'Professional Details' })}</h2>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowEditProfile(true)}
-                    className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                  >
-                    <Edit3 className="mr-2 h-4 w-4" />
-                    {t('worker:dashboard.editProfile', { defaultValue: 'Edit Profile' })}
-                  </button>
-                </div>
-
-                <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm">
-                        <User className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('worker:dashboard.fullName', { defaultValue: 'Full Name' })}</p>
-                        <p className="mt-1 truncate text-sm font-semibold text-slate-900">{fullName}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm">
-                        <Phone className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('worker:dashboard.phoneNumber', { defaultValue: 'Phone Number' })}</p>
-                        <p className="mt-1 truncate text-sm font-semibold text-slate-900">{phoneNumber}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm">
-                        <MapPin className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('worker:dashboard.baseCity', { defaultValue: 'Base City' })}</p>
-                        <p className="mt-1 truncate text-sm font-semibold text-slate-900">{baseCity}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
-                        <Wrench className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-500">{t('worker:dashboard.primarySkill', { defaultValue: 'Primary Skill' })}</p>
-                        <div className="mt-1 flex items-center gap-2">
-                          <span className="truncate text-sm font-semibold text-blue-800">{primarySkill}</span>
-                          <span className="inline-flex items-center rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white">
-                            Active
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm">
-                        <Award className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('worker:dashboard.experience', { defaultValue: 'Experience' })}</p>
-                        <p className="mt-1 truncate text-sm font-semibold text-slate-900">{experience}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm">
-                        <Navigation2 className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('common:address', { defaultValue: 'Service Address' })}</p>
-                        <p className="mt-1 truncate text-sm font-semibold text-slate-900">{serviceAddress}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2 rounded-xl border border-slate-100 bg-slate-50 p-4">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm">
-                          <ShieldCheck className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">{t('worker:dashboard.accountStatus', { defaultValue: 'Account Status' })}</p>
-                          <p className="mt-1 truncate text-sm font-semibold text-slate-900">{t('worker:verificationStatus', { defaultValue: 'Verification Status' })}</p>
-                        </div>
-                      </div>
-                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${accountBadge.className}`}>
-                        {isVerified ? <CheckCircle2 className="h-3.5 w-3.5" /> : <BadgeCheck className="h-3.5 w-3.5" />}
-                        {accountBadge.label}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </SurfaceCard>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <Link
-                  href="/worker/bookings"
-                  className="group relative overflow-hidden rounded-xl border border-transparent bg-gradient-to-br from-blue-600 to-blue-700 p-6 text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur-sm">
-                        <Briefcase className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-blue-100">{t('worker:jobRequests', { defaultValue: 'Job Requests' })}</p>
-                        <h3 className="mt-1 text-xl font-bold tracking-tight">
-                          {t('worker:dashboard.quickActions.jobRequestsTitle', { defaultValue: 'New work is waiting' })}
-                        </h3>
-                        <p className="mt-2 max-w-sm text-sm text-blue-100/90">
-                          {t('worker:dashboard.quickActions.jobRequestsSubtitle', { defaultValue: 'Review new job requests and manage your active bookings from one place.' })}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="inline-flex shrink-0 items-center rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white ring-1 ring-white/20">
-                      {jobRequestsCount} {t('worker:newRequests', { defaultValue: 'New' })}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
+        <div className="mx-auto max-w-7xl px-3 sm:px-4 lg:px-6 py-3 sm:py-6 space-y-3 sm:space-y-6">
+          
+          {/* Hero Header - Mobile Optimized */}
+          <div className="relative overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 p-4 sm:p-6 lg:p-8 shadow-lg shadow-blue-500/20 mx-0.5">
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00em0wIDI0YzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00ek0xMiAxNmMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHptMCAyNGMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
+            
+            <div className="relative">
+              {/* Top Section */}
+              <div className="flex items-start justify-between gap-3 mb-3 sm:mb-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <div className="h-1 w-1 rounded-full bg-emerald-400 animate-pulse"></div>
+                    <span className="text-[10px] sm:text-xs font-semibold text-blue-100 uppercase tracking-wider">
+                      {t('worker:workerDashboard', { defaultValue: 'Dashboard' })}
                     </span>
                   </div>
-                  <div className="mt-8 flex items-center justify-between text-sm font-semibold text-white/90">
-                    <span>{t('common:viewAll', { defaultValue: 'View All' })}</span>
-                    <ChevronRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
-                  </div>
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight">
+                    {t('worker:dashboard.welcomeBack', { name: `, ${firstName}`, defaultValue: `Hi, ${firstName}!` })}
+                  </h1>
+                </div>
+
+                {/* Availability Toggle - Always Show Text */}
+                <button
+                  onClick={() => setSchedule((prev) => ({ ...prev, isAvailableNow: !prev.isAvailableNow }))}
+                  className={`flex items-center gap-1.5 rounded-full px-2.5 sm:px-3 py-1.5 text-[11px] sm:text-xs font-semibold transition-all duration-200 shadow-lg shrink-0 ${
+                    schedule.isAvailableNow
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-white/10 backdrop-blur-sm border border-white/20 text-white'
+                  }`}
+                >
+                  <div className={`h-1.5 w-1.5 rounded-full ${
+                    schedule.isAvailableNow ? 'bg-white' : 'bg-white/60'
+                  }`}></div>
+                  <span>{schedule.isAvailableNow ? t('worker:available', { defaultValue: 'Available' }) : t('worker:dashboard.notAvailable', { defaultValue: 'Away' })}</span>
+                </button>
+              </div>
+
+              {/* Quick Actions - Mobile Optimized */}
+              <div className="flex gap-2">
+                <Link
+                  href="/worker/bookings"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 px-3 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-white/20 transition-all duration-200"
+                >
+                  <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span>{t('worker:jobRequests', { defaultValue: 'Jobs' })}</span>
+                  <span className="inline-flex items-center justify-center min-w-[1.125rem] h-4 rounded-full bg-white/20 px-1 text-[10px] font-bold">
+                    {jobRequestsCount}
+                  </span>
                 </Link>
 
                 <Link
                   href="/worker/chat"
-                  className="group relative overflow-hidden rounded-xl border border-transparent bg-gradient-to-br from-emerald-600 to-emerald-700 p-6 text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 px-3 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-white/20 transition-all duration-200"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur-sm">
-                        <MessageCircle className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-emerald-100">{t('common:messages', { defaultValue: 'Messages' })}</p>
-                        <h3 className="mt-1 text-xl font-bold tracking-tight">
-                          {t('worker:dashboard.quickActions.messagesTitle', { defaultValue: 'Stay connected with customers' })}
-                        </h3>
-                        <p className="mt-2 max-w-sm text-sm text-emerald-100/90">
-                          {t('worker:dashboard.quickActions.messagesSubtitle', { defaultValue: 'Keep conversations moving and respond faster to new customers.' })}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="inline-flex shrink-0 items-center rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white ring-1 ring-white/20">
-                      {unreadCount} {t('common:messages', { defaultValue: 'Unread' })}
-                    </span>
-                  </div>
-                  <div className="mt-8 flex items-center justify-between text-sm font-semibold text-white/90">
-                    <span>{t('common:messages', { defaultValue: 'Open Messages' })}</span>
-                    <ChevronRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
-                  </div>
+                  <MessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span>{t('common:messages', { defaultValue: 'Chat' })}</span>
+                  <span className="inline-flex items-center justify-center min-w-[1.125rem] h-4 rounded-full bg-white/20 px-1 text-[10px] font-bold">
+                    {unreadCount}
+                  </span>
                 </Link>
               </div>
-
-              {!isVerified && (
-                <SurfaceCard>
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{t('worker:verificationStatus', { defaultValue: 'Verification' })}</p>
-                      <h3 className="mt-2 text-lg font-bold tracking-tight text-slate-900">
-                        {t('worker:dashboard.verificationCta.title', { defaultValue: 'Complete your worker verification' })}
-                      </h3>
-                      <p className="mt-2 text-sm text-slate-500">
-                        {t('worker:dashboard.verificationCta.subtitle', {
-                          defaultValue: 'Upload your CNIC so customers and admins can trust your profile and unlock more bookings.',
-                        })}
-                      </p>
-                    </div>
-                    <UploadCNIC userId={profile?._id} onUploadSuccess={() => loadDashboard({ silent: true })} />
-                  </div>
-                </SurfaceCard>
-              )}
             </div>
+          </div>
 
-            <div className="space-y-6">
-              <SurfaceCard>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{t('worker:dashboard.availabilitySchedule', { defaultValue: 'Availability Schedule' })}</p>
-                    <h2 className="mt-2 text-xl font-bold tracking-tight text-slate-900">{t('worker:dashboard.availabilitySchedule', { defaultValue: 'Manage your working hours' })}</h2>
+          {/* Stats Grid - Compact Mobile */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 px-0.5">
+            {statCards.map((card, index) => (
+              <div
+                key={card.label}
+                className="group relative overflow-hidden rounded-lg sm:rounded-xl bg-white p-3 sm:p-4 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                  animation: 'slideUp 0.5s ease-out forwards'
+                }}
+              >
+                <div className="absolute -top-4 -right-4 w-16 h-16 bg-gradient-to-br opacity-5 rounded-full blur-xl" 
+                  style={{ background: `linear-gradient(135deg, ${card.accent.replace('text-', '')})` }}></div>
+                
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg ${card.iconWrapClass}`}>
+                      <card.icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${card.accent}`} />
+                    </div>
                   </div>
-                  <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${schedule.isAvailableNow ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-amber-200 bg-amber-50 text-amber-700'}`}>
+                  <p className="text-[9px] sm:text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1 line-clamp-1">
+                    {t(card.labelKey, { defaultValue: card.label })}
+                  </p>
+                  <p className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900 mb-0.5">{card.value}</p>
+                  <p className="text-[9px] sm:text-[10px] text-slate-400 line-clamp-1">{card.trend}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Availability Schedule - Modern Card */}
+          <div className="space-y-4">
+            <div className="rounded-2xl sm:rounded-3xl bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
+              {/* Card Header */}
+              <div className="bg-gradient-to-r from-slate-50 to-blue-50/50 px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-900">
+                      {t('worker:dashboard.availabilitySchedule', { defaultValue: 'Availability Schedule' })}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
+                      {t('worker:dashboard.availabilitySchedule', { defaultValue: 'Manage your working hours' })}
+                    </p>
+                  </div>
+                  <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${
+                    schedule.isAvailableNow 
+                      ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' 
+                      : 'bg-amber-100 text-amber-700 border border-amber-200'
+                  }`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${
+                      schedule.isAvailableNow ? 'bg-emerald-500' : 'bg-amber-500'
+                    }`}></span>
                     {schedule.isAvailableNow
                       ? t('worker:dashboard.availableNow', { defaultValue: 'Available Now' })
                       : t('worker:dashboard.notAvailable', { defaultValue: 'Away' })}
                   </span>
                 </div>
+              </div>
 
+              {/* Card Body */}
+              <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                {/* Quick Apply Button */}
                 <button
                   type="button"
                   onClick={applySameTimeToAllDays}
-                  className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-all"
                 >
+                  <Clock3 className="h-4 w-4" />
                   {t('common:applySame', { defaultValue: 'Apply same time to all days' })}
                 </button>
 
-                <div className="mt-5 grid grid-cols-1 gap-3">
+                {/* Days Grid - Mobile Optimized */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
                   {schedule.weeklySchedule.map((item, index) => (
-                    <ScheduleDayRow
-                      key={item.day}
-                      item={item}
-                      dayLabel={t(`worker:dashboard.days.${item.day.toLowerCase()}`, { defaultValue: item.day })}
-                      index={index}
-                      onToggle={handleDayToggle}
-                      onTimeChange={handleDayTimeChange}
-                      closedLabel={t('common:closed', { defaultValue: 'Closed' })}
-                    />
+                    <div 
+                      key={item.day} 
+                      className={`group relative rounded-xl border-2 p-3 transition-all duration-200 ${
+                        item.enabled 
+                          ? 'border-blue-200 bg-blue-50/50 hover:border-blue-300 hover:bg-blue-50' 
+                          : 'border-slate-200 bg-slate-50 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <p className={`text-xs font-bold uppercase tracking-wide truncate ${
+                            item.enabled ? 'text-blue-900' : 'text-slate-500'
+                          }`}>
+                            {t(`worker:dashboard.days.${item.day.toLowerCase()}`, { defaultValue: item.day.slice(0, 3) })}
+                          </p>
+                          <button
+                            onClick={() => handleDayToggle(index)}
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                              item.enabled ? 'bg-blue-600' : 'bg-slate-300'
+                            }`}
+                          >
+                            <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
+                              item.enabled ? 'translate-x-4' : 'translate-x-0.5'
+                            }`} />
+                          </button>
+                        </div>
+                        
+                        {item.enabled ? (
+                          <div className="space-y-1.5">
+                            <input
+                              type="time"
+                              value={item.start}
+                              onChange={(event) => handleDayTimeChange(index, 'start', event.target.value)}
+                              className="h-8 w-full rounded-lg border border-blue-200 bg-white px-2 text-xs font-medium text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            />
+                            <input
+                              type="time"
+                              value={item.end}
+                              onChange={(event) => handleDayTimeChange(index, 'end', event.target.value)}
+                              className="h-8 w-full rounded-lg border border-blue-200 bg-white px-2 text-xs font-medium text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                            />
+                          </div>
+                        ) : (
+                          <p className="text-xs font-medium text-slate-400 text-center py-2">
+                            {t('common:closed', { defaultValue: 'Closed' })}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   ))}
                 </div>
 
-                <div className="mt-5 space-y-4 rounded-xl border border-slate-100 bg-slate-50 p-4">
+                {/* Service Settings */}
+                <div className="grid sm:grid-cols-2 gap-4 p-4 rounded-xl bg-gradient-to-br from-slate-50 to-blue-50/30 border border-slate-100">
                   <div>
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-slate-800">{t('worker:dashboard.serviceRadius', { defaultValue: 'Service Radius' })}</p>
-                      <span className="text-sm font-semibold text-slate-500">{scheduleRadius} km</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm font-semibold text-slate-700">
+                        {t('worker:dashboard.serviceRadius', { defaultValue: 'Service Radius' })}
+                      </label>
+                      <span className="text-sm font-bold text-blue-600">{scheduleRadius} km</span>
                     </div>
                     <input
                       type="range"
@@ -835,60 +728,77 @@ export default function WorkerDashboard() {
                       max="50"
                       value={scheduleRadius}
                       onChange={(event) => setSchedule((prev) => ({ ...prev, serviceRadiusKm: Number(event.target.value) }))}
-                      className="mt-3 h-2 w-full cursor-pointer accent-blue-600"
+                      className="h-2 w-full cursor-pointer accent-blue-600 rounded-full"
                     />
-                    <div className="mt-2 flex items-center justify-between text-[11px] font-medium text-slate-400">
+                    <div className="flex items-center justify-between mt-1.5 text-xs text-slate-400">
                       <span>0 km</span>
                       <span>50 km</span>
                     </div>
                   </div>
 
                   <div>
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-slate-800">{t('worker:dashboard.responseRate', { defaultValue: 'Response Rate' })}</p>
-                      <span className="text-sm font-semibold text-slate-500">{responseRate}%</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm font-semibold text-slate-700">
+                        {t('worker:dashboard.responseRate', { defaultValue: 'Response Rate' })}
+                      </label>
+                      <span className="text-sm font-bold text-emerald-600">{responseRate}%</span>
                     </div>
-                    <div className="mt-3 h-2 rounded-full bg-slate-200">
-                      <div className="h-2 rounded-full bg-emerald-500 transition-all duration-300" style={{ width: `${responseRate}%` }} />
+                    <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-300 rounded-full" 
+                        style={{ width: `${responseRate}%` }}
+                      />
                     </div>
-                    <div className="mt-2 flex items-center justify-between text-[11px] font-medium text-slate-400">
+                    <div className="flex items-center justify-between mt-1.5 text-xs text-slate-400">
                       <span>{t('worker:dashboard.responseRateHint', { defaultValue: 'Average reply performance' })}</span>
                       <span>{t('common:readOnly', { defaultValue: 'Read only' })}</span>
                     </div>
                   </div>
                 </div>
 
+                {/* Save Button */}
                 <button
                   type="button"
                   onClick={saveSchedule}
                   disabled={savingSchedule}
-                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:-translate-y-0.5"
                 >
-                  {savingSchedule ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-                  {savingSchedule
-                    ? t('worker:dashboard.saving', { defaultValue: 'Saving...' })
-                    : t('worker:dashboard.saveSchedule', { defaultValue: 'Save Schedule' })}
+                  {savingSchedule ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {t('worker:dashboard.saving', { defaultValue: 'Saving...' })}
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="h-4 w-4" />
+                      {t('worker:dashboard.saveSchedule', { defaultValue: 'Save Schedule' })}
+                    </>
+                  )}
                 </button>
-              </SurfaceCard>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {showEditProfile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 px-4 py-6 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl rounded-2xl bg-white p-4 shadow-2xl sm:p-6">
-            <button
-              type="button"
-              onClick={() => setShowEditProfile(false)}
-              className="absolute right-4 top-4 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50"
-            >
-              {t('common:close', { defaultValue: 'Close' })}
-            </button>
-            <EditProfile profile={profile} onProfileUpdate={handleProfileUpdate} onCancel={() => setShowEditProfile(false)} />
-          </div>
-        </div>
-      )}
+      <style jsx global>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @media (min-width: 475px) {
+          .xs\:inline {
+            display: inline;
+          }
+        }
+      `}</style>
     </DashboardLayout>
   );
 }

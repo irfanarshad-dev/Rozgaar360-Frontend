@@ -57,6 +57,8 @@
   "bookingCreateFailed": "بکنگ بنانے میں ناکامی",
   "dashboard": {
     "welcomeBack": "خوش آمدید{{name}}!",
+    "welcome": "خوش آمدید، {{name}}!",
+    "defaultName": "یہاں",
     "subtitle": "آج ہنر مند پیشہ ور افراد کو ہائر کرنے کے لیے تیار ہیں؟",
     "stats": {
       "discover": "دریافت",
@@ -150,6 +152,8 @@
       "workerInfo": "کارکن کی معلومات",
       "serviceDetails": "سروس کی تفصیلات",
       "serviceLocation": "سروس کی جگہ",
+      "schedule": "شیڈول",
+      "serviceDescription": "سروس کی تفصیل",
       "issueDescription": "مسئلے کی تفصیل",
       "paymentInfo": "ادائیگی کی معلومات",
       "timeline": "ٹائم لائن",
@@ -168,6 +172,7 @@
       "stripe": "اسٹرائپ",
       "transactionId": "ٹرانزیکشن آئی ڈی"
     },
+    "paymentCompleted": "ادائیگی مکمل ہو گئی",
     "readyForStripe": "اسٹرائپ کے ذریعے ادائیگی کے لیے تیار",
     "waitingForWorker": {
       "title": "کارکن کا انتظار ہے",
@@ -183,11 +188,77 @@
       "chatWithWorker": "کارکن سے چیٹ کریں",
       "leaveReview": "جائزہ دیں",
       "cancelBooking": "بکنگ منسوخ کریں",
-      "cancelConfirm": "کیا آپ واقعی اس بکنگ کو منسوخ کرنا چاہتے ہیں؟"
+      "cancelConfirm": "کیا آپ واقعی اس بکنگ کو منسوخ کرنا چاہتے ہیں؟",
+      "cancelWarning": "یہ کارروائی واپس نہیں لی جا سکتی"
+    },
+    "noDescription": "کوئی تفصیل فراہم نہیں کی گئی",
+    "trust": {
+      "title": "ہمیں کیوں منتخب کریں",
+      "badges": {
+        "secure": "محفوظ",
+        "verified": "تصدیق شدہ",
+        "onTime": "وقت پر",
+        "quality": "معیاری"
+      }
     },
     "errors": {
       "notFoundOrDenied": "بکنگ نہیں ملی یا رسائی نہیں ہے",
       "cancelFailed": "بکنگ منسوخ کرنے میں ناکامی"
+    }
+  },
+  "confirmation": {
+    "header": {
+      "title": "بکنگ جمع ہو گئی!",
+      "subtitle": "کارکن کے جواب کا انتظار ہے..."
+    },
+    "notFoundTitle": "بکنگ نہیں ملی",
+    "notFoundMessage": "ہم اس بکنگ کی تصدیق لوڈ نہیں کر سکے۔ براہ کرم واپس اپنی بکنگز پر جائیں اور دوبارہ کوشش کریں۔",
+    "backToBookings": "میری بکنگز پر واپس جائیں",
+    "details": {
+      "title": "بکنگ کی تفصیلات",
+      "service": "سروس",
+      "worker": "کارکن",
+      "date": "تاریخ",
+      "time": "وقت",
+      "status": "حالت"
+    },
+    "placeholders": {
+      "defaultService": "پینٹر",
+      "defaultWorker": "مقررہ کارکن",
+      "defaultDate": "ہفتہ، 30 مئی 2026",
+      "defaultTime": "1:35 AM"
+    },
+    "next": {
+      "title": "اگلا کیا ہوگا؟",
+      "message": "جب کارکن آپ کی بکنگ درخواست کا جواب دے گا تو آپ کو اطلاع مل جائے گی۔"
+    },
+    "wait": {
+      "title": "براہ کرم انتظار کریں",
+      "message": "آپ کی بکنگ درخواست کارکن کو بھیج دی گئی ہے۔ براہ کرم ان کے قبول کرنے اور سروس رقم مقرر کرنے کا انتظار کریں۔",
+      "note": "جب کارکن جواب دے گا تو آپ کو اطلاع مل جائے گی۔"
+    },
+    "actions": {
+      "goToBookings": "میری بکنگز پر جائیں",
+      "chatWithWorker": "کارکن سے چیٹ کریں",
+      "refreshing": "ہر 5 سیکنڈ بعد خود بخود تازہ ہو رہا ہے..."
+    },
+    "trust": {
+      "secure": {
+        "title": "محفوظ اور مامون",
+        "description": "آپ کی معلومات محفوظ ہیں"
+      },
+      "verified": {
+        "title": "تصدیق شدہ کارکن",
+        "description": "تمام کارکن تصدیق شدہ ہیں"
+      },
+      "onTime": {
+        "title": "وقت پر سروس",
+        "description": "ہم آپ کے وقت کی قدر کرتے ہیں"
+      },
+      "satisfaction": {
+        "title": "100% اطمینان",
+        "description": "ہم آپ کے اطمینان کا خیال رکھتے ہیں"
+      }
     }
   },
   "paymentPage": {

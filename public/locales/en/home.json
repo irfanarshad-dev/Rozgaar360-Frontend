@@ -1,6 +1,7 @@
 {
   "banner": {
     "welcomeBack": "Welcome back, {{name}}!",
+    "workerWelcomeBack": "Welcome back, {{name}}! Manage your bookings and availability.",
     "goToDashboard": "Go to your dashboard →"
   },
   "ad": {
@@ -40,6 +41,10 @@
     "resultsTitle": "AI Recommendations",
     "viewProfile": "View Profile",
     "reviewCount": "{{count}} Reviews",
+    "searchButton": "Search",
+    "searching": "Searching...",
+    "skillFallback": "Skill",
+    "matches": "{{count}} matches",
     "match": "Match",
     "disclaimer": "AI matches are based on skill relevance, experience, and proximity.",
     "noRelatedWorkers": "No workers found related to your query. Please change your preference.",

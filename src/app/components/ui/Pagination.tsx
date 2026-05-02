@@ -100,13 +100,38 @@ export default function Pagination({
   const isPrevDisabled = currentPage === 1 || loading;
   const isNextDisabled = currentPage === totalPages || loading;
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      handlePrevious();
+    }
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      handleNext();
+    }
+    if (event.key === 'Home') {
+      event.preventDefault();
+      handlePageClick(1);
+    }
+    if (event.key === 'End') {
+      event.preventDefault();
+      handlePageClick(totalPages);
+    }
+  };
+
   return (
     <nav
       role="navigation"
       aria-label="Pagination Navigation"
-      className="flex items-center justify-center w-full px-4 py-8"
+      aria-busy={loading}
+      onKeyDown={handleKeyDown}
+      className="relative flex w-full items-center justify-center px-4 py-8"
     >
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <span className="sr-only" aria-live="polite">
+        Page {currentPage} of {totalPages}
+      </span>
+      <div className="flex w-full max-w-2xl items-center justify-center">
+        <div className="flex items-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-2 py-2 shadow-sm sm:gap-2 sm:px-3">
         {/* Previous Button */}
         <button
           onClick={handlePrevious}
@@ -114,15 +139,15 @@ export default function Pagination({
           aria-label="Go to previous page"
           className={`
             group relative flex items-center justify-center gap-1.5 sm:gap-2
-            h-9 sm:h-10 px-3 sm:px-4
-            rounded-lg sm:rounded-xl
-            text-xs sm:text-sm font-semibold
+            h-10 sm:h-11 px-3.5 sm:px-4
+            rounded-xl
+            text-xs sm:text-sm font-semibold tracking-tight
             transition-all duration-200
             border
             ${
               isPrevDisabled
-                ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed'
-                : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 hover:shadow-sm active:scale-95'
+                ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed'
+                : 'bg-slate-900/5 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-900/10 hover:text-slate-900 hover:shadow-sm active:scale-[0.98]'
             }
           `}
         >
@@ -138,7 +163,7 @@ export default function Pagination({
               return (
                 <div
                   key={page}
-                  className="flex items-center justify-center w-8 h-9 sm:w-9 sm:h-10 text-gray-400"
+                  className="flex items-center justify-center w-8 h-10 sm:w-10 sm:h-11 text-slate-400"
                   aria-hidden="true"
                 >
                   <MoreHorizontal className="w-4 h-4" />
@@ -157,22 +182,22 @@ export default function Pagination({
                 aria-current={isActive ? 'page' : undefined}
                 className={`
                   relative flex items-center justify-center
-                  w-8 h-9 sm:w-10 sm:h-10
-                  rounded-lg sm:rounded-xl
-                  text-xs sm:text-sm font-semibold
+                  w-9 h-10 sm:w-11 sm:h-11
+                  rounded-xl
+                  text-xs sm:text-sm font-semibold tracking-tight
                   transition-all duration-200
                   border
                   ${
                     isActive
-                      ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white border-blue-600 shadow-md shadow-blue-200 scale-105 z-10'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 hover:shadow-sm active:scale-95'
+                      ? 'bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 text-white border-transparent shadow-md shadow-blue-200/60 scale-[1.03] z-10'
+                      : 'bg-slate-900/5 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-900/10 hover:text-slate-900 hover:shadow-sm active:scale-[0.98]'
                   }
                   ${loading ? 'cursor-wait opacity-60' : ''}
                 `}
               >
                 {page}
                 {isActive && (
-                  <span className="absolute inset-0 rounded-lg sm:rounded-xl ring-2 ring-blue-400 ring-offset-1 animate-pulse" />
+                  <span className="absolute inset-0 rounded-xl ring-2 ring-blue-400/50 ring-offset-2 ring-offset-white motion-safe:animate-pulse" />
                 )}
               </button>
             );
@@ -186,26 +211,27 @@ export default function Pagination({
           aria-label="Go to next page"
           className={`
             group relative flex items-center justify-center gap-1.5 sm:gap-2
-            h-9 sm:h-10 px-3 sm:px-4
-            rounded-lg sm:rounded-xl
-            text-xs sm:text-sm font-semibold
+            h-10 sm:h-11 px-3.5 sm:px-4
+            rounded-xl
+            text-xs sm:text-sm font-semibold tracking-tight
             transition-all duration-200
             border
             ${
               isNextDisabled
-                ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed'
-                : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 hover:shadow-sm active:scale-95'
+                ? 'bg-slate-50 text-slate-300 border-slate-200 cursor-not-allowed'
+                : 'bg-slate-900/5 text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-900/10 hover:text-slate-900 hover:shadow-sm active:scale-[0.98]'
             }
           `}
         >
           <span className="hidden sm:inline">Next</span>
           <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:translate-x-0.5" />
         </button>
+        </div>
       </div>
 
       {/* Page Info - Mobile Only */}
       <div className="sm:hidden absolute bottom-2 left-1/2 -translate-x-1/2">
-        <span className="text-[10px] font-medium text-gray-400 bg-white px-2 py-0.5 rounded-full border border-gray-100">
+        <span className="text-[10px] font-medium text-slate-400 bg-white px-2 py-0.5 rounded-full border border-slate-200">
           Page {currentPage} of {totalPages}
         </span>
       </div>

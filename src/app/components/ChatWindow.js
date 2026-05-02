@@ -2,10 +2,10 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useChat } from '@/lib/useChat';
-import { Send, ArrowLeft, Phone, MoreVertical, CheckCheck, Check, Shield, Paperclip, X, Download, FileText } from 'lucide-react';
+import { Send, ArrowLeft, MoreVertical, CheckCheck, Check, Shield, Paperclip, X, Download, FileText } from 'lucide-react';
 import NotificationPermissionBanner from './NotificationPermissionBanner';
 
-function Avatar({ name, size = 'md' }) {
+function Avatar({ name, src, size = 'md' }) {
   const colors = [
     'from-blue-500 to-blue-600',
     'from-violet-500 to-purple-600',
@@ -16,6 +16,22 @@ function Avatar({ name, size = 'md' }) {
   ];
   const idx = name ? name.charCodeAt(0) % colors.length : 0;
   const sz = size === 'lg' ? 'w-12 h-12 text-base' : 'w-9 h-9 text-sm';
+
+  if (src) {
+    return (
+      <div className={`${sz} rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-white ring-1 ring-gray-100`}>
+        <img
+          src={src}
+          alt={name || 'Chat avatar'}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={`${sz} bg-gradient-to-br ${colors[idx]} rounded-2xl flex items-center justify-center text-white font-bold flex-shrink-0 shadow-md`}>
       {name?.charAt(0)?.toUpperCase() || '?'}
@@ -34,11 +50,12 @@ function formatTime(dateStr) {
   return new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-export default function ChatWindow({ conversationId, otherUserName, onBack }) {
+export default function ChatWindow({ conversationId, otherUserName, otherUserProfilePicture, onBack }) {
   const { t, i18n } = useTranslation('common');
   const { isConnected, messages, sendMessage, setTyping, joinConversation, deleteMessage } = useChat();
   const [input, setInput] = useState('');
   const [displayName, setDisplayName] = useState(otherUserName || t('user'));
+  const [displayPicture, setDisplayPicture] = useState(otherUserProfilePicture || null);
   const [isTypingLocal, setIsTypingLocal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [filePreview, setFilePreview] = useState(null);
@@ -84,7 +101,9 @@ export default function ChatWindow({ conversationId, otherUserName, onBack }) {
       if (details) {
         const isWorker = String(details.workerId) === String(userId);
         const other = isWorker ? details.customerName : details.workerName;
+        const picture = isWorker ? details.customerProfilePicture : details.workerProfilePicture;
         setDisplayName(other || otherUserName || t('user'));
+        setDisplayPicture(picture || otherUserProfilePicture || null);
       }
       setLoading(false);
     }).catch(err => {
@@ -95,7 +114,7 @@ export default function ChatWindow({ conversationId, otherUserName, onBack }) {
     return () => {
       if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
     };
-  }, [conversationId, isConnected, userId, joinConversation, otherUserName, t]);
+  }, [conversationId, isConnected, userId, joinConversation, otherUserName, otherUserProfilePicture, t]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -267,7 +286,7 @@ export default function ChatWindow({ conversationId, otherUserName, onBack }) {
           </button>
         )}
 
-        <Avatar name={displayName} size="lg" />
+        <Avatar name={displayName} src={displayPicture} size="lg" />
 
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-gray-900 text-sm sm:text-base leading-tight truncate">{displayName}</p>
@@ -278,9 +297,6 @@ export default function ChatWindow({ conversationId, otherUserName, onBack }) {
         </div>
 
         <div className="flex items-center gap-0.5 sm:gap-1">
-          <button className="p-1.5 sm:p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
-            <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-          </button>
           <button className="p-1.5 sm:p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
             <MoreVertical className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>

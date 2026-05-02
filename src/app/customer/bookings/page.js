@@ -152,7 +152,7 @@ export default function CustomerBookings() {
               </Link>
               {!payments[booking._id] && booking.status !== 'cancelled' && (
                 <Link href={`/payment?bookingId=${booking._id}`} className="inline-flex h-9 items-center justify-center rounded-lg bg-blue-600 px-4 text-xs font-medium text-white transition hover:bg-blue-700">
-                  {t('customer:bookings.actions.payNow')}
+                  {t('customer:paymentPage.actions.payNowAmount', { amount: booking.totalAmount.toFixed(2) })}
                 </Link>
               )}
               {booking.conversationId && (

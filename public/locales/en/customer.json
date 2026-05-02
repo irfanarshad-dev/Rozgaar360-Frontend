@@ -57,6 +57,8 @@
   "bookingCreateFailed": "Failed to create booking",
   "dashboard": {
     "welcomeBack": "Hi{{name}}!",
+    "welcome": "Hi, {{name}}!",
+    "defaultName": "there",
     "subtitle": "Ready to hire skilled professionals today?",
     "stats": {
       "discover": "Discover",
@@ -150,6 +152,8 @@
       "workerInfo": "Worker Information",
       "serviceDetails": "Service Details",
       "serviceLocation": "Service Location",
+      "schedule": "Schedule",
+      "serviceDescription": "Service Description",
       "issueDescription": "Issue Description",
       "paymentInfo": "Payment Information",
       "timeline": "Timeline",
@@ -168,6 +172,7 @@
       "stripe": "Stripe",
       "transactionId": "Transaction ID"
     },
+    "paymentCompleted": "Payment Completed",
     "readyForStripe": "Ready for payment via Stripe",
     "waitingForWorker": {
       "title": "Waiting for Worker",
@@ -183,11 +188,77 @@
       "chatWithWorker": "Chat with Worker",
       "leaveReview": "Leave Review",
       "cancelBooking": "Cancel Booking",
-      "cancelConfirm": "Are you sure you want to cancel this booking?"
+      "cancelConfirm": "Are you sure you want to cancel this booking?",
+      "cancelWarning": "This action cannot be undone"
+    },
+    "noDescription": "No description provided",
+    "trust": {
+      "title": "Why Choose Us",
+      "badges": {
+        "secure": "Secure",
+        "verified": "Verified",
+        "onTime": "On-time",
+        "quality": "Quality"
+      }
     },
     "errors": {
       "notFoundOrDenied": "Booking not found or access denied",
       "cancelFailed": "Failed to cancel booking"
+    }
+  },
+  "confirmation": {
+    "header": {
+      "title": "Booking Submitted!",
+      "subtitle": "Waiting for worker response..."
+    },
+    "notFoundTitle": "Booking not found",
+    "notFoundMessage": "We could not load this booking confirmation. Please go back to your bookings and try again.",
+    "backToBookings": "Back to My Bookings",
+    "details": {
+      "title": "Booking Details",
+      "service": "Service",
+      "worker": "Worker",
+      "date": "Date",
+      "time": "Time",
+      "status": "Status"
+    },
+    "placeholders": {
+      "defaultService": "Painter",
+      "defaultWorker": "Assigned worker",
+      "defaultDate": "Saturday, May 30, 2026",
+      "defaultTime": "1:35 AM"
+    },
+    "next": {
+      "title": "What happens next?",
+      "message": "You will receive a notification once the worker responds to your booking request."
+    },
+    "wait": {
+      "title": "Please Wait",
+      "message": "Your booking request has been sent to the worker. Please wait for them to accept and set the service amount.",
+      "note": "You will receive a notification once the worker responds."
+    },
+    "actions": {
+      "goToBookings": "Go to My Bookings",
+      "chatWithWorker": "Chat with Worker",
+      "refreshing": "Auto-refreshing every 5 seconds..."
+    },
+    "trust": {
+      "secure": {
+        "title": "Secure & Safe",
+        "description": "Your information is protected"
+      },
+      "verified": {
+        "title": "Verified Workers",
+        "description": "All workers are verified"
+      },
+      "onTime": {
+        "title": "On-time Service",
+        "description": "We value your time"
+      },
+      "satisfaction": {
+        "title": "100% Satisfaction",
+        "description": "We care about your satisfaction"
+      }
     }
   },
   "paymentPage": {

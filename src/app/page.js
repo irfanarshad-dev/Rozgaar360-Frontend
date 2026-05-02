@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -87,6 +87,7 @@ function Counter({ end, suffix = '' }) {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   const started = useRef(false);
+
   useEffect(() => {
     const observer = new IntersectionObserver(([e]) => {
       if (e.isIntersecting && !started.current) {
@@ -110,7 +111,7 @@ function Counter({ end, suffix = '' }) {
 
 // Worker card using real backend data
 function WorkerCard({ worker, t, getSkillLabel, onViewProfile, mounted }) {
-  const router = useRouter();
+  const cardRouter = useRouter();
   const translatedSkill = getSkillLabel(worker.skill);
   const avatarSrc = worker.profilePicture && worker.profilePicture !== '/user.png'
     ? worker.profilePicture
@@ -123,68 +124,93 @@ function WorkerCard({ worker, t, getSkillLabel, onViewProfile, mounted }) {
     .join('');
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md hover:border-blue-200 transition-all">
-      <div className="h-2 rounded-t-xl bg-blue-600" />
+    <div className="group bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-300">
+      <div className="p-5">
+        {/* Header */}
+        <div className="flex items-start gap-4 mb-4">
+          <div className="relative flex-shrink-0">
+            <div className="relative h-14 w-14 rounded-xl overflow-hidden ring-2 ring-gray-100 group-hover:ring-blue-200 transition-all">
+              {avatarSrc ? (
+                <Image
+                  src={avatarSrc}
+                  alt={worker.name}
+                  width={56}
+                  height={56}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full bg-blue-50 text-blue-700 flex items-center justify-center text-lg font-bold">
+                  {initials || 'W'}
+                </div>
+              )}
+            </div>
+            {worker.verified && (
+              <div className="absolute -bottom-1 -right-1 h-5 w-5 bg-blue-600 rounded-full flex items-center justify-center ring-2 ring-white">
+                <CheckCircle2 className="h-3 w-3 text-white" />
+              </div>
+            )}
+          </div>
 
-      <div className="flex flex-col items-center mt-3">
-        {avatarSrc ? (
-          <Image
-            src={avatarSrc}
-            alt={worker.name}
-            width={48}
-            height={48}
-            className="h-12 w-12 rounded-full object-cover"
-          />
-        ) : (
-          <div className="h-12 w-12 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center text-lg font-medium">
-            {initials || 'W'}
+          <div className="flex-1 min-w-0">
+            <h3 className="text-base font-semibold text-gray-900 truncate mb-1">
+              {worker.name}
+            </h3>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-100">
+              <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+              <span className="text-xs font-medium text-blue-700">
+                {translatedSkill}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-2 mb-3 text-sm text-gray-600">
+          <MapPin className="h-4 w-4 text-gray-400" />
+          <span>{worker.city}</span>
+        </div>
+
+        {/* Rating */}
+        <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+          <div className="flex items-center gap-1">
+            <Stars rating={worker.rating} />
+          </div>
+          <span className="text-sm text-gray-500" suppressHydrationWarning>
+            {worker.reviewCount || 0} {t('home:featured.reviews')}
+          </span>
+        </div>
+
+        {/* Experience */}
+        {worker.experience != null && (
+          <div className="mb-4">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 text-xs font-medium text-gray-700" suppressHydrationWarning>
+              {worker.experience === 1
+                ? t('home:featured.experienceOne', { count: worker.experience })
+                : t('home:featured.experienceOther', { count: worker.experience })}
+            </span>
           </div>
         )}
-        {worker.verified && (
-          <span className="mt-2 text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full" suppressHydrationWarning>
-            {mounted ? t('home:featured.verified', { defaultValue: 'Verified' }) : 'Verified'}
-          </span>
-        )}
+
+        {/* Action Button */}
+        <button
+          onClick={() => {
+            if (onViewProfile) {
+              onViewProfile(worker.id);
+              return;
+            }
+            cardRouter.push(`/profile/${worker.id}`);
+          }}
+          className="w-full px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all active:scale-95 shadow-sm"
+          suppressHydrationWarning
+        >
+          {t('home:featured.viewProfile')}
+        </button>
       </div>
-
-      <h3 className="mt-3 text-base font-medium text-gray-900 truncate text-center">{worker.name}</h3>
-      <p className="text-sm text-gray-400 text-center">{translatedSkill} - {worker.city}</p>
-
-      <div className="mt-2 flex items-center justify-center gap-1.5">
-        <Stars rating={worker.rating} />
-        <span className="text-xs text-gray-400" suppressHydrationWarning>({worker.reviewCount || 0} {mounted ? t('home:featured.reviews', { defaultValue: 'reviews' }) : 'reviews'})</span>
-      </div>
-
-      {worker.experience != null && (
-        <span className="mt-2 inline-block text-xs text-gray-500 bg-gray-50 rounded-md px-2 py-1" suppressHydrationWarning>
-          {mounted ? (
-            worker.experience === 1
-              ? t('home:featured.experienceOne', { count: worker.experience })
-              : t('home:featured.experienceOther', { count: worker.experience })
-          ) : (
-            `${worker.experience} year${worker.experience === 1 ? '' : 's'} experience`
-          )}
-        </span>
-      )}
-
-      <button
-        onClick={() => {
-          if (onViewProfile) {
-            onViewProfile(worker.id);
-            return;
-          }
-          router.push(`/profile/${worker.id}`);
-        }}
-        className="mt-3 w-full border border-gray-200 text-gray-700 text-sm py-2 rounded-lg hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all"
-        suppressHydrationWarning
-      >
-        {mounted ? t('home:featured.viewProfile') : 'View Profile'}
-      </button>
     </div>
   );
 }
 
-// ΓöÇΓöÇΓöÇ Main Page ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+// ΓöÇΓöÇΓöÇ Main Page ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 export default function Home() {
   const { t } = useTranslation(['home', 'common']);
   const { language, changeLanguage } = useLanguage();
@@ -201,8 +227,7 @@ export default function Home() {
   const [showMap,   setShowMap]   = useState(false);
   const [sharedLocation, setSharedLocation] = useState(null);
 
-  // Featured workers (top rated from backend)
-  const [workers,        setWorkers]        = useState([]);
+  const [workers, setWorkers] = useState([]);
   const [workersLoading, setWorkersLoading] = useState(true);
   const [workersError,   setWorkersError]   = useState(false);
 
@@ -364,12 +389,12 @@ export default function Home() {
           isWorker ? 'bg-emerald-600' : 'bg-blue-600'
         }`}>
           {isWorker
-            ? `Welcome back, ${user.name}! Manage your bookings and availability.`
-            : `Welcome back, ${user.name}!`
+            ? t('home:banner.workerWelcomeBack', { name: user.name })
+            : t('home:banner.welcomeBack', { name: user.name })
           }<br />
           <Link href={user.role === 'worker' ? '/worker/dashboard' : '/customer/dashboard'}
             className="font-bold hover:opacity-90">
-            Go to your dashboard
+            {t('home:banner.goToDashboard')}
           </Link>
         </div>
       )}
@@ -675,7 +700,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {SKILLS.map((s) => {
               const meta = SKILL_META[s] || DEFAULT_META;
               const Icon = meta.icon;
@@ -688,32 +713,49 @@ export default function Home() {
                     if (active) { setSkill(''); setSearchWorkers([]); }
                     else handleSkillFilter(s);
                   }}
-                  className={`service-card-hover group rounded-2xl p-5 sm:p-6 cursor-pointer border text-left relative overflow-hidden transition-all ${
+                  className={`group relative rounded-2xl p-4 sm:p-5 cursor-pointer border-2 text-left overflow-hidden transition-all duration-300 ${
                     active
-                      ? 'border-blue-400 bg-blue-50 shadow-lg'
-                      : `${meta.bg} border-gray-100/80 bg-opacity-80`
+                      ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg shadow-blue-500/20'
+                      : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-md'
                   }`}
                 >
-                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl mb-4 shadow-md overflow-hidden group-hover:scale-110 transition-transform duration-300 ${avatarSrc ? 'bg-white ring-1 ring-gray-200' : `bg-gradient-to-br ${meta.color} flex items-center justify-center`}`}>
-                    {avatarSrc ? (
-                      <Image
-                        src={avatarSrc}
-                        alt={getSkillLabel(s)}
-                        width={56}
-                        height={56}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <Icon className="w-7 h-7 text-white" strokeWidth={1.75} />
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Icon className="w-4 h-4 text-gray-700" strokeWidth={2} />
-                    <h3 className="font-bold text-gray-900 text-[14px] sm:text-[15px]">{getSkillLabel(s)}</h3>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <p className="text-gray-400 text-[12px] leading-tight">{active ? (mounted ? t('home:services.showingWorkers') : 'Showing workers') : (mounted ? t('home:services.browseWorkers') : 'Browse workers')}</p>
-                    <ChevronRight className={`w-4 h-4 transition-all ${active ? 'text-blue-500 rotate-90' : 'text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1'}`} />
+                  {/* Gradient overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-indigo-50/0 group-hover:from-blue-50/50 group-hover:to-indigo-50/30 transition-all duration-300 pointer-events-none" />
+                  
+                  <div className="relative">
+                    {/* Icon/Avatar */}
+                    <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl mb-3 sm:mb-4 shadow-sm overflow-hidden transition-all duration-300 group-hover:scale-105 ${
+                      avatarSrc ? 'bg-white ring-2 ring-gray-100 group-hover:ring-blue-200' : `bg-gradient-to-br ${meta.color} flex items-center justify-center`
+                    }`}>
+                      {avatarSrc ? (
+                        <Image
+                          src={avatarSrc}
+                          alt={getSkillLabel(s)}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-white" strokeWidth={2} />
+                      )}
+                    </div>
+                    
+                    {/* Title */}
+                    <h3 className="font-bold text-gray-900 text-sm sm:text-base mb-1 truncate">
+                      {getSkillLabel(s)}
+                    </h3>
+                    
+                    {/* Status/Action */}
+                    <div className="flex items-center justify-between">
+                      <p className={`text-xs font-medium transition-colors ${
+                        active ? 'text-blue-600' : 'text-gray-500 group-hover:text-blue-600'
+                      }`}>
+                        {active ? (mounted ? t('home:services.showingWorkers') : 'Showing') : (mounted ? t('home:services.browseWorkers') : 'Browse')}
+                      </p>
+                      <ChevronRight className={`w-4 h-4 transition-all duration-300 ${
+                        active ? 'text-blue-500 rotate-90' : 'text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1'
+                      }`} />
+                    </div>
                   </div>
                 </button>
               );
@@ -743,19 +785,6 @@ export default function Home() {
                 )}
               </p>
             </div>
-            {!skill && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (!ensureRegistered()) return;
-                  router.push('/recommendations');
-                }}
-                className="text-sm text-blue-600 hover:underline"
-                suppressHydrationWarning
-              >
-                {mounted ? t('home:featured.seeAllWorkers') : 'See all workers'} →
-              </button>
-            )}
             {skill && (
               <button onClick={() => { setSkill(''); setSearchWorkers([]); }}
                 className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 border border-gray-200 hover:border-blue-300 px-3 py-1.5 rounded-full transition-all"
@@ -799,18 +828,37 @@ export default function Home() {
           )}
 
           {!displayLoading && displayWorkers.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
-              {displayWorkers.map(w => (
-                <WorkerCard
-                  key={w.id}
-                  worker={w}
-                  t={t}
-                  getSkillLabel={getSkillLabel}
-                  onViewProfile={handleViewProfile}
-                  mounted={mounted}
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+                {displayWorkers.map(w => (
+                  <WorkerCard
+                    key={w.id}
+                    worker={w}
+                    t={t}
+                    getSkillLabel={getSkillLabel}
+                    onViewProfile={handleViewProfile}
+                    mounted={mounted}
+                  />
+                ))}
+              </div>
+
+              {/* Shadcn-Style Modern Button */}
+              <div className="mt-12 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!ensureRegistered()) return;
+                    router.push('/recommendations');
+                  }}
+                  className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl bg-gradient-to-b from-blue-600 to-blue-700 text-white font-semibold text-sm shadow-[0_1px_0_0_rgba(255,255,255,0.2)_inset,0_1px_2px_0_rgba(0,0,0,0.05)] hover:shadow-[0_1px_0_0_rgba(255,255,255,0.2)_inset,0_4px_8px_0_rgba(0,0,0,0.1)] active:shadow-[0_0_0_0_rgba(255,255,255,0.2)_inset,0_1px_2px_0_rgba(0,0,0,0.05)_inset] transition-all duration-150 active:translate-y-[1px] border border-blue-700/50"
+                >
+                  <span className="relative" suppressHydrationWarning>
+                    {mounted ? t('home:featured.seeAllWorkers') : 'Browse All Workers'}
+                  </span>
+                  <ArrowRight className="relative w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-150" />
+                </button>
+              </div>
+            </>
           )}
         </div>
       </section>

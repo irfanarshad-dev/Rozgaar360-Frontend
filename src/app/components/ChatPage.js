@@ -91,9 +91,12 @@ function ChatPageInner({ embedded = false }) {
       const defaultCustomer = t('customerLabel');
       const workerName = typeof conv.workerId === 'object' ? conv.workerId?.name || defaultWorker : defaultWorker;
       const customerName = typeof conv.customerId === 'object' ? conv.customerId?.name || defaultCustomer : defaultCustomer;
+      const workerProfilePicture = typeof conv.workerId === 'object' ? conv.workerId?.profilePicture || null : null;
+      const customerProfilePicture = typeof conv.customerId === 'object' ? conv.customerId?.profilePicture || null : null;
 
       const isWorker = workerIdStr === String(currentUserId);
       conv.otherParticipantName = isWorker ? customerName : workerName;
+      conv.otherParticipantProfilePicture = isWorker ? customerProfilePicture : workerProfilePicture;
       conv._id = String(conv._id);
 
       setSelectedConv(conv);
@@ -218,6 +221,7 @@ function ChatPageInner({ embedded = false }) {
             key={selectedConv._id}
             conversationId={selectedConv._id}
             otherUserName={selectedConv.otherParticipantName || t('name')}
+            otherUserProfilePicture={selectedConv.otherParticipantProfilePicture}
             onBack={handleBack}
           />
         ) : (

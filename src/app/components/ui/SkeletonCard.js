@@ -5,25 +5,45 @@
  */
 export function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4">
-      {/* Avatar placeholder */}
-      <div className="w-full aspect-[4/3] rounded-xl skeleton" />
-
-      {/* Name */}
-      <div className="h-4 w-3/4 rounded-lg skeleton" />
-
-      {/* Skill & city */}
-      <div className="h-3 w-1/2 rounded-lg skeleton" />
-
-      {/* Stars */}
-      <div className="flex gap-1 mt-1">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="w-3.5 h-3.5 rounded-sm skeleton" />
-        ))}
+    <div className="bg-white rounded-2xl border border-gray-200 p-5">
+      {/* Header Section */}
+      <div className="flex items-start gap-4 mb-4">
+        {/* Avatar */}
+        <div className="h-14 w-14 rounded-xl skeleton flex-shrink-0" />
+        
+        {/* Name and Skill */}
+        <div className="flex-1 min-w-0 space-y-2">
+          <div className="h-4 w-32 rounded skeleton" />
+          <div className="h-6 w-20 rounded-lg skeleton" />
+        </div>
       </div>
 
-      {/* Button */}
-      <div className="h-10 rounded-xl skeleton mt-auto" />
+      {/* Location */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="h-4 w-4 rounded skeleton" />
+        <div className="h-3 w-24 rounded skeleton" />
+      </div>
+
+      {/* Rating Section */}
+      <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+        <div className="flex gap-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="w-4 h-4 rounded skeleton" />
+          ))}
+        </div>
+        <div className="h-3 w-16 rounded skeleton" />
+      </div>
+
+      {/* Experience Badge */}
+      <div className="mb-4">
+        <div className="h-7 w-32 rounded-lg skeleton" />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-2">
+        <div className="flex-1 h-10 rounded-xl skeleton" />
+        <div className="flex-1 h-10 rounded-xl skeleton" />
+      </div>
     </div>
   );
 }
