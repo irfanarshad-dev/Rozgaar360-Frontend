@@ -166,7 +166,7 @@ function ProfileDropdown({ user, onEditProfile, onLogout, onEditPhoto, onVerify,
   const showVerification = role === 'worker';
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-[100]" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 sm:gap-3 p-1 pr-2 sm:pr-3 rounded-2xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-200 group"
@@ -199,12 +199,12 @@ function ProfileDropdown({ user, onEditProfile, onLogout, onEditPhoto, onVerify,
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+        <div className="fixed inset-0 z-[90]" onClick={() => setIsOpen(false)} />
       )}
       
       {isOpen && (
         <div 
-          className="w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-lg border border-gray-200 bg-white shadow-xl z-50 overflow-hidden"
+          className="w-[calc(100vw-2rem)] max-w-sm sm:w-96 rounded-lg border border-gray-200 bg-white shadow-xl z-[100] overflow-hidden"
           style={{
             position: 'fixed',
             top: '4.5rem',
@@ -532,7 +532,7 @@ export default function DashboardLayout({
       </aside>
 
       <div className={`flex-1 flex flex-col ${isFixedHeight ? 'h-screen' : 'min-h-screen'} ${isRTL ? 'lg:mr-64' : 'lg:ml-64'}`}>
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm pl-4 pr-6 sm:pr-8 h-16 flex items-center justify-between">
+        <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm pl-4 pr-6 sm:pr-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
              <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100" aria-label={t('common:openMenu')}>
                <Menu className="w-5 h-5" />

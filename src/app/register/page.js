@@ -89,6 +89,22 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate location is shared
+    if (selectedRole === ROLES.WORKER) {
+      if (!formData.workerLatitude || !formData.workerLongitude) {
+        setError(t('locationRequired') || 'Please share your location to continue');
+        return;
+      }
+    }
+    
+    if (selectedRole === ROLES.CUSTOMER) {
+      if (!formData.customerLatitude || !formData.customerLongitude) {
+        setError(t('locationRequired') || 'Please share your location to continue');
+        return;
+      }
+    }
+    
     setLoading(true);
     setError('');
     try {
@@ -347,24 +363,36 @@ export default function Register() {
                     </select>
                   </div>
 
-                  <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-3.5">
+                  <div className="rounded-xl border-2 border-blue-200 bg-blue-50 p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div className="w-full">
-                        <p className="text-sm font-semibold text-blue-800">{t('usePreciseMapLocation')}</p>
-                        <p className="text-xs text-blue-700/80 mt-0.5">{t('usePreciseMapLocationDescription')}</p>
+                        <p className="text-sm font-bold text-blue-900 flex items-center gap-1.5">
+                          <MapPin className="w-4 h-4" />
+                          {t('shareYourLocation')} <span className="text-red-600">*</span>
+                        </p>
+                        <p className="text-xs text-blue-700 mt-1">{t('locationRequiredDescription')}</p>
+                        {(selectedRole === ROLES.WORKER && formData.workerLatitude && formData.workerLongitude) || 
+                         (selectedRole === ROLES.CUSTOMER && formData.customerLatitude && formData.customerLongitude) ? (
+                          <p className="text-xs text-emerald-700 font-semibold mt-2 flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                            {t('locationShared')}
+                          </p>
+                        ) : null}
                       </div>
                       <button
                         type="button"
                         onClick={captureCurrentLocation}
                         disabled={locationLoading}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-white hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold px-3 py-2 rounded-lg transition-colors disabled:opacity-70"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-4 py-2.5 rounded-lg transition-colors disabled:opacity-70 shadow-md"
                       >
-                        {locationLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <MapPin className="w-3.5 h-3.5" />}
-                        {locationLoading ? t('detectingLocation') : t('useCurrentLocation')}
+                        {locationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
+                        {locationLoading ? t('detectingLocation') : t('shareLocation')}
                       </button>
                     </div>
                     {locationStatus && (
-                      <p className="mt-2 text-xs text-blue-700 font-medium">{locationStatus}</p>
+                      <p className="mt-3 text-xs text-blue-800 font-medium bg-white/60 px-3 py-2 rounded-lg">{locationStatus}</p>
                     )}
                   </div>
 
@@ -404,7 +432,7 @@ export default function Register() {
                   {selectedRole === ROLES.WORKER && (
                     <>
                       <div className="space-y-1.5">
-                        <label className="text-sm font-semibold text-gray-700">{t('workAddressOptional')}</label>
+                        <label className="text-sm font-semibold text-gray-700">{t('workAddress')}</label>
                         <input
                           name="workerAddress"
                           placeholder={t('streetArea')}

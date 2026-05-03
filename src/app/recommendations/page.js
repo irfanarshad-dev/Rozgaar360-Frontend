@@ -138,7 +138,7 @@ export default function Recommendations() {
     <DashboardLayout role="customer" contentClassName="">
     <div className="min-h-screen bg-gray-50">
       {/* Mobile-Optimized Header */}
-      <div className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
+      <div className="sticky top-0 z-[5] bg-white border-b border-gray-200 shadow-sm">
         <div className="mx-auto max-w-7xl">
           {/* Top Bar - Mobile Optimized */}
           <div className="flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8 sm:py-4">
