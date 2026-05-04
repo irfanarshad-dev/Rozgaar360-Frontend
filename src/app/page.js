@@ -1071,7 +1071,7 @@ export default function Home() {
 
               <div className="mt-5 relative rounded-2xl overflow-hidden border border-white/10 bg-white/5">
                 <video
-                  src="/ad-byRizwan.mp4"
+                  src="/Rozgaar360-ad.mp4"
                   className="w-full h-full aspect-video object-cover"
                   autoPlay
                   muted

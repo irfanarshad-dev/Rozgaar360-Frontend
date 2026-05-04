@@ -110,9 +110,8 @@ export default function ForgotPasswordPage() {
 
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <p className="text-sm text-green-800">
-                ✅ <strong>Email OTP is completely FREE</strong><br />
-                Powered by Nodemailer + Gmail SMTP
-              </p>
+                ✅ <strong>Email OTP is completely Secured</strong><br />
+                </p>
             </div>
           </form>
         )}

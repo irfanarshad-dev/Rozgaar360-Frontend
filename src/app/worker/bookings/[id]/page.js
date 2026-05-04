@@ -303,22 +303,29 @@ export default function WorkerBookingDetails() {
             </CardHeader>
             <CardContent>
               {booking.estimatedCost ? (
-                <div>
-                  <div className="mb-4 text-center">
-                    <div className="text-5xl font-bold text-gray-900">$</div>
-                    <p className="mt-2 text-sm text-gray-600">
-                      {t('worker:bookingDetails.budgetNotSet', { defaultValue: 'Budget not set for this job yet.' })}
-                    </p>
-                    <p className="mt-1 text-xs text-gray-500">
-                      {t('worker:bookingDetails.budgetNotSetHint', { defaultValue: 'The worker will set the amount after reviewing' })}
-                    </p>
+                <div className="space-y-4">
+                  <div className="space-y-2 rounded-lg bg-gray-50 p-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t('worker:bookingDetails.yourEarning')}</span>
+                      <span className="font-bold text-gray-900">{formatCurrency(booking.estimatedCost)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-600">
+                      <span>{t('worker:bookingDetails.platformManagement')}</span>
+                      <span className="font-semibold">{formatCurrency(booking.estimatedCost * 0.15)}</span>
+                    </div>
+                    <div className="h-px bg-gray-200" />
+                    <div className="flex justify-between pt-1">
+                      <span className="text-sm font-bold text-blue-600">{t('worker:bookingDetails.totalPrice')}</span>
+                      <span className="text-xl font-bold text-blue-600">{formatCurrency(booking.estimatedCost * 1.15)}</span>
+                    </div>
                   </div>
                   {booking.status !== 'cancelled' && (
                     <Button 
                       onClick={() => setShowAmountModal(true)} 
-                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      variant="outline"
+                      className="w-full"
                     >
-                      {t('worker:bookingDetails.sendPriceOffer')}
+                      {t('worker:bookingDetails.updatePrice', { defaultValue: 'Update Price' })}
                     </Button>
                   )}
                 </div>

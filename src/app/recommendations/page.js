@@ -30,7 +30,7 @@ export default function Recommendations() {
     setLoading(true);
     const activeFilters = overrideFilters || filtersRef.current;
     
-    const params = {};
+    const params = { limit: 100 };
     if (activeFilters.city) params.city = activeFilters.city;
     if (activeFilters.skill) params.skill = activeFilters.skill;
     if (activeFilters.lat && activeFilters.lng) {
@@ -118,18 +118,19 @@ export default function Recommendations() {
   }, [fetchRecommendations]);
 
   const handleFilterChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+    const newFilters = { ...filters, [e.target.name]: e.target.value };
+    setFilters(newFilters);
   };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     setCurrentPage(1);
-    fetchRecommendations(null, 1);
+    fetchRecommendations(filters, 1);
     setShowFilters(false);
   };
 
   const handlePageChange = (page) => {
-    fetchRecommendations(null, page);
+    fetchRecommendations(filters, page);
   };
 
   const hasActiveFilters = filters.city || filters.skill || filters.search || (filters.lat && filters.lng);
@@ -279,7 +280,9 @@ export default function Recommendations() {
                     <select
                       name="city"
                       value={filters.city}
-                      onChange={handleFilterChange}
+                      onChange={(e) => {
+                        handleFilterChange(e);
+                      }}
                       className="flex-1 border-0 bg-transparent p-0 text-sm text-gray-900 focus:outline-none focus:ring-0"
                     >
                       <option value="">All Cities</option>
@@ -296,7 +299,9 @@ export default function Recommendations() {
                     <select
                       name="skill"
                       value={filters.skill}
-                      onChange={handleFilterChange}
+                      onChange={(e) => {
+                        handleFilterChange(e);
+                      }}
                       className="flex-1 border-0 bg-transparent p-0 text-sm text-gray-900 focus:outline-none focus:ring-0"
                     >
                       <option value="">All Skills</option>
